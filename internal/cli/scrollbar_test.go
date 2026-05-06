@@ -23,10 +23,10 @@ func stripANSI(s string) string {
 }
 
 // hasThumbBg — проверка, что в строке встречается ANSI-код фона thumb
-// (заливка GreenPrimary = #34d399 = 52;211;153). Track использует BorderIdle
+// (заливка AccentPurple = #a78bfa = 167;139;250). Track использует BorderIdle
 // = #1f2937 = 31;41;55, и не должен срабатывать на этот тест.
 func hasThumbBg(line string) bool {
-	return strings.Contains(line, "48;2;52;211;153")
+	return strings.Contains(line, "48;2;167;139;250")
 }
 
 func TestRenderScrollbar_HidesWhenFits(t *testing.T) {

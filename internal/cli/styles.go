@@ -245,10 +245,12 @@ func (s *StyleConfig) ScrollbarTrackStyle() lipgloss.Style {
 		Background(lipgloss.Color(s.BorderIdle))
 }
 
-// ScrollbarThumbStyle — стиль ползунка scrollbar (заливной GreenPrimary, 2 cols).
+// ScrollbarThumbStyle — стиль ползунка scrollbar (заливной AccentPurple, 2 cols).
+// Фиолетовый в тон рамке content-блока: «фиолетовый = навигация/позиция».
+// NeonGreen остаётся за действиями (left-bracket, CTA).
 func (s *StyleConfig) ScrollbarThumbStyle() lipgloss.Style {
 	return lipgloss.NewStyle().
-		Background(lipgloss.Color(s.GreenPrimary))
+		Background(lipgloss.Color(s.AccentPurple))
 }
 
 // ScrollbarWidth — ширина scrollbar в колонках. Используется и в рендере,
