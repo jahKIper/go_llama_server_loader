@@ -80,6 +80,12 @@ func (f *filterInput) Text() string {
 	return f.text
 }
 
+// Clear сбрасывает текст и позицию курсора. Состояние visibility/state не трогается.
+func (f *filterInput) Clear() {
+	f.text = ""
+	f.cursor = 0
+}
+
 // HandleKey обрабатывает нажатия клавиш в поле ввода фильтра.
 // UTF-8 safe: cursor работает на rune-границах.
 func (f *filterInput) HandleKey(key string) tea.Cmd {

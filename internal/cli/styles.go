@@ -110,11 +110,13 @@ func (s *StyleConfig) TabSeparatorStyle() lipgloss.Style {
 
 // === Content block ===
 
-// ContentBlockStyle — неоновая rounded рамка content-блока + BgPanel внутри.
+// ContentBlockStyle — rounded рамка content-блока (AccentPurple) + BgPanel внутри.
+// Фиолетовая рамка связывает контейнер с dot-индикатором selected (тоже AccentPurple),
+// зелёный остаётся за «действия» — CTA, left-bracket, scrollbar thumb.
 func (s *StyleConfig) ContentBlockStyle() lipgloss.Style {
 	return lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder(), true, true, true, true).
-		BorderForeground(lipgloss.Color(s.NeonGreen)).
+		BorderForeground(lipgloss.Color(s.AccentPurple)).
 		BorderBackground(lipgloss.Color(s.BgPanel)).
 		Padding(1, 2).
 		Background(lipgloss.Color(s.BgPanel))

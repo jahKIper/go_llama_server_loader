@@ -48,41 +48,54 @@ func (h *HelpPopup) Render(screenWidth, screenHeight int) string {
 		popupW = 80
 	}
 
-	// Заголовок
-	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(st.GreenPrimary))
-	title := titleStyle.Render("Справка")
-
-	// Строки биндингов
-	keyStyle := lipgloss.NewStyle().
-		Bold(true).
-		Foreground(lipgloss.Color(st.KeyHint)).
-		Width(14)
-	descStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(st.TextSecondary))
-
-	rows := make([]string, 0, len(helpBindings)+3)
-	rows = append(rows, title, "")
-	for _, b := range helpBindings {
-		row := lipgloss.JoinHorizontal(lipgloss.Top,
-			keyStyle.Render(b.key),
-			descStyle.Render(b.desc),
-		)
-		rows = append(rows, row)
-	}
-
-	// Footer popup
-	closeHint := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(st.TextMuted)).
-		Render("Esc или ? — закрыть")
-	rows = append(rows, "", closeHint)
-
-	body := lipgloss.JoinVertical(lipgloss.Left, rows...)
-
-	// Оборачиваем в HelpPopupStyle
+	// innerW — ширина области внутри border+padding HelpPopupStyle,
+	// которую заполняют наши rowFill-обёртки.
 	innerW := popupW - st.HelpPopupStyle().GetHorizontalFrameSize()
 	if innerW < 10 {
 		innerW = 10
 	}
+
+	// rowFill — фон BgPanel + Width=innerW. Каждый видимый rows-сегмент
+	// оборачиваем им, чтобы добить пустоту справа фоном popup'а
+	// (lipgloss v2 теряет родительский bg после inner ANSI-reset).
+	rowFill := lipgloss.NewStyle().
+		Background(lipgloss.Color(st.BgPanel)).
+		Width(innerW)
+
+	titleStyle := lipgloss.NewStyle().
+		Bold(true).
+		Background(lipgloss.Color(st.BgPanel)).
+		Foreground(lipgloss.Color(st.GreenPrimary))
+
+	keyStyle := lipgloss.NewStyle().
+		Bold(true).
+		Background(lipgloss.Color(st.BgPanel)).
+		Foreground(lipgloss.Color(st.KeyHint)).
+		Width(14)
+
+	descStyle := lipgloss.NewStyle().
+		Background(lipgloss.Color(st.BgPanel)).
+		Foreground(lipgloss.Color(st.TextSecondary))
+
+	closeStyle := lipgloss.NewStyle().
+		Background(lipgloss.Color(st.BgPanel)).
+		Foreground(lipgloss.Color(st.TextMuted))
+
+	empty := rowFill.Render("")
+
+	rows := make([]string, 0, len(helpBindings)+4)
+	rows = append(rows, rowFill.Render(titleStyle.Render("Справка")), empty)
+	for _, b := range helpBindings {
+		inline := lipgloss.JoinHorizontal(lipgloss.Top,
+			keyStyle.Render(b.key),
+			descStyle.Render(b.desc),
+		)
+		rows = append(rows, rowFill.Render(inline))
+	}
+	rows = append(rows, empty, rowFill.Render(closeStyle.Render("Esc или ? — закрыть")))
+
+	body := lipgloss.JoinVertical(lipgloss.Left, rows...)
+
 	popup := st.HelpPopupStyle().Width(innerW).Render(body)
 
 	// Центрируем на экране. BackgroundColor задаётся в View() через v.BackgroundColor,

@@ -499,6 +499,12 @@ func NewApp(models []*modelscan.Model) *App {
 	l.SetShowHelp(false)       // встроенный help отключён — используем кастомный Footer
 	l.SetShowPagination(false) // pagination dots не нужны — список со скроллом
 	l.SetShowTitle(false)      // встроенный title тоже не нужен (есть свой Header)
+	// «No items.» (пустой результат фильтра) — на фоне BgPanel, чтобы
+	// не светил терминальный bg.
+	l.Styles.NoItems = lipgloss.NewStyle().
+		Background(lipgloss.Color(st.BgPanel)).
+		Foreground(lipgloss.Color(st.TextMuted)).
+		Padding(0, 0, 0, 2)
 
 	return &App{
 		list:        l,
@@ -564,6 +570,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			if a.filterState != FilterIdle {
 				a.filterInput.Toggle()
+				a.filterInput.Clear()
 				a.filterState = FilterIdle
 				a.filterText = ""
 				setListItems(a, a.allModels)
@@ -771,12 +778,20 @@ func (a *App) View() tea.View {
 	filterRow := a.filterInput.Render(contentInnerW)
 
 	// Scrollbar параметры (плавный offset по курсору)
-	_, listH := a.list.Width(), a.list.Height()
+	listW, listH := a.list.Width(), a.list.Height()
 	sbOffset, sbVisible, sbTotal := a.scrollbarParams()
 	scrollbar := RenderScrollbar(sbOffset, sbVisible, sbTotal, listH, a.styles)
 
+	// Заливаем list-вьюху BgPanel: при пустом списке («No items.») и для
+	// неиспользованного хвоста, чтобы терминальный фон не просвечивал.
+	listView := lipgloss.NewStyle().
+		Background(lipgloss.Color(a.styles.BgPanel)).
+		Width(listW).
+		Height(listH).
+		Render(a.list.View())
+
 	listWithScrollbar := lipgloss.JoinHorizontal(lipgloss.Top,
-		a.list.View(),
+		listView,
 		scrollbar,
 	)
 
