@@ -107,26 +107,27 @@ func renderSelected(model *modelscan.Model, dot, quant string, itemWidth int, st
 		Background(lipgloss.Color(st.BgSelected)).
 		Foreground(lipgloss.Color(st.TextPrimary)).
 		Render(" " + model.Name)
-	nameLine := rowFill.Render(lipgloss.JoinHorizontal(lipgloss.Top, dot, nameRest))
+	metaBracket := formatMetaBracket(model, st, st.BgSelected)
+	nameSpacerW := innerW - lipgloss.Width(dot) - lipgloss.Width(nameRest) - lipgloss.Width(metaBracket)
+	if nameSpacerW < 1 {
+		nameSpacerW = 1
+	}
+	nameSpacer := lipgloss.NewStyle().Background(lipgloss.Color(st.BgSelected)).Render(strings.Repeat(" ", nameSpacerW))
+	nameLine := rowFill.Render(lipgloss.JoinHorizontal(lipgloss.Top, dot, nameRest, nameSpacer, metaBracket))
 
 	pathStr := truncatePathLeft(model.Path, itemWidth-4)
 	pathLine := rowFill.
-		Foreground(lipgloss.Color(st.TextSecondary)).
-		Render("  " + pathStr)
-
-	metaLine := rowFill.
-		PaddingLeft(2).
 		Foreground(lipgloss.Color(st.TextMuted)).
-		Render(formatMetaLine(model, st, st.BgSelected))
+		Render("  " + pathStr)
 
 	badgeBlock := rowFill.
 		PaddingLeft(2).
 		Render(formatMetadataBadgesSelected(model, st))
 
 	// Пустые строки сверху и снизу — компенсируют отсутствие top/bottom border'а,
-	// чтобы суммарная высота selected = 8 (как у normal) и список не прыгал.
+	// суммарная высота selected = 7 (как у normal) и список не прыгает.
 	empty := rowFill.Render("")
-	content := lipgloss.JoinVertical(lipgloss.Left, empty, nameLine, pathLine, metaLine, badgeBlock, empty)
+	content := lipgloss.JoinVertical(lipgloss.Left, empty, nameLine, pathLine, badgeBlock, empty)
 
 	// Левая полоса NeonGreen, BgSelected — рамка только слева.
 	// lipgloss v2 .Width() — total width: задаём itemWidth, чтобы занять всю ширину item'а.
@@ -149,32 +150,34 @@ func renderNormal(model *modelscan.Model, dot, quant string, itemWidth int, st *
 		Background(lipgloss.Color(st.DarkBg)).
 		Width(itemWidth)
 
-	// nameLine: левый padding (2) + dot + " " + имя — каждый кусок отстайлен.
+	// nameLine: левый padding (2) + dot + " " + имя + [ мета ] — каждый кусок отстайлен.
 	leftPad2 := lipgloss.NewStyle().
 		Background(lipgloss.Color(st.DarkBg)).
 		Render("  ")
 	nameRest := lipgloss.NewStyle().
+		Bold(true).
 		Background(lipgloss.Color(st.DarkBg)).
 		Foreground(lipgloss.Color(st.TextPrimary)).
 		Render(" " + model.Name)
-	nameLine := rowFill.Render(lipgloss.JoinHorizontal(lipgloss.Top, leftPad2, dot, nameRest))
+	metaBracket := formatMetaBracket(model, st, st.DarkBg)
+	nameSpacerW := itemWidth - lipgloss.Width(leftPad2) - lipgloss.Width(dot) - lipgloss.Width(nameRest) - lipgloss.Width(metaBracket)
+	if nameSpacerW < 1 {
+		nameSpacerW = 1
+	}
+	nameSpacer := lipgloss.NewStyle().Background(lipgloss.Color(st.DarkBg)).Render(strings.Repeat(" ", nameSpacerW))
+	nameLine := rowFill.Render(lipgloss.JoinHorizontal(lipgloss.Top, leftPad2, dot, nameRest, nameSpacer, metaBracket))
 
 	pathStr := truncatePathLeft(model.Path, itemWidth-4)
 	pathLine := rowFill.
 		PaddingLeft(2).
-		Foreground(lipgloss.Color(st.TextSecondary)).
-		Render("  " + pathStr)
-
-	metaLine := rowFill.
-		PaddingLeft(4).
 		Foreground(lipgloss.Color(st.TextMuted)).
-		Render(formatMetaLine(model, st, st.DarkBg))
+		Render("  " + pathStr)
 
 	badgeBlock := rowFill.
 		PaddingLeft(4).
 		Render(formatMetadataBadges(model, st))
 
-	content := lipgloss.JoinVertical(lipgloss.Left, nameLine, pathLine, metaLine, badgeBlock)
+	content := lipgloss.JoinVertical(lipgloss.Left, nameLine, pathLine, badgeBlock)
 
 	// Пустые строки сверху и снизу для стабильной высоты = 8 строк.
 	empty := rowFill.Render("")
@@ -223,6 +226,36 @@ func truncatePathLeft(path string, maxLen int) string {
 	}
 	suffix := string(runes[len(runes)-maxLen+3:])
 	return "..." + suffix
+}
+
+// formatMetaBracket возвращает « [ GGUF · Q6_K · 5.8GB · mmproj ]» для вставки
+// в строку имени модели. Текст и скобки — TextMuted, разделители — TextSecondary.
+func formatMetaBracket(m *modelscan.Model, st *StyleConfig, parentBg string) string {
+	if st == nil {
+		return ""
+	}
+	mutedStyle := lipgloss.NewStyle().
+		Background(lipgloss.Color(parentBg)).
+		Foreground(lipgloss.Color(st.TextMuted))
+	sepStyle := lipgloss.NewStyle().
+		Background(lipgloss.Color(parentBg)).
+		Foreground(lipgloss.Color(st.TextSecondary))
+
+	parts := []string{"GGUF", extractQuantization(m.Name), formatSize(m.Size)}
+	if len(m.MMProjPaths) > 0 {
+		parts = append(parts, "mmproj")
+	}
+
+	pieces := make([]string, 0, len(parts)*2+1)
+	pieces = append(pieces, mutedStyle.Render(" [ "))
+	for i, p := range parts {
+		if i > 0 {
+			pieces = append(pieces, sepStyle.Render(" · "))
+		}
+		pieces = append(pieces, mutedStyle.Render(p))
+	}
+	pieces = append(pieces, mutedStyle.Render(" ]"))
+	return lipgloss.JoinHorizontal(lipgloss.Top, pieces...)
 }
 
 // formatMetaLine формирует одну строку «meta» под path в карточке модели:
@@ -337,8 +370,8 @@ type StyledDelegate struct {
 }
 
 func (d *StyledDelegate) Height() int {
-	// border-top/empty(1) + name(1) + path(1) + meta(1) + badges(3) + border-bottom/empty(1) = 8
-	return 8
+	// empty(1) + name+meta(1) + path(1) + badges(3) + empty(1) = 7
+	return 7
 }
 
 func (d *StyledDelegate) Spacing() int {

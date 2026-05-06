@@ -10,6 +10,7 @@
 /bin/
 /build/
 /dist/
+llama-server-loader
 
 # Hidden files and directories
 .*
@@ -21,4 +22,4 @@
 
 # Plans directory
 plans/
-llama-server-loader
+
