@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Llama Server Loader</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>&#129423; Llama Server Loader</h1>
+            <p class="subtitle">Model selection and server management</p>
+        </header>
+
+        <main>
+            <!-- Models Section -->
+            <section id="models-section" class="card">
+                <div class="card-header">
+                    <h2>Select Model</h2>
+                    <button id="scan-btn" class="btn btn-primary">&#8635; Scan</button>
+                </div>
+                <div id="models-list" class="model-list">
+                    <p class="placeholder">Click "Scan" to find available models</p>
+                </div>
+            </section>
+
+            <!-- Model Details Section -->
+            <section id="details-section" class="card hidden">
+                <div class="card-header">
+                    <h2>Model Configuration</h2>
+                </div>
+                <div class="form-grid">
+                    <label>
+                        Threads:
+                        <input type="number" id="threads" value="4" min="1" max="64">
+                    </label>
+                    <label>
+                        Temperature:
+                        <input type="number" id="temperature" value="0.8" step="0.1" min="0" max="2">
+                    </label>
+                    <label>
+                        Port:
+                        <input type="number" id="port" value="8080" min="1" max="65535">
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="mmproj-on"> Enable MMProj
+                    </label>
+                </div>
+            </section>
+
+            <!-- Server Status Section -->
+            <section id="status-section" class="card hidden">
+                <div class="card-header">
+                    <h2>Server Status</h2>
+                </div>
+                <div id="server-status" class="status-indicator idle">Idle</div>
+                <pre id="server-log" class="log-area"></pre>
+            </section>
+
+            <!-- Actions -->
+            <section id="actions-section" class="card hidden">
+                <button id="start-btn" class="btn btn-success">&#9654; Start Server</button>
+                <button id="stop-btn" class="btn btn-danger hidden">&#9726; Stop Server</button>
+            </section>
+        </main>
+
+        <footer>
+            <p>Llama Server Loader &mdash; Embedded Web UI</p>
+        </footer>
+    </div>
+
+    <script src="/app.js"></script>
+</body>
+</html>

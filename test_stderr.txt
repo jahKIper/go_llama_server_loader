@@ -1,0 +1,3 @@
+main: 2026/05/05 21:07:40 main.go:109: Сканирование каталога: .\testdata\models
+main: 2026/05/05 21:07:40 cli.go:272: Found 6 models and 1 mmproj files
+[48;2;10;15;24m

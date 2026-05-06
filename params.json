@@ -1,0 +1,6 @@
+{
+  "output_file": "params.json",
+  "generated_at": "TODO_TIMESTAMP",
+  "default_threads": 0,
+  "default_temperature": 0.80
+}
