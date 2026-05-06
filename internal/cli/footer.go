@@ -8,30 +8,35 @@ import (
 
 // HelpRow представляет одну строку подсказок в футере.
 type HelpRow struct {
-	Keys  string // Например "↑↓"
-	Label string // Например "навигация"
+	Keys  string
+	Label string
 }
 
-// Footer отвечает за рендеринг подсказок клавиш в подвале приложения.
-// Поддерживает два режима: compact (одна строка) и expanded (две строки)
-// — переключение по клавише "?".
+// Footer — минималистичный однострочный footer с двумя группами биндингов.
+// Левая группа (навигация, фильтр, помощь) + правая (выход) — разделены spacer-ом.
 type Footer struct {
-	compactRows []HelpRow // всегда видны
-	extraRows   []HelpRow // видны только в expanded
-	expanded    bool
-	styles      *StyleConfig
-	width       int
+	leftRows  []HelpRow
+	rightRows []HelpRow
+	// Backward-compat поля: expanded/extraRows оставлены но игнорируются.
+	// Удаляются в шаге 4 вместе с cli.go.
+	expanded  bool
+	extraRows []HelpRow
+	styles    *StyleConfig
+	width     int
 }
 
-// NewFooter создает новый Footer с дефолтными подсказками.
+// NewFooter создаёт Footer с дефолтными биндингами.
 func NewFooter(styles *StyleConfig) *Footer {
 	return &Footer{
-		compactRows: []HelpRow{
+		leftRows: []HelpRow{
 			{Keys: "↑↓", Label: "навигация"},
 			{Keys: "Enter", Label: "выбор"},
 			{Keys: "/", Label: "фильтр"},
-			{Keys: "q", Label: "выход"},
 			{Keys: "?", Label: "помощь"},
+			{Keys: "Tab", Label: "таб"},
+		},
+		rightRows: []HelpRow{
+			{Keys: "^q", Label: "выход"},
 		},
 		extraRows: []HelpRow{
 			{Keys: "→/PgDn", Label: "вперёд"},
@@ -48,71 +53,75 @@ func (f *Footer) SetWidth(w int) {
 	f.width = w
 }
 
-// SetExpanded переключает развёрнутый режим (показ extraRows).
-// В compact метка кнопки "?" — "помощь", в expanded — "скрыть".
+// SetExpanded — no-op stub для обратной совместимости с cli.go (шаг 4 удалит).
 func (f *Footer) SetExpanded(v bool) {
 	f.expanded = v
-	for i := range f.compactRows {
-		if f.compactRows[i].Keys == "?" {
-			if v {
-				f.compactRows[i].Label = "скрыть"
-			} else {
-				f.compactRows[i].Label = "помощь"
-			}
-			break
-		}
-	}
 }
 
-// Render рендерит футер. В expanded режиме два ряда подсказок.
+// Render рендерит однострочный футер: левая группа + spacer + правая группа.
 func (f *Footer) Render() string {
 	if f.styles == nil {
 		return f.renderFallback()
 	}
 
-	line1 := f.renderLine(f.compactRows)
-	if !f.expanded {
-		return f.applyContainer(line1)
-	}
+	leftStr := f.renderGroup(f.leftRows)
+	rightStr := f.renderGroup(f.rightRows)
 
-	line2 := f.renderLine(f.extraRows)
-	combined := lipgloss.JoinVertical(lipgloss.Center, line1, line2)
-	return f.applyContainer(combined)
+	leftW := lipgloss.Width(leftStr)
+	rightW := lipgloss.Width(rightStr)
+
+	// Inner width — без padding контейнера; spacer должен заполнять только эту область.
+	innerW := f.width - f.styles.FooterContainerStyle().GetHorizontalFrameSize()
+	if innerW < 1 {
+		innerW = 1
+	}
+	spacerW := innerW - leftW - rightW
+	if spacerW < 1 {
+		spacerW = 1
+	}
+	spacer := lipgloss.NewStyle().
+		Background(lipgloss.Color(f.styles.DarkBg)).
+		Render(strings.Repeat(" ", spacerW))
+
+	line := lipgloss.JoinHorizontal(lipgloss.Top, leftStr, spacer, rightStr)
+	return f.applyContainer(line)
 }
 
-// applyContainer оборачивает контент в FooterContainerStyle с учётом ширины.
+// renderGroup склеивает группу биндингов через FooterSeparatorStyle.
+func (f *Footer) renderGroup(rows []HelpRow) string {
+	sep := f.styles.FooterSeparatorStyle().Render(" │ ")
+	parts := make([]string, 0, len(rows)*2-1)
+	for i, row := range rows {
+		if i > 0 {
+			parts = append(parts, sep)
+		}
+		parts = append(parts, f.renderRow(row))
+	}
+	return lipgloss.JoinHorizontal(lipgloss.Top, parts...)
+}
+
+// renderRow рендерит одну пару key + label.
+func (f *Footer) renderRow(row HelpRow) string {
+	key := f.styles.FooterKeyStyle().Render(row.Keys)
+	label := f.styles.FooterLabelStyle().Render(" " + row.Label)
+	return lipgloss.JoinHorizontal(lipgloss.Top, key, label)
+}
+
+// applyContainer оборачивает контент в FooterContainerStyle.
+// lipgloss v2 .Width() — total width, поэтому передаём f.width напрямую.
 func (f *Footer) applyContainer(content string) string {
 	style := f.styles.FooterContainerStyle()
 	if f.width > 0 {
-		style = style.Width(f.width).Align(lipgloss.Center)
+		style = style.Width(f.width)
 	}
 	return style.Render(content)
 }
 
-// renderLine склеивает ряд подсказок через разделитель "│".
-func (f *Footer) renderLine(rows []HelpRow) string {
-	var parts []string
-	for _, row := range rows {
-		parts = append(parts, f.renderRow(row))
-	}
-	return strings.Join(parts, "  │  ")
-}
-
-// renderRow рендерит одну пару key+label.
-func (f *Footer) renderRow(row HelpRow) string {
-	keyStyle := f.styles.VersionBadgeStyle()
-	labelStyle := f.styles.CountLabelStyle()
-	return keyStyle.Render(row.Keys) + " " + labelStyle.Render(row.Label)
-}
-
-// renderFallback рендерит футер без стилей (для nil styles).
+// renderFallback рендерит футер без стилей.
 func (f *Footer) renderFallback() string {
-	rows := f.compactRows
-	if f.expanded {
-		rows = append(rows, f.extraRows...)
-	}
-	var parts []string
-	for _, row := range rows {
+	all := append(f.leftRows, f.rightRows...)
+	parts := make([]string, 0, len(all))
+	for _, row := range all {
 		parts = append(parts, row.Keys+" "+row.Label)
 	}
 	return strings.Join(parts, " │ ")
@@ -122,9 +131,9 @@ func (f *Footer) renderFallback() string {
 // Header рендеринг
 // ============================================================================
 
-// RenderHeader рендерит шапку приложения: бейдж версии слева, title по центру строки.
-// width — полная ширина терминала (для расчёта центровки).
-func RenderHeader(title, version string, styles *StyleConfig, width int) string {
+// RenderHeader рендерит шапку: version-бейдж слева, title по центру, tabs справа.
+// Если tabsStr пуст — сохраняется старое поведение (симметричный отступ справа).
+func RenderHeader(title, version string, styles *StyleConfig, width int, tabsStr ...string) string {
 	if styles == nil {
 		return title
 	}
@@ -132,10 +141,15 @@ func RenderHeader(title, version string, styles *StyleConfig, width int) string 
 	versionBadge := styles.VersionBadgeStyle().Render("v" + version)
 	badgeW := lipgloss.Width(versionBadge)
 
-	// Title центрирован относительно полной ширины. Чтобы визуальный центр
-	// совпал с центром экрана, занимаем всю оставшуюся ширину после бейджа
-	// и центрируем title внутри. Резерв справа = badgeW для симметрии.
-	available := width - badgeW*2
+	tabs := ""
+	tabsW := 0
+	if len(tabsStr) > 0 && tabsStr[0] != "" {
+		tabs = tabsStr[0]
+		tabsW = lipgloss.Width(tabs)
+	}
+
+	// Title занимает пространство между бейджем и табами.
+	available := width - badgeW - tabsW
 	if available < 1 {
 		return versionBadge + "  " + styles.TitleStyle().Render(title)
 	}
@@ -144,5 +158,8 @@ func RenderHeader(title, version string, styles *StyleConfig, width int) string 
 		Align(lipgloss.Center).
 		Render(title)
 
+	if tabs != "" {
+		return lipgloss.JoinHorizontal(lipgloss.Top, versionBadge, titleCentered, tabs)
+	}
 	return lipgloss.JoinHorizontal(lipgloss.Top, versionBadge, titleCentered)
 }

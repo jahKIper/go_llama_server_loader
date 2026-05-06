@@ -469,6 +469,8 @@ type App struct {
 	styles       *StyleConfig
 	dims         *Dimensions
 	footer       *Footer
+	tabs         *TabBar
+	helpPopup    *HelpPopup
 	helpExpanded bool // toggled by "?"
 }
 
@@ -502,6 +504,8 @@ func NewApp(models []*modelscan.Model) *App {
 		footer:      NewFooter(st),
 		filterInput: newFilterInput(st),
 		filterState: FilterIdle,
+		tabs:        NewTabBar(st),
+		helpPopup:   NewHelpPopup(st),
 	}
 }
 
@@ -525,6 +529,9 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c":
 			return a, tea.Quit
 
+		case "ctrl+q":
+			return a, tea.Quit
+
 		case "q":
 			// q — выход только вне режима фильтра. В фильтре "q" — обычный символ.
 			if a.filterState == FilterIdle {
@@ -542,8 +549,13 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case "esc":
+			// Esc-иерархия: popup → filter → no-op
+			if a.helpExpanded {
+				a.helpExpanded = false
+				return a, nil
+			}
 			if a.filterState != FilterIdle {
-				a.filterInput.Toggle() // → FilterIdle, очищает text/cursor
+				a.filterInput.Toggle()
 				a.filterState = FilterIdle
 				a.filterText = ""
 				setListItems(a, a.allModels)
@@ -553,10 +565,9 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "/":
 			if a.filterState == FilterIdle {
-				a.filterInput.Toggle() // → FilterActive
+				a.filterInput.Toggle()
 				a.filterState = FilterActive
 			} else {
-				// В режиме фильтра "/" — обычный символ
 				a.filterInput.HandleKey("/")
 				a.filterText = a.filterInput.Text()
 				a.applyFilter()
@@ -564,19 +575,42 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return a, nil
 
 		case "?":
-			// Toggle expanded help только в Idle. В режиме фильтра "?"
-			// — обычный символ для ввода.
 			if a.filterState == FilterIdle {
 				a.helpExpanded = !a.helpExpanded
-				a.footer.SetExpanded(a.helpExpanded)
-				a.recomputeListSize()
+				return a, nil
+			}
+			// В режиме фильтра "?" — обычный символ
+			a.filterInput.HandleKey("?")
+			a.filterText = a.filterInput.Text()
+			a.applyFilter()
+			return a, nil
+
+		case "1", "2", "3":
+			if a.filterState == FilterIdle {
+				idx := int(msg.String()[0]-'1')
+				a.tabs.SetActive(idx)
+				return a, nil
+			}
+			a.filterInput.HandleKey(msg.String())
+			a.filterText = a.filterInput.Text()
+			a.applyFilter()
+			return a, nil
+
+		case "tab":
+			if a.filterState == FilterIdle {
+				a.tabs.Next()
+				return a, nil
+			}
+
+		case "shift+tab":
+			if a.filterState == FilterIdle {
+				a.tabs.Prev()
 				return a, nil
 			}
 
 		default:
 			keyStr := msg.String()
 			if a.filterState == FilterActive || a.filterState == Filtering {
-				// ↑↓ передаём в список для навигации по отфильтрованным результатам
 				if keyStr == "up" || keyStr == "down" {
 					break
 				}
@@ -593,14 +627,12 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return a, cmd
 }
 
-// recomputeListSize пересчитывает размер списка по текущим width/height и состоянию help.
-// Вызывается при WindowSizeMsg и при toggle expanded help.
+// recomputeListSize пересчитывает размер списка по текущим width/height.
 func (a *App) recomputeListSize() {
 	if a.width == 0 || a.height == 0 {
 		return
 	}
 
-	// Пропорции по высоте: 10% header / 80% content / 10% footer (схема §1).
 	headerH := a.height * 10 / 100
 	footerH := a.height * 10 / 100
 	if headerH < 1 {
@@ -609,22 +641,19 @@ func (a *App) recomputeListSize() {
 	if footerH < 1 {
 		footerH = 1
 	}
-	// Expanded help добавляет 1 строку к footer.
-	if a.helpExpanded {
-		footerH++
-	}
 	contentH := a.height - headerH - footerH
 
 	contentStyle := a.styles.ContentBlockStyle()
-	listW := a.width - contentStyle.GetHorizontalFrameSize()
-	// Внутри блока: filterRow(1) + countLabel(1) + list
-	listH := contentH - contentStyle.GetVerticalFrameSize() - 2
+	// -1 под scrollbar справа
+	listW := a.width - contentStyle.GetHorizontalFrameSize() - 1
+	// filterRow (3 строки с рамкой) + padding внутри блока
+	listH := contentH - contentStyle.GetVerticalFrameSize() - 3
 
 	if listW < 10 {
 		listW = 10
 	}
-	if listH < 3 {
-		listH = 3
+	if listH < 7 {
+		listH = 7
 	}
 	a.list.SetSize(listW, listH)
 }
@@ -652,7 +681,7 @@ func setListItems(a *App, models []*modelscan.Model) {
 	a.list.SetItems(items)
 }
 
-// View implements tea.Model interface — 3-блочная раскладка по схеме §2.
+// View implements tea.Model interface — 3-блочная раскладка.
 func (a *App) View() tea.View {
 	// Guard: первый рендер до WindowSizeMsg
 	if a.width == 0 {
@@ -661,37 +690,64 @@ func (a *App) View() tea.View {
 		return v
 	}
 
-	// ── Block 1: Header (100% ширины, version слева, title по центру) ──────
-	header := a.styles.HeaderBlockStyle().
-		Width(a.width).
-		Render(RenderHeader(a.title, a.version, a.styles, a.width))
-
-	// ── Block 2: Content — единый контейнер (filter+count+list внутри одной рамки)
-	var filterRow string
-	switch a.filterState {
-	case FilterIdle:
-		filterRow = a.filterInput.RenderFilterBadge()
-	default:
-		filterRow = a.filterInput.RenderFilterInput()
+	// ── Help popup (полноэкранный, early return) ──────────────────────────
+	if a.helpExpanded {
+		screen := a.helpPopup.Render(a.width, a.height)
+		v := tea.NewView(screen)
+		v.AltScreen = true
+		v.BackgroundColor = lipgloss.Color(a.styles.DarkBg)
+		return v
 	}
 
-	countLabel := a.styles.CountLabelStyle().Render(
-		fmt.Sprintf("Показано: %d / Всего: %d", a.countShown, a.countTotal),
+	// ── Block 1: Header (version слева, title по центру, tabs справа) ─────
+	// lipgloss v2 .Width() задаёт total width; рендер в inner-area идёт на (a.width - frame).
+	headerStyle := a.styles.HeaderBlockStyle()
+	headerInnerW := a.width - headerStyle.GetHorizontalFrameSize()
+	if headerInnerW < 1 {
+		headerInnerW = 1
+	}
+	header := headerStyle.
+		Width(a.width).
+		Render(RenderHeader(a.title, a.version, a.styles, headerInnerW, a.tabs.Render()))
+
+	// ── Block 2: Content ──────────────────────────────────────────────────
+	// lipgloss v2 .Width() — total width. Content-блок занимает всю ширину терминала;
+	// inner area внутри = a.width - frame, и именно её занимает filterRow.
+	contentStyle := a.styles.ContentBlockStyle()
+	blockW := a.width - contentStyle.GetHorizontalFrameSize()
+
+	// Фильтр — всегда виден (idle или active). Передаём inner-area;
+	// filterInput сам вызовет .Width(blockW) (total width = blockW).
+	filterRow := a.filterInput.Render(blockW)
+
+	// Scrollbar параметры
+	total := len(a.list.Items())
+	visible := a.list.Paginator.PerPage
+	offset := a.list.Paginator.Page * a.list.Paginator.PerPage
+	_, listH := a.list.Width(), a.list.Height()
+
+	scrollbar := RenderScrollbar(offset, visible, total, listH, a.styles)
+
+	listWithScrollbar := lipgloss.JoinHorizontal(lipgloss.Top,
+		a.list.View(),
+		scrollbar,
 	)
 
 	innerContent := lipgloss.JoinVertical(lipgloss.Left,
 		filterRow,
-		countLabel,
-		a.list.View(),
+		listWithScrollbar,
 	)
-	content := a.styles.ContentBlockStyle().
-		Width(a.width - a.styles.ContentBlockStyle().GetHorizontalFrameSize()).
-		Render(innerContent)
 
-	// ── Block 3: Footer (100% ширины) ──────────────────────────────────────
+	rawContent := contentStyle.Width(a.width).Render(innerContent)
+
+	// Инжектируем счётчик в верхнюю границу content-блока
+	counter := fmt.Sprintf("%d / %d", a.countShown, a.countTotal)
+	content := InjectBorderTitle(rawContent, "Список моделей", counter)
+
+	// ── Block 3: Footer ───────────────────────────────────────────────────
 	footerLine := a.footer.Render()
 
-	// ── Сборка экрана ────────────────────────────────────────────────────────
+	// ── Сборка экрана ────────────────────────────────────────────────────
 	screen := lipgloss.JoinVertical(lipgloss.Left,
 		header,
 		content,
@@ -700,7 +756,7 @@ func (a *App) View() tea.View {
 
 	v := tea.NewView(screen)
 	v.AltScreen = true
-	v.BackgroundColor = lipgloss.Color(a.styles.DarkBg) // #0a0f18 перекрывает прозрачность PowerShell
+	v.BackgroundColor = lipgloss.Color(a.styles.DarkBg)
 	return v
 }
 

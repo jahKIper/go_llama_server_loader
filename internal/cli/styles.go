@@ -2,85 +2,65 @@ package cli
 
 import "charm.land/lipgloss/v2"
 
-// StyleConfig определяет цветовую схему TUI интерфейса.
-// Цвета выбраны согласно WCAG AA требованиям доступности (контраст ≥ 4.5:1).
+// === Palette ===
+
+// StyleConfig определяет цветовую схему TUI интерфейса (WCAG AA ≥ 4.5:1).
 type StyleConfig struct {
-	GreenDark     string // #064e3b - темный зеленый (текст на зеленом фоне)
-	GreenPrimary  string // #34d399 - основной зеленый (CTA кнопки, активные элементы)
-	GreenBright   string // #4ade80 - яркий зеленый (границы, акценты, hover-эффекты)
-	TextPrimary   string // #ffffff - чистый белый для максимального контраста на темном фоне
-	TextSecondary string // #e2e8f0 - светло-серый для вторичного текста (контраст 13.8:1 на DarkBg)
-	// Новые цвета для темного фона интерфейса
-	DarkBg        string // #0a0f18 - темный фон интерфейса
-	ListBorder    string // #4ade80 - яркая граница блока списка (контраст 5.2:1)
+	// Existing palette — сохранены
+	GreenDark     string // #064e3b — тёмный зелёный (текст на зелёном фоне)
+	GreenPrimary  string // #34d399 — статичные акценты: active tab, version badge, halo
+	TextPrimary   string // #ffffff — чистый белый
+	TextSecondary string // #e2e8f0 — светло-серый вторичный текст
+	DarkBg        string // #0a0f18 — экран и футер
+
+	// New palette tokens
+	BgPanel    string // #0d1320 — интерьер content-блока, активного фильтра
+	BgSelected string // #1a2e25 — заливка выбранной строки (зелёный тинт)
+	BorderIdle string // #1f2937 — рамки неактивных элементов, scrollbar track
+	NeonGreen  string // #50fa7b — активность/фокус: рамки, cursor, scrollbar thumb
+	TextMuted  string // #94a3b8 — placeholder, label хоткеев, disabled tab
+	KeyHint    string // #6ee7b7 — клавиши в футере
 }
 
-// GetStyles возвращает конфигурацию стилей с зеленой цветовой схемой.
+// GetStyles возвращает конфигурацию стилей с зелёной цветовой схемой.
 func GetStyles() *StyleConfig {
 	return &StyleConfig{
 		GreenDark:     "#064e3b",
 		GreenPrimary:  "#34d399",
-		GreenBright:   "#4ade80", // Яркий зеленый для границ и акцентов (контраст 5.2:1 на темном фоне)
-		TextPrimary:   "#ffffff", // Чистый белый для максимального контраста (16.2:1 на DarkBg)
-		TextSecondary: "#e2e8f0", // Светло-серый для вторичного текста (контраст 13.8:1 на DarkBg)
+		TextPrimary:   "#ffffff",
+		TextSecondary: "#e2e8f0",
 		DarkBg:        "#0a0f18",
-		ListBorder:    "#4ade80", // Яркая граница для лучшей видимости
+
+		BgPanel:    "#0d1320",
+		BgSelected: "#1a2e25",
+		BorderIdle: "#1f2937",
+		NeonGreen:  "#50fa7b",
+		TextMuted:  "#94a3b8",
+		KeyHint:    "#6ee7b7",
 	}
 }
 
-// VersionBadgeStyle возвращает стиль бейджа версии приложения.
-// Фон: GreenBright, Текст: GreenDark — максимальная читаемость.
-func (s *StyleConfig) VersionBadgeStyle() lipgloss.Style {
-	return lipgloss.NewStyle().
-		Bold(true).
-		Padding(0, 2).
-		Background(lipgloss.Color(s.GreenBright)).
-		Foreground(lipgloss.Color(s.GreenDark))
-}
+// === Header / Tabs ===
 
 // TitleStyle возвращает стиль заголовка экрана.
 func (s *StyleConfig) TitleStyle() lipgloss.Style {
 	return lipgloss.NewStyle().
 		Bold(true).
-		Padding(0, 0).
+		Background(lipgloss.Color(s.DarkBg)).
 		Foreground(lipgloss.Color(s.TextPrimary))
 }
 
-// FilterBadgeStyle возвращает стиль бейджа FILTER (статичный, в режиме ожидания).
-func (s *StyleConfig) FilterBadgeStyle() lipgloss.Style {
+// VersionBadgeStyle возвращает стиль бейджа версии приложения.
+// Фон GreenPrimary, текст GreenDark — AA контраст ~5.2:1.
+func (s *StyleConfig) VersionBadgeStyle() lipgloss.Style {
 	return lipgloss.NewStyle().
 		Bold(true).
 		Padding(0, 2).
-		Background(lipgloss.Color(s.GreenBright)).
+		Background(lipgloss.Color(s.GreenPrimary)).
 		Foreground(lipgloss.Color(s.GreenDark))
 }
 
-// CountLabelStyle возвращает стиль лейбла счётчика моделей.
-func (s *StyleConfig) CountLabelStyle() lipgloss.Style {
-	return lipgloss.NewStyle().
-		Padding(0, 0).
-		Foreground(lipgloss.Color(s.TextSecondary))
-}
-
-// ItemActiveBorderStyle возвращает стиль активного элемента списка с неоновым бордером.
-// Левый бордер GreenBright. Shadow не поддерживается lipgloss v2 — fallback на чистый бордер.
-func (s *StyleConfig) ItemActiveBorderStyle() lipgloss.Style {
-	return lipgloss.NewStyle().
-		Border(lipgloss.NormalBorder(), false, false, false, true).
-		BorderForeground(lipgloss.Color(s.GreenBright)).
-		Padding(0, 0, 0, 1)
-}
-
-// ItemNormalStyle возвращает стиль обычного (не выбранного) элемента.
-func (s *StyleConfig) ItemNormalStyle() lipgloss.Style {
-	return lipgloss.NewStyle().
-		Background(lipgloss.Color(s.DarkBg)).
-		Foreground(lipgloss.Color(s.TextPrimary)).
-		Padding(0, 0, 0, 2)
-}
-
-// HeaderBlockStyle возвращает стиль блока заголовка с темным фоном.
-// Без вертикального padding — header это одна строка по схеме §2.
+// HeaderBlockStyle возвращает стиль блока заголовка.
 func (s *StyleConfig) HeaderBlockStyle() lipgloss.Style {
 	return lipgloss.NewStyle().
 		Bold(true).
@@ -89,70 +69,221 @@ func (s *StyleConfig) HeaderBlockStyle() lipgloss.Style {
 		Foreground(lipgloss.Color(s.TextPrimary))
 }
 
-// ItemSelectedStyle возвращает стиль выбранного элемента списка.
-func (s *StyleConfig) ItemSelectedStyle() lipgloss.Style {
+// TabActiveStyle — активный (выбранный) таб: заливка GreenPrimary, текст GreenDark.
+func (s *StyleConfig) TabActiveStyle() lipgloss.Style {
 	return lipgloss.NewStyle().
 		Bold(true).
-		Border(lipgloss.NormalBorder(), false, false, false, true).
-		BorderForeground(lipgloss.Color(s.GreenBright)).
+		Padding(0, 1).
+		Background(lipgloss.Color(s.GreenPrimary)).
+		Foreground(lipgloss.Color(s.GreenDark))
+}
+
+// TabInactiveStyle — неактивный enabled таб.
+func (s *StyleConfig) TabInactiveStyle() lipgloss.Style {
+	return lipgloss.NewStyle().
+		Padding(0, 1).
 		Background(lipgloss.Color(s.DarkBg)).
-		Foreground(lipgloss.Color(s.TextPrimary)).
-		Padding(0, 0, 0, 1)
-}
-
-// ContentBlockStyle возвращает стиль контейнера блока 2 (filter+count+list)
-// с одной общей рамкой по схеме §2. Без Margin — растягивается на 100% ширины.
-func (s *StyleConfig) ContentBlockStyle() lipgloss.Style {
-	return lipgloss.NewStyle().
-		Border(lipgloss.RoundedBorder(), true, true, true, true).
-		BorderForeground(lipgloss.Color(s.ListBorder)).
-		Padding(1, 2).
-		Background(lipgloss.Color(s.DarkBg))
-}
-
-// FooterContainerStyle возвращает стиль контейнера футера: одна строка по
-// центру, верхний бордер-разделитель, без вертикального padding.
-func (s *StyleConfig) FooterContainerStyle() lipgloss.Style {
-	return lipgloss.NewStyle().
-		Bold(true).
-		Padding(0, 2).
-		Border(lipgloss.NormalBorder(), true, false, false, false).
-		BorderForeground(lipgloss.Color(s.GreenBright)).
-		Background(lipgloss.Color("#050a12")).
 		Foreground(lipgloss.Color(s.TextSecondary))
 }
 
-// SizeBadgeStyle возвращает стиль бейджа размера файла.
-func (s *StyleConfig) SizeBadgeStyle() lipgloss.Style {
+// TabDisabledStyle — отключённый таб (disabled).
+func (s *StyleConfig) TabDisabledStyle() lipgloss.Style {
 	return lipgloss.NewStyle().
 		Padding(0, 1).
+		Background(lipgloss.Color(s.DarkBg)).
+		Foreground(lipgloss.Color(s.TextMuted))
+}
+
+// TabSeparatorStyle — разделитель │ между табами.
+func (s *StyleConfig) TabSeparatorStyle() lipgloss.Style {
+	return lipgloss.NewStyle().
+		Background(lipgloss.Color(s.DarkBg)).
+		Foreground(lipgloss.Color(s.BorderIdle))
+}
+
+// === Content block ===
+
+// ContentBlockStyle — неоновая rounded рамка content-блока + BgPanel внутри.
+func (s *StyleConfig) ContentBlockStyle() lipgloss.Style {
+	return lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder(), true, true, true, true).
-		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color(s.GreenBright)).
-		Background(lipgloss.Color("#050a12")).
+		BorderForeground(lipgloss.Color(s.NeonGreen)).
+		BorderBackground(lipgloss.Color(s.BgPanel)).
+		Padding(1, 2).
+		Background(lipgloss.Color(s.BgPanel))
+}
+
+// CountLabelStyle возвращает стиль лейбла счётчика моделей.
+func (s *StyleConfig) CountLabelStyle() lipgloss.Style {
+	return lipgloss.NewStyle().
+		Background(lipgloss.Color(s.BgPanel)).
+		Foreground(lipgloss.Color(s.TextSecondary))
+}
+
+// === Filter input ===
+
+// FilterBadgeStyle — обратная совместимость (idle state badge).
+func (s *StyleConfig) FilterBadgeStyle() lipgloss.Style {
+	return s.FilterInputIdleStyle()
+}
+
+// FilterInputIdleStyle — поле фильтра в состоянии ожидания: приглушённая рамка.
+func (s *StyleConfig) FilterInputIdleStyle() lipgloss.Style {
+	return lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder(), true, true, true, true).
+		BorderForeground(lipgloss.Color(s.BorderIdle)).
+		BorderBackground(lipgloss.Color(s.BgPanel)).
+		Background(lipgloss.Color(s.BgPanel)).
+		Foreground(lipgloss.Color(s.TextMuted)).
+		Padding(0, 1)
+}
+
+// FilterInputActiveStyle — поле фильтра в активном состоянии: неоновая рамка.
+func (s *StyleConfig) FilterInputActiveStyle() lipgloss.Style {
+	return lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder(), true, true, true, true).
+		BorderForeground(lipgloss.Color(s.NeonGreen)).
+		BorderBackground(lipgloss.Color(s.BgPanel)).
+		Background(lipgloss.Color(s.BgPanel)).
+		Foreground(lipgloss.Color(s.TextPrimary)).
+		Padding(0, 1)
+}
+
+// === List item ===
+
+// ItemNormalStyle — обычный (не выбранный) элемент списка.
+func (s *StyleConfig) ItemNormalStyle() lipgloss.Style {
+	return lipgloss.NewStyle().
+		Background(lipgloss.Color(s.DarkBg)).
+		Foreground(lipgloss.Color(s.TextPrimary)).
+		Padding(0, 0, 0, 2)
+}
+
+// ItemSelectedStyle — выбранный элемент: F-bracket (top+left+bottom) NeonGreen + BgSelected.
+func (s *StyleConfig) ItemSelectedStyle() lipgloss.Style {
+	b := lipgloss.NormalBorder()
+	return lipgloss.NewStyle().
+		Bold(true).
+		Border(b, true, false, true, true).
+		BorderForeground(lipgloss.Color(s.NeonGreen)).
+		BorderBackground(lipgloss.Color(s.BgSelected)).
+		Background(lipgloss.Color(s.BgSelected)).
+		Foreground(lipgloss.Color(s.TextPrimary)).
+		Padding(0, 1)
+}
+
+// SizeBadgeStyle возвращает стиль бейджа размера файла.
+// rowBg — фон строки-родителя (DarkBg / BgSelected) для прозрачной интеграции.
+// BorderBackground важен: без него ячейки border'а останутся без bg → дырки терминального фона.
+func (s *StyleConfig) SizeBadgeStyle(rowBg ...string) lipgloss.Style {
+	bg := s.DarkBg
+	if len(rowBg) > 0 && rowBg[0] != "" {
+		bg = rowBg[0]
+	}
+	return lipgloss.NewStyle().
+		Padding(0, 1).
+		Border(lipgloss.NormalBorder(), true, true, true, true).
+		BorderForeground(lipgloss.Color(s.NeonGreen)).
+		BorderBackground(lipgloss.Color(bg)).
+		Background(lipgloss.Color(bg)).
 		Foreground(lipgloss.Color(s.GreenPrimary))
 }
 
-// MMProjBadgeStyle возвращает стиль бейджа mmproj.
-func (s *StyleConfig) MMProjBadgeStyle() lipgloss.Style {
+// MMProjBadgeStyle — стиль рамки бейджа mmproj (контур + padding на фоне строки).
+// Заливной зелёный фон применяется отдельно к самой надписи (см. MMProjLabelStyle).
+func (s *StyleConfig) MMProjBadgeStyle(rowBg ...string) lipgloss.Style {
+	bg := s.DarkBg
+	if len(rowBg) > 0 && rowBg[0] != "" {
+		bg = rowBg[0]
+	}
 	return lipgloss.NewStyle().
 		Padding(0, 1).
-		Border(lipgloss.RoundedBorder(), true, true, true, true).
-		BorderStyle(lipgloss.NormalBorder()).
+		Border(lipgloss.NormalBorder(), true, true, true, true).
 		BorderForeground(lipgloss.Color(s.GreenPrimary)).
+		BorderBackground(lipgloss.Color(bg)).
+		Background(lipgloss.Color(bg)).
+		Foreground(lipgloss.Color(s.GreenPrimary))
+}
+
+// MMProjLabelStyle — стиль самой надписи «mmproj»: заливной зелёный фон + тёмный текст.
+func (s *StyleConfig) MMProjLabelStyle() lipgloss.Style {
+	return lipgloss.NewStyle().
 		Background(lipgloss.Color(s.GreenPrimary)).
 		Foreground(lipgloss.Color(s.GreenDark))
 }
 
 // QuantizationBadgeStyle возвращает стиль бейджа квантования.
-func (s *StyleConfig) QuantizationBadgeStyle() lipgloss.Style {
+func (s *StyleConfig) QuantizationBadgeStyle(rowBg ...string) lipgloss.Style {
+	bg := s.DarkBg
+	if len(rowBg) > 0 && rowBg[0] != "" {
+		bg = rowBg[0]
+	}
 	return lipgloss.NewStyle().
 		Padding(0, 1).
-		Border(lipgloss.RoundedBorder(), true, true, true, true).
-		BorderStyle(lipgloss.NormalBorder()).
+		Border(lipgloss.NormalBorder(), true, true, true, true).
 		BorderForeground(lipgloss.Color(s.TextSecondary)).
-		Background(lipgloss.Color("#050a12")).
+		BorderBackground(lipgloss.Color(bg)).
+		Background(lipgloss.Color(bg)).
 		Foreground(lipgloss.Color(s.TextSecondary))
 }
 
+// === Scrollbar ===
 
+// ScrollbarTrackStyle — символ дорожки scrollbar (│ цвет BorderIdle).
+func (s *StyleConfig) ScrollbarTrackStyle() lipgloss.Style {
+	return lipgloss.NewStyle().
+		Background(lipgloss.Color(s.BgPanel)).
+		Foreground(lipgloss.Color(s.BorderIdle))
+}
+
+// ScrollbarThumbStyle — символ ползунка scrollbar (┃ цвет NeonGreen).
+func (s *StyleConfig) ScrollbarThumbStyle() lipgloss.Style {
+	return lipgloss.NewStyle().
+		Background(lipgloss.Color(s.BgPanel)).
+		Foreground(lipgloss.Color(s.NeonGreen))
+}
+
+// === Footer ===
+
+// FooterContainerStyle — минималистичный однострочный футер без top border.
+func (s *StyleConfig) FooterContainerStyle() lipgloss.Style {
+	return lipgloss.NewStyle().
+		Padding(0, 2).
+		Background(lipgloss.Color(s.DarkBg)).
+		Foreground(lipgloss.Color(s.TextSecondary))
+}
+
+// FooterKeyStyle — клавиша в футере: KeyHint bold, subtle bg BgPanel.
+func (s *StyleConfig) FooterKeyStyle() lipgloss.Style {
+	return lipgloss.NewStyle().
+		Bold(true).
+		Padding(0, 1).
+		Background(lipgloss.Color(s.BgPanel)).
+		Foreground(lipgloss.Color(s.KeyHint))
+}
+
+// FooterLabelStyle — подпись клавиши в футере.
+func (s *StyleConfig) FooterLabelStyle() lipgloss.Style {
+	return lipgloss.NewStyle().
+		Background(lipgloss.Color(s.DarkBg)).
+		Foreground(lipgloss.Color(s.TextMuted))
+}
+
+// FooterSeparatorStyle — разделитель │ между парами key+label в футере.
+func (s *StyleConfig) FooterSeparatorStyle() lipgloss.Style {
+	return lipgloss.NewStyle().
+		Background(lipgloss.Color(s.DarkBg)).
+		Foreground(lipgloss.Color(s.BorderIdle))
+}
+
+// === Help popup ===
+
+// HelpPopupStyle — popup полной справки: NeonGreen rounded border, BgPanel фон.
+func (s *StyleConfig) HelpPopupStyle() lipgloss.Style {
+	return lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder(), true, true, true, true).
+		BorderForeground(lipgloss.Color(s.NeonGreen)).
+		BorderBackground(lipgloss.Color(s.BgPanel)).
+		Background(lipgloss.Color(s.BgPanel)).
+		Padding(1, 2)
+}

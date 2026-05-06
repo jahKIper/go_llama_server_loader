@@ -489,3 +489,99 @@ func TestAppFilter_EscFromIdleIsNoop(t *testing.T) {
 		t.Errorf("countShown want 6, got %d", a.countShown)
 	}
 }
+
+// ── Tabs: 1/2/3 + Tab/Shift+Tab ──────────────────────────────────────────────
+
+func TestAppTabs_NumberKeys(t *testing.T) {
+	a := NewApp(testModels())
+	a = sendWindowSize(a, 120, 40)
+
+	// "2" — SetActive(1), но таб 1 disabled → индекс всё равно устанавливается
+	a, _ = sendKey(a, "2")
+	if a.tabs.Active() != 1 {
+		t.Errorf("after '2': tabs.Active() want 1, got %d", a.tabs.Active())
+	}
+
+	// "1" — возвращаем на 0
+	a, _ = sendKey(a, "1")
+	if a.tabs.Active() != 0 {
+		t.Errorf("after '1': tabs.Active() want 0, got %d", a.tabs.Active())
+	}
+}
+
+func TestAppTabs_TabKey(t *testing.T) {
+	a := NewApp(testModels())
+	a = sendWindowSize(a, 120, 40)
+
+	// Только Models enabled → Tab должен быть no-op
+	a, _ = sendKey(a, "tab")
+	if a.tabs.Active() != 0 {
+		t.Errorf("Tab with single enabled tab should be no-op, got %d", a.tabs.Active())
+	}
+}
+
+// ── Help popup toggle ────────────────────────────────────────────────────────
+
+func TestAppHelp_QuestionMarkToggles(t *testing.T) {
+	a := NewApp(testModels())
+	a = sendWindowSize(a, 120, 40)
+
+	a, _ = sendKey(a, "?")
+	if !a.helpExpanded {
+		t.Error("'?' should set helpExpanded=true")
+	}
+
+	// View не должен паниковать при helpExpanded
+	content := viewContent(a)
+	if content == "" {
+		t.Error("view with helpExpanded should not be empty")
+	}
+
+	a, _ = sendKey(a, "?")
+	if a.helpExpanded {
+		t.Error("second '?' should set helpExpanded=false")
+	}
+}
+
+func TestAppHelp_EscClosesPopup(t *testing.T) {
+	a := NewApp(testModels())
+	a = sendWindowSize(a, 120, 40)
+
+	a, _ = sendKey(a, "?")
+	if !a.helpExpanded {
+		t.Fatal("precondition: helpExpanded should be true")
+	}
+
+	a, _ = sendKey(a, "esc")
+	if a.helpExpanded {
+		t.Error("Esc should close help popup")
+	}
+	// После закрытия popup — фильтр всё ещё в Idle
+	if a.filterState != FilterIdle {
+		t.Errorf("filterState want FilterIdle after Esc from popup, got %d", a.filterState)
+	}
+}
+
+func TestAppHelp_PopupDoesNotQuit(t *testing.T) {
+	a := NewApp(testModels())
+	a = sendWindowSize(a, 120, 40)
+
+	a, _ = sendKey(a, "?")
+	_, cmd := sendKey(a, "esc")
+	// Esc из popup не должен передаваться как Quit
+	if cmd != nil {
+		t.Error("Esc from popup should not return tea.Quit")
+	}
+}
+
+// ── ctrl+q — выход ───────────────────────────────────────────────────────────
+
+func TestAppCtrlQ_Quits(t *testing.T) {
+	a := NewApp(testModels())
+	a = sendWindowSize(a, 120, 40)
+
+	_, cmd := a.Update(tea.KeyPressMsg{Code: rune('q'), Mod: tea.ModCtrl})
+	if cmd == nil {
+		t.Error("ctrl+q should return tea.Quit cmd")
+	}
+}

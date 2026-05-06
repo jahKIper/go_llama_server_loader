@@ -6,6 +6,7 @@ import (
 	"unicode/utf8"
 
 	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 
 	"llama-server-loader/pkg/modelscan"
 )
@@ -14,9 +15,9 @@ import (
 type FilterState int
 
 const (
-	// FilterIdle — фильтр не активен, показываем бейдж [FILTER].
+	// FilterIdle — фильтр не активен.
 	FilterIdle FilterState = iota
-	// FilterActive — поле ввода активно, но пустое, ждём ввод.
+	// FilterActive — поле ввода активно, но пустое.
 	FilterActive
 	// Filtering — пользователь вводит текст, фильтрация применена.
 	Filtering
@@ -80,8 +81,7 @@ func (f *filterInput) Text() string {
 }
 
 // HandleKey обрабатывает нажатия клавиш в поле ввода фильтра.
-// Cursor работает с байтовыми смещениями, но всегда на rune-границах (UTF-8 safe).
-// Esc перехватывается на уровне App.Update, сюда не доходит.
+// UTF-8 safe: cursor работает на rune-границах.
 func (f *filterInput) HandleKey(key string) tea.Cmd {
 	switch key {
 	case "backspace", "ctrl+h":
@@ -111,7 +111,6 @@ func (f *filterInput) HandleKey(key string) tea.Cmd {
 	case "end":
 		f.cursor = len(f.text)
 	default:
-		// Вставляем печатный rune на позицию курсора. UTF-8: kириллица, эмодзи и др.
 		if utf8.RuneCountInString(key) == 1 {
 			r, _ := utf8.DecodeRuneInString(key)
 			if unicode.IsPrint(r) {
@@ -123,35 +122,69 @@ func (f *filterInput) HandleKey(key string) tea.Cmd {
 	return nil
 }
 
-// RenderFilterBadge рендерит бейдж FILTER (в режиме FilterIdle).
-func (f *filterInput) RenderFilterBadge() string {
-	if f.styles == nil {
-		return "[FILTER]"
+// Render — единая точка рендера: возвращает idle или active вид по состоянию.
+// blockWidth — ширина content-блока (0 = без явного width).
+func (f *filterInput) Render(blockWidth int) string {
+	if f.state == FilterIdle {
+		return f.RenderFilterIdle(blockWidth)
 	}
-	return f.styles.FilterBadgeStyle().Render("[FILTER]")
+	return f.RenderFilterActive(blockWidth)
 }
 
-// RenderFilterInput рендерит поле ввода фильтра.
-func (f *filterInput) RenderFilterInput() string {
+// RenderFilterIdle рендерит поле в idle-состоянии: приглушённая рамка + placeholder.
+// blockWidth — полная итоговая ширина поля (lipgloss v2 .Width() — total width).
+func (f *filterInput) RenderFilterIdle(blockWidth int) string {
+	if f.styles == nil {
+		return "[/ поиск...]"
+	}
+	st := f.styles.FilterInputIdleStyle()
+	if blockWidth > 0 {
+		st = st.Width(blockWidth)
+	}
+	// Placeholder рендерим с фоном фильтра (BgPanel), а не FooterLabelStyle (DarkBg).
+	placeholder := lipgloss.NewStyle().
+		Background(lipgloss.Color(f.styles.BgPanel)).
+		Foreground(lipgloss.Color(f.styles.TextMuted)).
+		Render("поиск...")
+	return st.Render("/  " + placeholder)
+}
+
+// RenderFilterActive рендерит поле в активном состоянии: неоновая рамка + cursor.
+func (f *filterInput) RenderFilterActive(blockWidth int) string {
 	if f.styles == nil {
 		cursorChar := "│"
 		if f.cursor < len(f.text) {
-			return f.text[:f.cursor] + cursorChar + f.text[f.cursor:]
+			return "/  " + f.text[:f.cursor] + cursorChar + f.text[f.cursor:]
 		}
-		return f.text + cursorChar
+		return "/  " + f.text + cursorChar
 	}
 
-	prompt := f.styles.FilterBadgeStyle().Render("[FILTER] ")
-	cursorChar := "▌"
+	cursor := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(f.styles.NeonGreen)).
+		Render("▌")
 
 	var display string
 	if f.cursor < len(f.text) {
-		display = f.text[:f.cursor] + cursorChar + f.text[f.cursor:]
+		display = f.text[:f.cursor] + cursor + f.text[f.cursor:]
 	} else {
-		display = f.text + cursorChar
+		display = f.text + cursor
 	}
 
-	return prompt + f.styles.CountLabelStyle().Render(display)
+	st := f.styles.FilterInputActiveStyle()
+	if blockWidth > 0 {
+		st = st.Width(blockWidth)
+	}
+	return st.Render("/  " + display)
+}
+
+// RenderFilterBadge — backward-compat обёртка над RenderFilterIdle(0).
+func (f *filterInput) RenderFilterBadge() string {
+	return f.RenderFilterIdle(0)
+}
+
+// RenderFilterInput — backward-compat обёртка над RenderFilterActive(0).
+func (f *filterInput) RenderFilterInput() string {
+	return f.RenderFilterActive(0)
 }
 
 // FilterModels применяет текстовый фильтр к списку моделей.
