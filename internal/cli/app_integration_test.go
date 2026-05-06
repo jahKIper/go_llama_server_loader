@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -583,5 +584,52 @@ func TestAppCtrlQ_Quits(t *testing.T) {
 	_, cmd := a.Update(tea.KeyPressMsg{Code: rune('q'), Mod: tea.ModCtrl})
 	if cmd == nil {
 		t.Error("ctrl+q should return tea.Quit cmd")
+	}
+}
+
+func TestApp_ScrollbarOffset_FollowsCursor(t *testing.T) {
+	// 12 моделей — достаточно, чтобы список не влез целиком на экран.
+	models := make([]*modelscan.Model, 12)
+	for i := range models {
+		models[i] = &modelscan.Model{
+			Name: fmt.Sprintf("model-%02d.Q4_K_M.gguf", i),
+			Path: fmt.Sprintf("/models/model-%02d.gguf", i),
+			Size: 4_000_000_000,
+		}
+	}
+	a := NewApp(models)
+	m, _ := a.Update(tea.WindowSizeMsg{Width: 120, Height: 40})
+	app := m.(*App)
+
+	itemH := (&StyledDelegate{}).Height()
+	listH := app.list.Height()
+	visible := listH / itemH
+	if visible < 1 {
+		visible = 1
+	}
+	total := len(app.list.Items())
+
+	for _, idx := range []int{0, 3, 6, total - 1} {
+		app.list.Select(idx)
+		offset, gotVisible, gotTotal := app.scrollbarParams()
+		if gotVisible != visible {
+			t.Errorf("idx=%d: visible=%d want %d", idx, gotVisible, visible)
+		}
+		if gotTotal != total {
+			t.Errorf("idx=%d: total=%d want %d", idx, gotTotal, total)
+		}
+		wantOffset := idx - visible/2
+		if wantOffset < 0 {
+			wantOffset = 0
+		}
+		if mx := total - visible; wantOffset > mx {
+			wantOffset = mx
+		}
+		if wantOffset < 0 {
+			wantOffset = 0
+		}
+		if offset != wantOffset {
+			t.Errorf("idx=%d: offset=%d want %d", idx, offset, wantOffset)
+		}
 	}
 }

@@ -22,6 +22,13 @@ func stripANSI(s string) string {
 	return ansiRe.ReplaceAllString(s, "")
 }
 
+// hasThumbBg — проверка, что в строке встречается ANSI-код фона thumb
+// (заливка GreenPrimary = #34d399 = 52;211;153). Track использует BorderIdle
+// = #1f2937 = 31;41;55, и не должен срабатывать на этот тест.
+func hasThumbBg(line string) bool {
+	return strings.Contains(line, "48;2;52;211;153")
+}
+
 func TestRenderScrollbar_HidesWhenFits(t *testing.T) {
 	st := testStyles()
 	// total == visible — scrollbar не нужен, возвращаем пробелы
@@ -63,7 +70,7 @@ func TestRenderScrollbar_ThumbAtTop(t *testing.T) {
 	// thumbSize = 10*3/10 = 3, thumbPos = 0
 	// строки 0,1,2 — thumb, остальные — track
 	for i, l := range lines {
-		hasThumb := strings.Contains(l, scrollbarThumb)
+		hasThumb := hasThumbBg(l)
 		if i < 3 && !hasThumb {
 			t.Errorf("line %d: expected thumb, got %q", i, l)
 		}
@@ -84,7 +91,7 @@ func TestRenderScrollbar_ThumbAtBottom(t *testing.T) {
 	// thumbSize=3, maxOffset=7, thumbPos=7*(10-3)/7=7
 	// строки 7,8,9 — thumb
 	for i, l := range lines {
-		hasThumb := strings.Contains(l, scrollbarThumb)
+		hasThumb := hasThumbBg(l)
 		if i >= 7 && !hasThumb {
 			t.Errorf("line %d: expected thumb, got %q", i, l)
 		}
@@ -106,7 +113,7 @@ func TestRenderScrollbar_ThumbMiddle(t *testing.T) {
 	}
 	thumbCount := 0
 	for _, l := range lines {
-		if strings.Contains(l, scrollbarThumb) {
+		if hasThumbBg(l) {
 			thumbCount++
 		}
 	}

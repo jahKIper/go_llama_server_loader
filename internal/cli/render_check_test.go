@@ -41,7 +41,7 @@ func TestRenderVerification(t *testing.T) {
 		{"footer ^q",       "^q"},
 		{"rounded border ╭","╭"},
 		{"rounded border ╰","╰"},
-		{"scrollbar track", "│"},
+		{"border vertical │", "│"},
 	}
 
 	t.Log("=== Main view checks ===")

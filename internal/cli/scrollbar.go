@@ -6,24 +6,22 @@ import (
 	"charm.land/lipgloss/v2"
 )
 
-const (
-	scrollbarTrack = "│"
-	scrollbarThumb = "┃"
-)
-
-// RenderScrollbar возвращает вертикальный scrollbar шириной 1 символ.
-// Если total <= visible, возвращает колонку пробелов (scrollbar не нужен,
-// но высота сохраняется — UI не «прыгает»).
+// RenderScrollbar возвращает вертикальный scrollbar шириной ScrollbarWidth (2 col).
+// Track и thumb рендерятся как bg-fill (без glyph'ов) — стабильно в любом
+// терминале, не «дрожит» от шрифта.
+//
+// Если total <= visible, возвращает пустую колонку BgPanel (scrollbar скрыт,
+// но высота/ширина сохраняются — UI не «прыгает»).
 // Параметры: offset — первый видимый элемент, visible — кол-во видимых,
 // total — кол-во всех, height — высота в строках.
 func RenderScrollbar(offset, visible, total, height int, st *StyleConfig) string {
 	lines := make([]string, height)
+	cell := strings.Repeat(" ", ScrollbarWidth)
 
 	if total <= visible || height == 0 {
-		// Пустая колонка: пробел с фоном BgPanel — чтобы не было «дырки» терминального фона.
 		emptyCell := lipgloss.NewStyle().
 			Background(lipgloss.Color(st.BgPanel)).
-			Render(" ")
+			Render(cell)
 		for i := range lines {
 			lines[i] = emptyCell
 		}
@@ -41,14 +39,14 @@ func RenderScrollbar(offset, visible, total, height int, st *StyleConfig) string
 	}
 	thumbPos := offset * (height - thumbSize) / maxOffset
 
-	trackStyle := st.ScrollbarTrackStyle()
-	thumbStyle := st.ScrollbarThumbStyle()
+	trackCell := st.ScrollbarTrackStyle().Render(cell)
+	thumbCell := st.ScrollbarThumbStyle().Render(cell)
 
 	for i := range lines {
 		if i >= thumbPos && i < thumbPos+thumbSize {
-			lines[i] = thumbStyle.Render(scrollbarThumb)
+			lines[i] = thumbCell
 		} else {
-			lines[i] = trackStyle.Render(scrollbarTrack)
+			lines[i] = trackCell
 		}
 	}
 

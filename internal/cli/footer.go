@@ -14,15 +14,13 @@ type HelpRow struct {
 
 // Footer — минималистичный однострочный footer с двумя группами биндингов.
 // Левая группа (навигация, фильтр, помощь) + правая (выход) — разделены spacer-ом.
+// Опционально слева отображается primary-CTA (зелёный «pill» с действием Enter).
 type Footer struct {
-	leftRows  []HelpRow
-	rightRows []HelpRow
-	// Backward-compat поля: expanded/extraRows оставлены но игнорируются.
-	// Удаляются в шаге 4 вместе с cli.go.
-	expanded  bool
-	extraRows []HelpRow
-	styles    *StyleConfig
-	width     int
+	leftRows   []HelpRow
+	rightRows  []HelpRow
+	styles     *StyleConfig
+	width      int
+	primaryCTA string // если не пустой — рендерится как зелёная кнопка слева
 }
 
 // NewFooter создаёт Footer с дефолтными биндингами.
@@ -30,19 +28,12 @@ func NewFooter(styles *StyleConfig) *Footer {
 	return &Footer{
 		leftRows: []HelpRow{
 			{Keys: "↑↓", Label: "навигация"},
-			{Keys: "Enter", Label: "выбор"},
 			{Keys: "/", Label: "фильтр"},
 			{Keys: "?", Label: "помощь"},
 			{Keys: "Tab", Label: "таб"},
 		},
 		rightRows: []HelpRow{
 			{Keys: "^q", Label: "выход"},
-		},
-		extraRows: []HelpRow{
-			{Keys: "→/PgDn", Label: "вперёд"},
-			{Keys: "←/PgUp", Label: "назад"},
-			{Keys: "g/Home", Label: "начало"},
-			{Keys: "G/End", Label: "конец"},
 		},
 		styles: styles,
 	}
@@ -53,21 +44,31 @@ func (f *Footer) SetWidth(w int) {
 	f.width = w
 }
 
-// SetExpanded — no-op stub для обратной совместимости с cli.go (шаг 4 удалит).
-func (f *Footer) SetExpanded(v bool) {
-	f.expanded = v
+// SetPrimaryCTA задаёт текст primary-кнопки footer'а. Пустая строка — кнопка скрыта.
+func (f *Footer) SetPrimaryCTA(text string) {
+	f.primaryCTA = text
 }
 
-// Render рендерит однострочный футер: левая группа + spacer + правая группа.
+// Render рендерит однострочный футер: [CTA] [hints-left] [spacer] [hints-right].
 func (f *Footer) Render() string {
 	if f.styles == nil {
 		return f.renderFallback()
 	}
 
-	leftStr := f.renderGroup(f.leftRows)
+	hintsLeftStr := f.renderGroup(f.leftRows)
 	rightStr := f.renderGroup(f.rightRows)
 
-	leftW := lipgloss.Width(leftStr)
+	// CTA + разделитель перед hints (если CTA задан)
+	var ctaStr, ctaSepStr string
+	if f.primaryCTA != "" {
+		ctaStr = f.styles.FooterPrimaryCTAStyle().Render(f.primaryCTA)
+		ctaSepStr = lipgloss.NewStyle().
+			Background(lipgloss.Color(f.styles.DarkBg)).
+			Render("  ")
+	}
+
+	ctaW := lipgloss.Width(ctaStr) + lipgloss.Width(ctaSepStr)
+	hintsLeftW := lipgloss.Width(hintsLeftStr)
 	rightW := lipgloss.Width(rightStr)
 
 	// Inner width — без padding контейнера; spacer должен заполнять только эту область.
@@ -75,7 +76,7 @@ func (f *Footer) Render() string {
 	if innerW < 1 {
 		innerW = 1
 	}
-	spacerW := innerW - leftW - rightW
+	spacerW := innerW - ctaW - hintsLeftW - rightW
 	if spacerW < 1 {
 		spacerW = 1
 	}
@@ -83,7 +84,12 @@ func (f *Footer) Render() string {
 		Background(lipgloss.Color(f.styles.DarkBg)).
 		Render(strings.Repeat(" ", spacerW))
 
-	line := lipgloss.JoinHorizontal(lipgloss.Top, leftStr, spacer, rightStr)
+	parts := make([]string, 0, 5)
+	if ctaStr != "" {
+		parts = append(parts, ctaStr, ctaSepStr)
+	}
+	parts = append(parts, hintsLeftStr, spacer, rightStr)
+	line := lipgloss.JoinHorizontal(lipgloss.Top, parts...)
 	return f.applyContainer(line)
 }
 

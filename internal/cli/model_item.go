@@ -46,9 +46,9 @@ func (l *ListItem) Model() *modelscan.Model {
 }
 
 // Render рендерит элемент списка.
-// Структура (Height=7):
-//   - Selected:   F-bracket с border top+bottom (содержит name+path+badges, 5 строк) = 7
-//   - Unselected: пустая строка(1) + name+path+badges(5) + пустая строка(1) = 7
+// Структура (Height=8):
+//   - Selected:   F-bracket с border top+bottom (name+path+meta+badges, 6 строк) = 8
+//   - Unselected: пустая строка(1) + name+path+meta+badges(6) + пустая строка(1) = 8
 func (l *ListItem) Render(w io.Writer, m list.Model, index int, item list.Item) {
 	listItem := item.(*ListItem)
 	model := listItem.model
@@ -62,15 +62,20 @@ func (l *ListItem) Render(w io.Writer, m list.Model, index int, item list.Item) 
 	itemWidth := m.Width()
 
 	quant := extractQuantization(model.Name)
-	// Точка-индикатор: фон делаем зависящим от состояния (selected/normal),
-	// чтобы при склейке в строку имени не образовывалась «дырка» терминального фона.
-	dotStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(quantColor(quant, st)))
+	// Dot-индикатор: цвет — состояние выбора (фиолетовый акцент).
+	// Bg делаем явным под состояние, чтобы ANSI-reset не оставлял «дырку».
+	var dotFg, dotBg string
 	if selected {
-		dotStyle = dotStyle.Background(lipgloss.Color(st.BgSelected))
+		dotFg = st.AccentPurple
+		dotBg = st.BgSelected
 	} else {
-		dotStyle = dotStyle.Background(lipgloss.Color(st.DarkBg))
+		dotFg = st.AccentPurpleMuted
+		dotBg = st.DarkBg
 	}
-	dot := dotStyle.Render("●")
+	dot := lipgloss.NewStyle().
+		Background(lipgloss.Color(dotBg)).
+		Foreground(lipgloss.Color(dotFg)).
+		Render("●")
 
 	if selected {
 		fmt.Fprint(w, renderSelected(model, dot, quant, itemWidth, st))
@@ -109,13 +114,21 @@ func renderSelected(model *modelscan.Model, dot, quant string, itemWidth int, st
 		Foreground(lipgloss.Color(st.TextSecondary)).
 		Render("  " + pathStr)
 
+	metaLine := rowFill.
+		PaddingLeft(2).
+		Foreground(lipgloss.Color(st.TextMuted)).
+		Render(formatMetaLine(model, st, st.BgSelected))
+
 	badgeBlock := rowFill.
 		PaddingLeft(2).
 		Render(formatMetadataBadgesSelected(model, st))
 
-	content := lipgloss.JoinVertical(lipgloss.Left, nameLine, pathLine, badgeBlock)
+	// Пустые строки сверху и снизу — компенсируют отсутствие top/bottom border'а,
+	// чтобы суммарная высота selected = 8 (как у normal) и список не прыгал.
+	empty := rowFill.Render("")
+	content := lipgloss.JoinVertical(lipgloss.Left, empty, nameLine, pathLine, metaLine, badgeBlock, empty)
 
-	// F-bracket: top + left + bottom (no right), NeonGreen, BgSelected.
+	// Левая полоса NeonGreen, BgSelected — рамка только слева.
 	// lipgloss v2 .Width() — total width: задаём itemWidth, чтобы занять всю ширину item'а.
 	if itemWidth > 0 {
 		bracketStyle = bracketStyle.Width(itemWidth)
@@ -152,13 +165,18 @@ func renderNormal(model *modelscan.Model, dot, quant string, itemWidth int, st *
 		Foreground(lipgloss.Color(st.TextSecondary)).
 		Render("  " + pathStr)
 
+	metaLine := rowFill.
+		PaddingLeft(4).
+		Foreground(lipgloss.Color(st.TextMuted)).
+		Render(formatMetaLine(model, st, st.DarkBg))
+
 	badgeBlock := rowFill.
 		PaddingLeft(4).
 		Render(formatMetadataBadges(model, st))
 
-	content := lipgloss.JoinVertical(lipgloss.Left, nameLine, pathLine, badgeBlock)
+	content := lipgloss.JoinVertical(lipgloss.Left, nameLine, pathLine, metaLine, badgeBlock)
 
-	// Пустые строки сверху и снизу для стабильной высоты = 7 строк.
+	// Пустые строки сверху и снизу для стабильной высоты = 8 строк.
 	empty := rowFill.Render("")
 	return lipgloss.JoinVertical(lipgloss.Left, empty, content, empty)
 }
@@ -207,12 +225,45 @@ func truncatePathLeft(path string, maxLen int) string {
 	return "..." + suffix
 }
 
+// formatMetaLine формирует одну строку «meta» под path в карточке модели:
+// формат · квантование · размер[ · mmproj]. Разделители красятся в TextSecondary
+// для приглушённого dot-separator стиля. parentBg — фон строки (DarkBg/BgSelected).
+func formatMetaLine(m *modelscan.Model, st *StyleConfig, parentBg string) string {
+	if st == nil {
+		return ""
+	}
+	parts := []string{
+		"GGUF",
+		extractQuantization(m.Name),
+		formatSize(m.Size),
+	}
+	if len(m.MMProjPaths) > 0 {
+		parts = append(parts, "mmproj")
+	}
+	textStyle := lipgloss.NewStyle().
+		Background(lipgloss.Color(parentBg)).
+		Foreground(lipgloss.Color(st.TextMuted))
+	sepStyle := lipgloss.NewStyle().
+		Background(lipgloss.Color(parentBg)).
+		Foreground(lipgloss.Color(st.TextSecondary))
+	pieces := make([]string, 0, len(parts)*2-1)
+	for i, p := range parts {
+		if i > 0 {
+			pieces = append(pieces, sepStyle.Render(" · "))
+		}
+		pieces = append(pieces, textStyle.Render(p))
+	}
+	return lipgloss.JoinHorizontal(lipgloss.Top, pieces...)
+}
+
 // formatMetadataBadges формирует строку бейджей для обычного (unselected) item.
 func formatMetadataBadges(m *modelscan.Model, st *StyleConfig) string {
 	return formatMetadataBadgesWithBg(m, st, "")
 }
 
-// formatMetadataBadgesSelected — то же, но separator красится в BgSelected.
+// formatMetadataBadgesSelected — те же бейджи, что и в normal-состоянии,
+// только parentBg = BgSelected. Стили рамок/текста идентичны — визуально бейджи
+// не «прыгают» при переключении выбора, меняется только фон под ними.
 func formatMetadataBadgesSelected(m *modelscan.Model, st *StyleConfig) string {
 	if st == nil {
 		return formatMetadataBadges(m, st)
@@ -286,8 +337,8 @@ type StyledDelegate struct {
 }
 
 func (d *StyledDelegate) Height() int {
-	// border-top/empty(1) + name(1) + path(1) + badges(3) + border-bottom/empty(1) = 7
-	return 7
+	// border-top/empty(1) + name(1) + path(1) + meta(1) + badges(3) + border-bottom/empty(1) = 8
+	return 8
 }
 
 func (d *StyledDelegate) Spacing() int {
@@ -301,22 +352,6 @@ func (d *StyledDelegate) Render(w io.Writer, m list.Model, index int, item list.
 		return
 	}
 	listItem.Render(w, m, index, item)
-}
-
-func (d *StyledDelegate) TitleStyle() lipgloss.Style {
-	return d.styles.ItemNormalStyle().Foreground(lipgloss.Color(d.styles.TextPrimary))
-}
-
-func (d *StyledDelegate) DescStyle() lipgloss.Style {
-	return d.styles.ItemNormalStyle().Foreground(lipgloss.Color(d.styles.TextSecondary))
-}
-
-func (d *StyledDelegate) TitleStyleSelected() lipgloss.Style {
-	return d.styles.ItemSelectedStyle().Foreground(lipgloss.Color(d.styles.TextPrimary))
-}
-
-func (d *StyledDelegate) DescStyleSelected() lipgloss.Style {
-	return d.styles.ItemNormalStyle().Foreground(lipgloss.Color(d.styles.TextSecondary))
 }
 
 func (d *StyledDelegate) Update(msg tea.Msg, m *list.Model) tea.Cmd {

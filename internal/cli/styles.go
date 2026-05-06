@@ -20,6 +20,10 @@ type StyleConfig struct {
 	NeonGreen  string // #50fa7b — активность/фокус: рамки, cursor, scrollbar thumb
 	TextMuted  string // #94a3b8 — placeholder, label хоткеев, disabled tab
 	KeyHint    string // #6ee7b7 — клавиши в футере
+
+	// Accent для dot-индикатора (комплементарный к зелёной палитре)
+	AccentPurple      string // #a78bfa — selected dot, в тон с NeonGreen по яркости
+	AccentPurpleMuted string // #6b5b95 — unselected dot, в тон с TextMuted
 }
 
 // GetStyles возвращает конфигурацию стилей с зелёной цветовой схемой.
@@ -37,6 +41,9 @@ func GetStyles() *StyleConfig {
 		NeonGreen:  "#50fa7b",
 		TextMuted:  "#94a3b8",
 		KeyHint:    "#6ee7b7",
+
+		AccentPurple:      "#a78bfa",
+		AccentPurpleMuted: "#6b5b95",
 	}
 }
 
@@ -159,12 +166,12 @@ func (s *StyleConfig) ItemNormalStyle() lipgloss.Style {
 		Padding(0, 0, 0, 2)
 }
 
-// ItemSelectedStyle — выбранный элемент: F-bracket (top+left+bottom) NeonGreen + BgSelected.
+// ItemSelectedStyle — выбранный элемент: только левая полоса NeonGreen + BgSelected.
 func (s *StyleConfig) ItemSelectedStyle() lipgloss.Style {
 	b := lipgloss.NormalBorder()
 	return lipgloss.NewStyle().
 		Bold(true).
-		Border(b, true, false, true, true).
+		Border(b, false, false, false, true).
 		BorderForeground(lipgloss.Color(s.NeonGreen)).
 		BorderBackground(lipgloss.Color(s.BgSelected)).
 		Background(lipgloss.Color(s.BgSelected)).
@@ -229,19 +236,22 @@ func (s *StyleConfig) QuantizationBadgeStyle(rowBg ...string) lipgloss.Style {
 
 // === Scrollbar ===
 
-// ScrollbarTrackStyle — символ дорожки scrollbar (│ цвет BorderIdle).
+// ScrollbarTrackStyle — стиль дорожки scrollbar (заливной BorderIdle, 2 cols).
+// Используется как bg-fill, без glyph'ов — стабильнее в разных терминалах.
 func (s *StyleConfig) ScrollbarTrackStyle() lipgloss.Style {
 	return lipgloss.NewStyle().
-		Background(lipgloss.Color(s.BgPanel)).
-		Foreground(lipgloss.Color(s.BorderIdle))
+		Background(lipgloss.Color(s.BorderIdle))
 }
 
-// ScrollbarThumbStyle — символ ползунка scrollbar (┃ цвет NeonGreen).
+// ScrollbarThumbStyle — стиль ползунка scrollbar (заливной GreenPrimary, 2 cols).
 func (s *StyleConfig) ScrollbarThumbStyle() lipgloss.Style {
 	return lipgloss.NewStyle().
-		Background(lipgloss.Color(s.BgPanel)).
-		Foreground(lipgloss.Color(s.NeonGreen))
+		Background(lipgloss.Color(s.GreenPrimary))
 }
+
+// ScrollbarWidth — ширина scrollbar в колонках. Используется и в рендере,
+// и в layout (recomputeListSize).
+const ScrollbarWidth = 2
 
 // === Footer ===
 
@@ -251,6 +261,16 @@ func (s *StyleConfig) FooterContainerStyle() lipgloss.Style {
 		Padding(0, 2).
 		Background(lipgloss.Color(s.DarkBg)).
 		Foreground(lipgloss.Color(s.TextSecondary))
+}
+
+// FooterPrimaryCTAStyle — стиль primary-кнопки footer'а («pill» Enter — Запустить).
+// Заливной зелёный + тёмный текст, по аналогии с VersionBadge / TabActive.
+func (s *StyleConfig) FooterPrimaryCTAStyle() lipgloss.Style {
+	return lipgloss.NewStyle().
+		Bold(true).
+		Padding(0, 2).
+		Background(lipgloss.Color(s.GreenPrimary)).
+		Foreground(lipgloss.Color(s.GreenDark))
 }
 
 // FooterKeyStyle — клавиша в футере: KeyHint bold, subtle bg BgPanel.

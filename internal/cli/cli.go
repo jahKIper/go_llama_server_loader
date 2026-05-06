@@ -452,6 +452,14 @@ func (c *CLI) SelectedModelName() string {
 // Terminal UI components using charm.land/bubbles/v2/list and bubbletea/v2
 // ============================================================================
 
+// Layout-константы «воздуха»: симметричный outer-padding и зазоры между блоками.
+// Меньшие значения сделают UI плотным, большие — растянут.
+const (
+	OuterPadH = 4 // горизонтальный gutter (≈3% от 130-col терминала)
+	OuterPadV = 1 // вертикальный padding сверху/снизу
+	BlockGap  = 1 // зазор между header↔content↔footer
+)
+
 // App represents the main TUI application.
 type App struct {
 	list         list.Model
@@ -628,25 +636,27 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 // recomputeListSize пересчитывает размер списка по текущим width/height.
+// Учитывает outer-padding и BlockGap, чтобы list не вылезал за «воздушный» layout.
 func (a *App) recomputeListSize() {
 	if a.width == 0 || a.height == 0 {
 		return
 	}
 
-	headerH := a.height * 10 / 100
-	footerH := a.height * 10 / 100
-	if headerH < 1 {
-		headerH = 1
+	innerW, padH := a.outerInnerWidth()
+	_ = padH
+
+	// header(1) + footer(1) — фиксированные. Зазоры — 2*BlockGap.
+	headerH := 1
+	footerH := 1
+	contentH := a.height - 2*OuterPadV - headerH - 2*BlockGap - footerH
+	if contentH < 7 {
+		contentH = 7
 	}
-	if footerH < 1 {
-		footerH = 1
-	}
-	contentH := a.height - headerH - footerH
 
 	contentStyle := a.styles.ContentBlockStyle()
-	// -1 под scrollbar справа
-	listW := a.width - contentStyle.GetHorizontalFrameSize() - 1
-	// filterRow (3 строки с рамкой) + padding внутри блока
+	// listW = inner area content-блока минус scrollbar
+	listW := innerW - contentStyle.GetHorizontalFrameSize() - ScrollbarWidth
+	// filterRow (3 строки с рамкой) + verticalFrame content-блока
 	listH := contentH - contentStyle.GetVerticalFrameSize() - 3
 
 	if listW < 10 {
@@ -656,6 +666,49 @@ func (a *App) recomputeListSize() {
 		listH = 7
 	}
 	a.list.SetSize(listW, listH)
+}
+
+// scrollbarParams вычисляет (offset, visible, total) для RenderScrollbar.
+// offset аппроксимируется по индексу курсора, а не по пагинатору, поэтому
+// thumb следует за курсором плавно, а не прыгает страницами.
+func (a *App) scrollbarParams() (offset, visible, total int) {
+	itemH := (&StyledDelegate{}).Height()
+	if itemH < 1 {
+		itemH = 1
+	}
+	listH := a.list.Height()
+	total = len(a.list.Items())
+	visible = listH / itemH
+	if visible < 1 {
+		visible = 1
+	}
+	idx := a.list.Index()
+	offset = idx - visible/2
+	if offset < 0 {
+		offset = 0
+	}
+	if mx := total - visible; offset > mx {
+		offset = mx
+	}
+	if offset < 0 {
+		offset = 0
+	}
+	return offset, visible, total
+}
+
+// outerInnerWidth возвращает ширину «inner column» (a.width минус 2*OuterPadH)
+// и фактический padH. При очень узком терминале (<20 col) padding отключается,
+// чтобы UI не ломался.
+func (a *App) outerInnerWidth() (innerW, padH int) {
+	padH = OuterPadH
+	if a.width < 20 {
+		padH = 0
+	}
+	innerW = a.width - 2*padH
+	if innerW < 1 {
+		innerW = 1
+	}
+	return innerW, padH
 }
 
 // applyFilter применяет filterText к списку и синхронизирует filterState и countShown.
@@ -699,34 +752,28 @@ func (a *App) View() tea.View {
 		return v
 	}
 
+	innerW, padH := a.outerInnerWidth()
+
 	// ── Block 1: Header (version слева, title по центру, tabs справа) ─────
-	// lipgloss v2 .Width() задаёт total width; рендер в inner-area идёт на (a.width - frame).
 	headerStyle := a.styles.HeaderBlockStyle()
-	headerInnerW := a.width - headerStyle.GetHorizontalFrameSize()
+	headerInnerW := innerW - headerStyle.GetHorizontalFrameSize()
 	if headerInnerW < 1 {
 		headerInnerW = 1
 	}
 	header := headerStyle.
-		Width(a.width).
+		Width(innerW).
 		Render(RenderHeader(a.title, a.version, a.styles, headerInnerW, a.tabs.Render()))
 
 	// ── Block 2: Content ──────────────────────────────────────────────────
-	// lipgloss v2 .Width() — total width. Content-блок занимает всю ширину терминала;
-	// inner area внутри = a.width - frame, и именно её занимает filterRow.
 	contentStyle := a.styles.ContentBlockStyle()
-	blockW := a.width - contentStyle.GetHorizontalFrameSize()
+	contentInnerW := innerW - contentStyle.GetHorizontalFrameSize()
 
-	// Фильтр — всегда виден (idle или active). Передаём inner-area;
-	// filterInput сам вызовет .Width(blockW) (total width = blockW).
-	filterRow := a.filterInput.Render(blockW)
+	filterRow := a.filterInput.Render(contentInnerW)
 
-	// Scrollbar параметры
-	total := len(a.list.Items())
-	visible := a.list.Paginator.PerPage
-	offset := a.list.Paginator.Page * a.list.Paginator.PerPage
+	// Scrollbar параметры (плавный offset по курсору)
 	_, listH := a.list.Width(), a.list.Height()
-
-	scrollbar := RenderScrollbar(offset, visible, total, listH, a.styles)
+	sbOffset, sbVisible, sbTotal := a.scrollbarParams()
+	scrollbar := RenderScrollbar(sbOffset, sbVisible, sbTotal, listH, a.styles)
 
 	listWithScrollbar := lipgloss.JoinHorizontal(lipgloss.Top,
 		a.list.View(),
@@ -738,21 +785,42 @@ func (a *App) View() tea.View {
 		listWithScrollbar,
 	)
 
-	rawContent := contentStyle.Width(a.width).Render(innerContent)
+	rawContent := contentStyle.Width(innerW).Render(innerContent)
 
-	// Инжектируем счётчик в верхнюю границу content-блока
 	counter := fmt.Sprintf("%d / %d", a.countShown, a.countTotal)
 	content := InjectBorderTitle(rawContent, "Список моделей", counter)
 
 	// ── Block 3: Footer ───────────────────────────────────────────────────
+	if _, ok := a.list.SelectedItem().(*ListItem); ok {
+		a.footer.SetPrimaryCTA(" Enter — Запустить выбранную модель ")
+	} else {
+		a.footer.SetPrimaryCTA("")
+	}
+	a.footer.SetWidth(innerW)
 	footerLine := a.footer.Render()
 
-	// ── Сборка экрана ────────────────────────────────────────────────────
-	screen := lipgloss.JoinVertical(lipgloss.Left,
-		header,
-		content,
-		footerLine,
-	)
+	// ── Сборка стека с зазорами ───────────────────────────────────────────
+	gapStyle := lipgloss.NewStyle().
+		Background(lipgloss.Color(a.styles.DarkBg)).
+		Width(innerW)
+	gap := gapStyle.Render("")
+	stackParts := []string{header}
+	for i := 0; i < BlockGap; i++ {
+		stackParts = append(stackParts, gap)
+	}
+	stackParts = append(stackParts, content)
+	for i := 0; i < BlockGap; i++ {
+		stackParts = append(stackParts, gap)
+	}
+	stackParts = append(stackParts, footerLine)
+	stack := lipgloss.JoinVertical(lipgloss.Left, stackParts...)
+
+	// ── Outer padding: симметричный gutter + воздух сверху/снизу ──────────
+	screen := lipgloss.NewStyle().
+		Background(lipgloss.Color(a.styles.DarkBg)).
+		Padding(OuterPadV, padH).
+		Width(a.width).
+		Render(stack)
 
 	v := tea.NewView(screen)
 	v.AltScreen = true
