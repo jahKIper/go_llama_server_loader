@@ -18,3 +18,6 @@
 # Markdown files (except README.md)
 *.md
 !README.md
+
+# Plans directory
+plans/
