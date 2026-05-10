@@ -4,19 +4,17 @@ import (
 	"strings"
 
 	"charm.land/lipgloss/v2"
+
+	"llama-server-loader/internal/cli/uistyle"
 )
 
+// ScrollbarWidth — ширина scrollbar в колонках.
+const ScrollbarWidth = uistyle.ScrollbarWidth
+
 // RenderScrollbar возвращает вертикальный scrollbar шириной ScrollbarWidth (2 col).
-// Track и thumb рендерятся как bg-fill (без glyph'ов) — стабильно в любом
-// терминале, не «дрожит» от шрифта.
-//
-// Если total <= visible, возвращает пустую колонку BgPanel (scrollbar скрыт,
-// но высота/ширина сохраняются — UI не «прыгает»).
-// Параметры: offset — первый видимый элемент, visible — кол-во видимых,
-// total — кол-во всех, height — высота в строках.
-func RenderScrollbar(offset, visible, total, height int, st *StyleConfig) string {
+func RenderScrollbar(offset, visible, total, height int, st *uistyle.StyleConfig) string {
 	lines := make([]string, height)
-	cell := strings.Repeat(" ", ScrollbarWidth)
+	cell := strings.Repeat(" ", uistyle.ScrollbarWidth)
 
 	if total <= visible || height == 0 {
 		emptyCell := lipgloss.NewStyle().

@@ -1,6 +1,10 @@
 package cli
 
-import "charm.land/lipgloss/v2"
+import (
+	"charm.land/lipgloss/v2"
+
+	"llama-server-loader/internal/cli/uistyle"
+)
 
 // Tab описывает один таб в панели табов.
 type Tab struct {
@@ -12,11 +16,11 @@ type Tab struct {
 type TabBar struct {
 	tabs   []Tab
 	active int
-	styles *StyleConfig
+	styles *uistyle.StyleConfig
 }
 
 // NewTabBar создаёт TabBar с тремя табами: Models (enabled), Running, Logs (disabled).
-func NewTabBar(st *StyleConfig) *TabBar {
+func NewTabBar(st *uistyle.StyleConfig) *TabBar {
 	return &TabBar{
 		tabs: []Tab{
 			{Label: "Models", Enabled: true},
@@ -35,7 +39,7 @@ func (tb *TabBar) SetActive(i int) {
 	}
 }
 
-// Next переключает на следующий enabled таб. Если enabled только один — no-op.
+// Next переключает на следующий enabled таб.
 func (tb *TabBar) Next() {
 	for step := 1; step < len(tb.tabs); step++ {
 		idx := (tb.active + step) % len(tb.tabs)
@@ -46,7 +50,7 @@ func (tb *TabBar) Next() {
 	}
 }
 
-// Prev переключает на предыдущий enabled таб. Если enabled только один — no-op.
+// Prev переключает на предыдущий enabled таб.
 func (tb *TabBar) Prev() {
 	for step := 1; step < len(tb.tabs); step++ {
 		idx := (tb.active - step + len(tb.tabs)) % len(tb.tabs)

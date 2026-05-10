@@ -3,10 +3,12 @@ package cli
 import (
 	"strings"
 	"testing"
+
+	"llama-server-loader/internal/cli/uistyle"
 )
 
 func TestNewTabBar_DefaultState(t *testing.T) {
-	tb := NewTabBar(GetStyles())
+	tb := NewTabBar(uistyle.GetStyles())
 	if tb.Active() != 0 {
 		t.Errorf("expected active=0, got %d", tb.Active())
 	}
@@ -22,7 +24,7 @@ func TestNewTabBar_DefaultState(t *testing.T) {
 }
 
 func TestTabBar_SetActive(t *testing.T) {
-	tb := NewTabBar(GetStyles())
+	tb := NewTabBar(uistyle.GetStyles())
 	tb.SetActive(2)
 	if tb.Active() != 2 {
 		t.Errorf("expected active=2, got %d", tb.Active())
@@ -35,7 +37,7 @@ func TestTabBar_SetActive(t *testing.T) {
 }
 
 func TestTabBarNext_SkipsDisabled(t *testing.T) {
-	tb := NewTabBar(GetStyles())
+	tb := NewTabBar(uistyle.GetStyles())
 	// Только один enabled таб (Models) — Next() должен быть no-op
 	tb.Next()
 	if tb.Active() != 0 {
@@ -44,7 +46,7 @@ func TestTabBarNext_SkipsDisabled(t *testing.T) {
 }
 
 func TestTabBarPrev_SkipsDisabled(t *testing.T) {
-	tb := NewTabBar(GetStyles())
+	tb := NewTabBar(uistyle.GetStyles())
 	tb.Prev()
 	if tb.Active() != 0 {
 		t.Errorf("Prev() with one enabled tab should be no-op, got active=%d", tb.Active())
@@ -52,7 +54,7 @@ func TestTabBarPrev_SkipsDisabled(t *testing.T) {
 }
 
 func TestTabBarNext_MultipleEnabled(t *testing.T) {
-	tb := NewTabBar(GetStyles())
+	tb := NewTabBar(uistyle.GetStyles())
 	// Включаем все табы вручную
 	tb.tabs[1].Enabled = true
 	tb.tabs[2].Enabled = true
@@ -74,7 +76,7 @@ func TestTabBarNext_MultipleEnabled(t *testing.T) {
 }
 
 func TestTabBarPrev_MultipleEnabled(t *testing.T) {
-	tb := NewTabBar(GetStyles())
+	tb := NewTabBar(uistyle.GetStyles())
 	tb.tabs[1].Enabled = true
 	tb.tabs[2].Enabled = true
 
@@ -86,7 +88,7 @@ func TestTabBarPrev_MultipleEnabled(t *testing.T) {
 }
 
 func TestTabBar_Render_ContainsLabels(t *testing.T) {
-	tb := NewTabBar(GetStyles())
+	tb := NewTabBar(uistyle.GetStyles())
 	out := tb.Render()
 	for _, label := range []string{"Models", "Running", "Logs"} {
 		if !strings.Contains(out, label) {

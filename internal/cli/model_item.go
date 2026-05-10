@@ -9,6 +9,7 @@ import (
 	"charm.land/bubbles/v2/list"
 	"charm.land/lipgloss/v2"
 
+	"llama-server-loader/internal/cli/uistyle"
 	"llama-server-loader/pkg/modelscan"
 )
 
@@ -22,7 +23,7 @@ func NewListItem(m *modelscan.Model) *ListItem {
 	return &ListItem{model: m}
 }
 
-// Title возвращает заголовок элемента (для совместимости с list.Interface).
+// Title возвращает заголовок элемента.
 func (l *ListItem) Title() string {
 	return l.model.Name
 }
@@ -46,24 +47,19 @@ func (l *ListItem) Model() *modelscan.Model {
 }
 
 // Render рендерит элемент списка.
-// Структура (Height=8):
-//   - Selected:   F-bracket с border top+bottom (name+path+meta+badges, 6 строк) = 8
-//   - Unselected: пустая строка(1) + name+path+meta+badges(6) + пустая строка(1) = 8
 func (l *ListItem) Render(w io.Writer, m list.Model, index int, item list.Item) {
 	listItem := item.(*ListItem)
 	model := listItem.model
 
-	st := GetStyles()
+	st := uistyle.GetStyles()
 	if st == nil {
-		st = &StyleConfig{}
+		st = &uistyle.StyleConfig{}
 	}
 
 	selected := m.Index() == index
 	itemWidth := m.Width()
 
 	quant := extractQuantization(model.Name)
-	// Dot-индикатор: цвет — состояние выбора (фиолетовый акцент).
-	// Bg делаем явным под состояние, чтобы ANSI-reset не оставлял «дырку».
 	var dotFg, dotBg string
 	if selected {
 		dotFg = st.AccentPurple
@@ -84,20 +80,14 @@ func (l *ListItem) Render(w io.Writer, m list.Model, index int, item list.Item) 
 	}
 }
 
-// renderSelected рендерит выбранный item: halo-top + F-bracket(name+path+badges) + halo-bottom.
-func renderSelected(model *modelscan.Model, dot, quant string, itemWidth int, st *StyleConfig) string {
+// renderSelected рендерит выбранный item.
+func renderSelected(model *modelscan.Model, dot, quant string, itemWidth int, st *uistyle.StyleConfig) string {
 	bracketStyle := st.ItemSelectedStyle()
 	innerW := itemWidth - bracketStyle.GetHorizontalFrameSize()
 	if innerW < 1 {
 		innerW = 1
 	}
 
-	// rowFill — стиль с фоном BgSelected и Width=innerW. Им оборачиваем
-	// уже отстайленный inline-контент, чтобы добить пустоту справа фоном.
-	// ВАЖНО: lipgloss теряет внешний bg после inner ANSI-reset, если внутри
-	// строки есть plain-текст после вложенного отстайленного куска. Поэтому
-	// все вложения собираем через JoinHorizontal предстайленных кусков
-	// (у каждого свой bg), а не конкатенацией с plain-string.
 	rowFill := lipgloss.NewStyle().
 		Background(lipgloss.Color(st.BgSelected)).
 		Width(innerW)
@@ -124,33 +114,25 @@ func renderSelected(model *modelscan.Model, dot, quant string, itemWidth int, st
 		PaddingLeft(2).
 		Render(formatMetadataBadgesSelected(model, st))
 
-	// Пустые строки сверху и снизу — компенсируют отсутствие top/bottom border'а,
-	// суммарная высота selected = 7 (как у normal) и список не прыгает.
 	empty := rowFill.Render("")
 	content := lipgloss.JoinVertical(lipgloss.Left, empty, nameLine, pathLine, badgeBlock, empty)
 
-	// Левая полоса NeonGreen, BgSelected — рамка только слева.
-	// lipgloss v2 .Width() — total width: задаём itemWidth, чтобы занять всю ширину item'а.
 	if itemWidth > 0 {
 		bracketStyle = bracketStyle.Width(itemWidth)
 	}
 	return bracketStyle.Render(content)
 }
 
-// renderNormal рендерит обычный (не выбранный) item: пустая строка + контент + пустая строка.
-func renderNormal(model *modelscan.Model, dot, quant string, itemWidth int, st *StyleConfig) string {
+// renderNormal рендерит обычный (не выбранный) item.
+func renderNormal(model *modelscan.Model, dot, quant string, itemWidth int, st *uistyle.StyleConfig) string {
 	if itemWidth < 1 {
 		itemWidth = 1
 	}
 
-	// rowFill — фон DarkBg + Width=itemWidth для добивки пустоты справа.
-	// Inline-контент с предстайленными вставками собираем через JoinHorizontal,
-	// чтобы lipgloss не терял bg после внутренних ANSI-reset.
 	rowFill := lipgloss.NewStyle().
 		Background(lipgloss.Color(st.DarkBg)).
 		Width(itemWidth)
 
-	// nameLine: левый padding (2) + dot + " " + имя + [ мета ] — каждый кусок отстайлен.
 	leftPad2 := lipgloss.NewStyle().
 		Background(lipgloss.Color(st.DarkBg)).
 		Render("  ")
@@ -179,13 +161,11 @@ func renderNormal(model *modelscan.Model, dot, quant string, itemWidth int, st *
 
 	content := lipgloss.JoinVertical(lipgloss.Left, nameLine, pathLine, badgeBlock)
 
-	// Пустые строки сверху и снизу для стабильной высоты = 8 строк.
 	empty := rowFill.Render("")
 	return lipgloss.JoinVertical(lipgloss.Left, empty, content, empty)
 }
 
-// quantColor возвращает hex-строку цвета точки-индикатора по квантованию.
-func quantColor(quant string, st *StyleConfig) string {
+func quantColor(quant string, st *uistyle.StyleConfig) string {
 	switch {
 	case strings.HasPrefix(quant, "Q5"),
 		strings.HasPrefix(quant, "Q6"),
@@ -215,7 +195,7 @@ func computePathWidth(m list.Model) int {
 	return 30
 }
 
-// truncatePathLeft обрезает путь слева, оставляя видимым конец пути. UTF-8 safe.
+// truncatePathLeft обрезает путь слева, оставляя видимым конец пути.
 func truncatePathLeft(path string, maxLen int) string {
 	if maxLen <= 0 {
 		return "..."
@@ -228,9 +208,8 @@ func truncatePathLeft(path string, maxLen int) string {
 	return "..." + suffix
 }
 
-// formatMetaBracket возвращает « [ GGUF · Q6_K · 5.8GB · mmproj ]» для вставки
-// в строку имени модели. Текст и скобки — TextMuted, разделители — TextSecondary.
-func formatMetaBracket(m *modelscan.Model, st *StyleConfig, parentBg string) string {
+// formatMetaBracket возвращает «[ GGUF · Q6_K · 5.8GB · mmproj ]» для вставки в строку имени.
+func formatMetaBracket(m *modelscan.Model, st *uistyle.StyleConfig, parentBg string) string {
 	if st == nil {
 		return ""
 	}
@@ -258,10 +237,8 @@ func formatMetaBracket(m *modelscan.Model, st *StyleConfig, parentBg string) str
 	return lipgloss.JoinHorizontal(lipgloss.Top, pieces...)
 }
 
-// formatMetaLine формирует одну строку «meta» под path в карточке модели:
-// формат · квантование · размер[ · mmproj]. Разделители красятся в TextSecondary
-// для приглушённого dot-separator стиля. parentBg — фон строки (DarkBg/BgSelected).
-func formatMetaLine(m *modelscan.Model, st *StyleConfig, parentBg string) string {
+// formatMetaLine формирует одну строку «meta» под path в карточке модели.
+func formatMetaLine(m *modelscan.Model, st *uistyle.StyleConfig, parentBg string) string {
 	if st == nil {
 		return ""
 	}
@@ -290,14 +267,12 @@ func formatMetaLine(m *modelscan.Model, st *StyleConfig, parentBg string) string
 }
 
 // formatMetadataBadges формирует строку бейджей для обычного (unselected) item.
-func formatMetadataBadges(m *modelscan.Model, st *StyleConfig) string {
+func formatMetadataBadges(m *modelscan.Model, st *uistyle.StyleConfig) string {
 	return formatMetadataBadgesWithBg(m, st, "")
 }
 
-// formatMetadataBadgesSelected — те же бейджи, что и в normal-состоянии,
-// только parentBg = BgSelected. Стили рамок/текста идентичны — визуально бейджи
-// не «прыгают» при переключении выбора, меняется только фон под ними.
-func formatMetadataBadgesSelected(m *modelscan.Model, st *StyleConfig) string {
+// formatMetadataBadgesSelected — те же бейджи с parentBg = BgSelected.
+func formatMetadataBadgesSelected(m *modelscan.Model, st *uistyle.StyleConfig) string {
 	if st == nil {
 		return formatMetadataBadges(m, st)
 	}
@@ -305,9 +280,7 @@ func formatMetadataBadgesSelected(m *modelscan.Model, st *StyleConfig) string {
 }
 
 // formatMetadataBadgesWithBg — общая реализация с настраиваемым фоном separator'а.
-// parentBg — цвет фона строки-родителя (DarkBg / BgSelected) для прокраски пробелов
-// между бейджами; пустая строка → DarkBg по умолчанию.
-func formatMetadataBadgesWithBg(m *modelscan.Model, st *StyleConfig, parentBg string) string {
+func formatMetadataBadgesWithBg(m *modelscan.Model, st *uistyle.StyleConfig, parentBg string) string {
 	if st == nil {
 		parts := "[" + formatSize(m.Size) + "]"
 		if len(m.MMProjPaths) > 0 {
@@ -319,8 +292,6 @@ func formatMetadataBadgesWithBg(m *modelscan.Model, st *StyleConfig, parentBg st
 	if parentBg == "" {
 		parentBg = st.DarkBg
 	}
-	// sep — 3 строки высотой (как у бейджа с border'ом), чтобы JoinHorizontal
-	// не достраивал короткий sep голыми пробелами без bg.
 	sepCell := lipgloss.NewStyle().
 		Background(lipgloss.Color(parentBg)).
 		Render("  ")
@@ -330,7 +301,6 @@ func formatMetadataBadgesWithBg(m *modelscan.Model, st *StyleConfig, parentBg st
 		sep,
 	}
 	if len(m.MMProjPaths) > 0 {
-		// Сначала надпись с зелёной заливкой, затем оборачиваем в рамку с фоном строки.
 		mmLabel := st.MMProjLabelStyle().Render("mmproj")
 		parts = append(parts, st.MMProjBadgeStyle(parentBg).Render(mmLabel), sep)
 	}
@@ -366,11 +336,10 @@ func extractQuantization(name string) string {
 
 type StyledDelegate struct {
 	base   list.DefaultDelegate
-	styles *StyleConfig
+	styles *uistyle.StyleConfig
 }
 
 func (d *StyledDelegate) Height() int {
-	// empty(1) + name+meta(1) + path(1) + badges(3) + empty(1) = 7
 	return 7
 }
 

@@ -4,6 +4,8 @@ import (
 	"strings"
 
 	"charm.land/lipgloss/v2"
+
+	"llama-server-loader/internal/cli/uistyle"
 )
 
 // HelpRow представляет одну строку подсказок в футере.
@@ -13,18 +15,16 @@ type HelpRow struct {
 }
 
 // Footer — минималистичный однострочный footer с двумя группами биндингов.
-// Левая группа (навигация, фильтр, помощь) + правая (выход) — разделены spacer-ом.
-// Опционально слева отображается primary-CTA (зелёный «pill» с действием Enter).
 type Footer struct {
 	leftRows   []HelpRow
 	rightRows  []HelpRow
-	styles     *StyleConfig
+	styles     *uistyle.StyleConfig
 	width      int
-	primaryCTA string // если не пустой — рендерится как зелёная кнопка слева
+	primaryCTA string
 }
 
 // NewFooter создаёт Footer с дефолтными биндингами.
-func NewFooter(styles *StyleConfig) *Footer {
+func NewFooter(styles *uistyle.StyleConfig) *Footer {
 	return &Footer{
 		leftRows: []HelpRow{
 			{Keys: "↑↓", Label: "навигация"},
@@ -58,7 +58,6 @@ func (f *Footer) Render() string {
 	hintsLeftStr := f.renderGroup(f.leftRows)
 	rightStr := f.renderGroup(f.rightRows)
 
-	// CTA + разделитель перед hints (если CTA задан)
 	var ctaStr, ctaSepStr string
 	if f.primaryCTA != "" {
 		ctaStr = f.styles.FooterPrimaryCTAStyle().Render(f.primaryCTA)
@@ -71,7 +70,6 @@ func (f *Footer) Render() string {
 	hintsLeftW := lipgloss.Width(hintsLeftStr)
 	rightW := lipgloss.Width(rightStr)
 
-	// Inner width — без padding контейнера; spacer должен заполнять только эту область.
 	innerW := f.width - f.styles.FooterContainerStyle().GetHorizontalFrameSize()
 	if innerW < 1 {
 		innerW = 1
@@ -114,7 +112,6 @@ func (f *Footer) renderRow(row HelpRow) string {
 }
 
 // applyContainer оборачивает контент в FooterContainerStyle.
-// lipgloss v2 .Width() — total width, поэтому передаём f.width напрямую.
 func (f *Footer) applyContainer(content string) string {
 	style := f.styles.FooterContainerStyle()
 	if f.width > 0 {
@@ -138,8 +135,7 @@ func (f *Footer) renderFallback() string {
 // ============================================================================
 
 // RenderHeader рендерит шапку: version-бейдж слева, title по центру, tabs справа.
-// Если tabsStr пуст — сохраняется старое поведение (симметричный отступ справа).
-func RenderHeader(title, version string, styles *StyleConfig, width int, tabsStr ...string) string {
+func RenderHeader(title, version string, styles *uistyle.StyleConfig, width int, tabsStr ...string) string {
 	if styles == nil {
 		return title
 	}
@@ -154,7 +150,6 @@ func RenderHeader(title, version string, styles *StyleConfig, width int, tabsStr
 		tabsW = lipgloss.Width(tabs)
 	}
 
-	// Title занимает пространство между бейджем и табами.
 	available := width - badgeW - tabsW
 	if available < 1 {
 		return versionBadge + "  " + styles.TitleStyle().Render(title)

@@ -134,6 +134,71 @@ func TestParseFlags(t *testing.T) {
 			wantErr:   true,
 			validate:  nil,
 		},
+		{
+			name:    "params-file flag space",
+			args:    []string{"--params-file", "/data/params_ru.json"},
+			wantErr: false,
+			validate: func(t *testing.T, f *Flags) {
+				if f.ParamsFile != "/data/params_ru.json" {
+					t.Errorf("expected params-file=/data/params_ru.json, got %s", f.ParamsFile)
+				}
+			},
+		},
+		{
+			name:    "params-file flag equals",
+			args:    []string{"--params-file=/data/params_ru.json"},
+			wantErr: false,
+			validate: func(t *testing.T, f *Flags) {
+				if f.ParamsFile != "/data/params_ru.json" {
+					t.Errorf("expected params-file=/data/params_ru.json, got %s", f.ParamsFile)
+				}
+			},
+		},
+		{
+			name:    "models-config flag space",
+			args:    []string{"--models-config", "/data/models.json"},
+			wantErr: false,
+			validate: func(t *testing.T, f *Flags) {
+				if f.ModelsConfig != "/data/models.json" {
+					t.Errorf("expected models-config=/data/models.json, got %s", f.ModelsConfig)
+				}
+			},
+		},
+		{
+			name:    "models-config flag equals",
+			args:    []string{"--models-config=/data/models.json"},
+			wantErr: false,
+			validate: func(t *testing.T, f *Flags) {
+				if f.ModelsConfig != "/data/models.json" {
+					t.Errorf("expected models-config=/data/models.json, got %s", f.ModelsConfig)
+				}
+			},
+		},
+		{
+			name:      "missing value for params-file",
+			args:      []string{"--params-file"},
+			wantErr:   true,
+			validate:  nil,
+		},
+		{
+			name:      "missing value for models-config",
+			args:      []string{"--models-config"},
+			wantErr:   true,
+			validate:  nil,
+		},
+		{
+			name:    "params-file and models-config together",
+			args:    []string{"--params-file", "./params_ru.json", "--models-config", "./models.json"},
+			wantErr: false,
+			validate: func(t *testing.T, f *Flags) {
+				if f.ParamsFile != "./params_ru.json" {
+					t.Errorf("expected params-file=./params_ru.json, got %s", f.ParamsFile)
+				}
+				if f.ModelsConfig != "./models.json" {
+					t.Errorf("expected models-config=./models.json, got %s", f.ModelsConfig)
+				}
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -158,13 +223,15 @@ func TestParseFlags(t *testing.T) {
 
 func TestNewCLI(t *testing.T) {
 	tests := []struct {
-		name          string
-		flags         *Flags
-		wantScanDir   string
-		wantModel     string
-		wantThreads   int
-		wantTemp      float64
-		wantWebPort   int
+		name               string
+		flags              *Flags
+		wantScanDir        string
+		wantModel          string
+		wantThreads        int
+		wantTemp           float64
+		wantWebPort        int
+		wantParamsFile     string
+		wantModelsConfig   string
 	}{
 		{
 			name: "all flags set",
@@ -189,6 +256,16 @@ func TestNewCLI(t *testing.T) {
 			},
 			wantWebPort: 8080,
 		},
+		{
+			name: "params-file and models-config propagated",
+			flags: &Flags{
+				ParamsFile:   "/data/params_ru.json",
+				ModelsConfig: "/data/models.json",
+			},
+			wantWebPort:      8080,
+			wantParamsFile:   "/data/params_ru.json",
+			wantModelsConfig: "/data/models.json",
+		},
 	}
 
 	for _, tt := range tests {
@@ -208,6 +285,12 @@ func TestNewCLI(t *testing.T) {
 			}
 			if c.webPort != tt.wantWebPort {
 				t.Errorf("webPort = %d, want %d", c.webPort, tt.wantWebPort)
+			}
+			if c.paramsFile != tt.wantParamsFile {
+				t.Errorf("paramsFile = %s, want %s", c.paramsFile, tt.wantParamsFile)
+			}
+			if c.modelsConfigPath != tt.wantModelsConfig {
+				t.Errorf("modelsConfigPath = %s, want %s", c.modelsConfigPath, tt.wantModelsConfig)
 			}
 		})
 	}

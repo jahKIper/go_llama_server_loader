@@ -108,6 +108,10 @@ require (
 
 Пользовательская конфигурация для сохранения выбранных моделей и их настроек. Подробнее в [docs/models_json_format.md](docs/models_json_format.md).
 
+### Экран «Параметры запуска модели»
+
+TUI-экран для интерактивного подбора флагов `llama-server` после выбора модели. Подробнее в [docs/run_config_screen.md](docs/run_config_screen.md).
+
 ## 🔌 JSON-RPC 2.0 API
 
 Web UI использует JSON-RPC 2.0 над HTTP для коммуникации с сервером.
