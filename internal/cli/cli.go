@@ -315,47 +315,49 @@ func (c *CLI) runInteractive() error {
 	// Ensure background is reset on exit (defer cleanup)
 	defer ResetTerminalBackground()
 
-	// Create and run TUI
-	app := NewApp(enrichedModels)
-	p := tea.NewProgram(app)
-	_, err = p.Run()
-	if err != nil {
-		return fmt.Errorf("error running TUI: %w", err)
-	}
-
-	// Store selected model
-	c.selectedModel = app.selected
-
-	// If no model was selected (e.g., user pressed Esc), return without error
-	if c.selectedModel == nil {
-		log.Println("No model selected, returning to model list")
-		fmt.Println("\nМодель не выбрана")
-		return nil
-	}
-
-	log.Printf("Selected model: %+v", c.selectedModel)
-
-	// Запускаем второй экран — параметры запуска модели
 	paramsFilePath, _ := runconfig.ResolveParamsFile(c.paramsFile)
-	rcApp := runconfig.NewApp(c.selectedModel, paramsFilePath)
-	p2 := tea.NewProgram(rcApp)
-	if _, err = p2.Run(); err != nil {
-		return fmt.Errorf("error running run config TUI: %w", err)
+	modelsCfgPath := c.modelsConfigPath
+	if modelsCfgPath == "" {
+		modelsCfgPath = "models.json"
 	}
 
-	res := rcApp.Result()
-	log.Printf("runconfig: action=%v rows=%d", res.Action, len(res.Rows))
-
-	if res.Action == runconfig.ActionRun {
-		modelsCfgPath := c.modelsConfigPath
-		if modelsCfgPath == "" {
-			modelsCfgPath = "models.json"
+	// Навигация между экранами в цикле: первый экран → второй экран → (Back →
+	// снова первый, Run → запуск llama-server, Cancel/q → выход).
+	for {
+		// ── Первый экран: выбор модели ───────────────────────────────────────
+		app := NewApp(enrichedModels)
+		p := tea.NewProgram(app)
+		if _, err = p.Run(); err != nil {
+			return fmt.Errorf("error running TUI: %w", err)
 		}
-		ResetTerminalBackground()
-		return runconfig.SaveAndRun(modelsCfgPath, res.Model, res.Rows)
-	}
+		c.selectedModel = app.selected
+		if c.selectedModel == nil {
+			log.Println("No model selected, returning to model list")
+			fmt.Println("\nМодель не выбрана")
+			return nil
+		}
+		log.Printf("Selected model: %+v", c.selectedModel)
 
-	return nil
+		// ── Второй экран: параметры запуска ──────────────────────────────────
+		rcApp := runconfig.NewApp(c.selectedModel, paramsFilePath, modelsCfgPath)
+		p2 := tea.NewProgram(rcApp)
+		if _, err = p2.Run(); err != nil {
+			return fmt.Errorf("error running run config TUI: %w", err)
+		}
+		res := rcApp.Result()
+		log.Printf("runconfig: action=%v rows=%d", res.Action, len(res.Rows))
+
+		switch res.Action {
+		case runconfig.ActionBack:
+			// Возврат к выбору модели — повторяем цикл.
+			continue
+		case runconfig.ActionRun:
+			ResetTerminalBackground()
+			return runconfig.SaveAndRun(modelsCfgPath, res.Model, res.Rows)
+		default:
+			return nil
+		}
+	}
 }
 
 // generateParameters creates a parameter configuration file.
@@ -848,7 +850,7 @@ func (a *App) View() tea.View {
 
 	// ── Block 3: Footer ───────────────────────────────────────────────────
 	if _, ok := a.list.SelectedItem().(*ListItem); ok {
-		a.footer.SetPrimaryCTA(" Enter — Запустить выбранную модель ")
+		a.footer.SetPrimaryCTA(" Enter — Параметры модели ")
 	} else {
 		a.footer.SetPrimaryCTA("")
 	}

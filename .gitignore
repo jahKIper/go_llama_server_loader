@@ -11,6 +11,7 @@
 /build/
 /dist/
 llama-server-loader
+*.gguf
 
 # Hidden files and directories
 .*
@@ -23,3 +24,4 @@ llama-server-loader
 # Plans directory
 plans/
 
+testdata/

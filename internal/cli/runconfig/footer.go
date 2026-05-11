@@ -15,6 +15,7 @@ type footerHint struct {
 }
 
 var footerHints = []footerHint{
+	{"Bksp", "← модели"},
 	{"Tab", "переключить"},
 	{"↑↓", "выбрать"},
 	{"Enter", "add/edit"},
@@ -23,7 +24,7 @@ var footerHints = []footerHint{
 	{"?", "описание"},
 	{"/", "поиск"},
 	{"r", "Run"},
-	{"Esc", "отмена"},
+	{"q", "выход"},
 }
 
 // RenderFooter рендерит однострочный footer с подсказками клавиш.
@@ -90,7 +91,7 @@ func RenderFooter(st *uistyle.StyleConfig, w int) string {
 	var line string
 	if len(parts) == 0 {
 		// Вырожденный случай: вообще ничего не влезло — показываем обрезанный текст.
-		fallback := "Tab · ↑↓ · Enter · d · ? · / · r · Esc"
+		fallback := "Bksp · Tab · ↑↓ · Enter · d · ? · / · r · q"
 		runes := []rune(fallback)
 		if len(runes) > w-1 {
 			runes = runes[:w-1]

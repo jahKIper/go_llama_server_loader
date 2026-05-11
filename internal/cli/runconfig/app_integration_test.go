@@ -93,7 +93,7 @@ func TestRunConfigApp_ScenarioA_AddEditRun(t *testing.T) {
 	dir := t.TempDir()
 	catalogPath := writeTempCatalog(t, dir)
 
-	a := NewApp(testModel(), catalogPath)
+	a := NewApp(testModel(), catalogPath, "")
 	a = sendAppWindowSize(a, 120, 40)
 
 	// Начальный фокус — правая панель.
@@ -187,23 +187,19 @@ func TestRunConfigApp_ScenarioA_AddEditRun(t *testing.T) {
 	}
 }
 
-// ── Сценарий B: отмена по Esc ────────────────────────────────────────────────
+// ── Сценарий B: Esc не закрывает приложение ──────────────────────────────────
 
-func TestRunConfigApp_ScenarioB_EscCancel(t *testing.T) {
+func TestRunConfigApp_ScenarioB_EscDoesNotQuit(t *testing.T) {
 	dir := t.TempDir()
 	catalogPath := writeTempCatalog(t, dir)
 
-	a := NewApp(testModel(), catalogPath)
+	a := NewApp(testModel(), catalogPath, "")
 	a = sendAppWindowSize(a, 120, 40)
 
-	// Esc когда фокус на правой панели и фильтр не активен → Cancel.
-	a2, cmd := sendAppKey(a, "esc")
-	if cmd == nil {
-		t.Error("Esc should return tea.Quit cmd")
-	}
-	res := a2.Result()
-	if res.Action != ActionCancel {
-		t.Errorf("expected ActionCancel (%d), got %d", ActionCancel, res.Action)
+	// Esc на правой панели без активного фильтра — не должен завершать программу.
+	_, cmd := sendAppKey(a, "esc")
+	if cmd != nil {
+		t.Error("Esc should NOT return tea.Quit cmd — only 'q' closes the app")
 	}
 }
 
@@ -211,7 +207,7 @@ func TestRunConfigApp_ScenarioB_QCancel(t *testing.T) {
 	dir := t.TempDir()
 	catalogPath := writeTempCatalog(t, dir)
 
-	a := NewApp(testModel(), catalogPath)
+	a := NewApp(testModel(), catalogPath, "")
 	a = sendAppWindowSize(a, 120, 40)
 
 	a2, cmd := sendAppKey(a, "q")
@@ -225,7 +221,7 @@ func TestRunConfigApp_ScenarioB_QCancel(t *testing.T) {
 }
 
 func TestRunConfigApp_ScenarioB_CtrlCCancel(t *testing.T) {
-	a := NewApp(testModel(), "")
+	a := NewApp(testModel(), "", "")
 	a2, cmd := a.Update(tea.KeyPressMsg{Code: rune('c'), Mod: tea.ModCtrl})
 	_ = a2
 	if cmd == nil {
@@ -237,7 +233,7 @@ func TestRunConfigApp_ScenarioB_CtrlCCancel(t *testing.T) {
 
 func TestRunConfigApp_ScenarioC_EmptyCatalog_NoPanic(t *testing.T) {
 	// Передаём несуществующий путь — каталог не загрузится.
-	a := NewApp(testModel(), "/nonexistent/path/params_ru.json")
+	a := NewApp(testModel(), "/nonexistent/path/params_ru.json", "")
 
 	// catalogErr должен быть установлен.
 	if a.catalogErr == nil {
@@ -272,7 +268,7 @@ func TestRunConfigApp_ScenarioC_EmptyCatalog_ShowsNotFound(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	a := NewApp(testModel(), "")
+	a := NewApp(testModel(), "", "")
 	if a.catalogErr == nil {
 		// Нашёлся файл рядом с бинарником — не можем проверить "not found".
 		t.Skip("params_ru.json found via binary-dir fallback, skipping empty-catalog test")
@@ -296,7 +292,7 @@ func TestRunConfigApp_ScenarioC_EmptyCatalog_ShowsNotFound(t *testing.T) {
 func TestRunConfigApp_WindowResize_NoPanic(t *testing.T) {
 	dir := t.TempDir()
 	catalogPath := writeTempCatalog(t, dir)
-	a := NewApp(testModel(), catalogPath)
+	a := NewApp(testModel(), catalogPath, "")
 
 	for _, size := range [][2]int{{120, 40}, {80, 24}, {60, 20}, {40, 10}} {
 		a = sendAppWindowSize(a, size[0], size[1])
@@ -308,7 +304,7 @@ func TestRunConfigApp_WindowResize_NoPanic(t *testing.T) {
 func TestRunConfigApp_TabSwitchesFocus(t *testing.T) {
 	dir := t.TempDir()
 	catalogPath := writeTempCatalog(t, dir)
-	a := NewApp(testModel(), catalogPath)
+	a := NewApp(testModel(), catalogPath, "")
 	a = sendAppWindowSize(a, 120, 40)
 
 	if a.focus != FocusRight {
@@ -327,7 +323,7 @@ func TestRunConfigApp_TabSwitchesFocus(t *testing.T) {
 func TestRunConfigApp_DescriptionPopup(t *testing.T) {
 	dir := t.TempDir()
 	catalogPath := writeTempCatalog(t, dir)
-	a := NewApp(testModel(), catalogPath)
+	a := NewApp(testModel(), catalogPath, "")
 	a = sendAppWindowSize(a, 120, 40)
 
 	// ? — открыть popup.
@@ -354,7 +350,7 @@ func TestRunConfigApp_DescriptionPopup(t *testing.T) {
 func TestRunConfigApp_EscFromFilter_NotQuit(t *testing.T) {
 	dir := t.TempDir()
 	catalogPath := writeTempCatalog(t, dir)
-	a := NewApp(testModel(), catalogPath)
+	a := NewApp(testModel(), catalogPath, "")
 	a = sendAppWindowSize(a, 120, 40)
 
 	// Активировать фильтр.
@@ -381,7 +377,7 @@ func TestRunConfigApp_EscFromFilter_NotQuit(t *testing.T) {
 func TestRunConfigApp_DeleteRow(t *testing.T) {
 	dir := t.TempDir()
 	catalogPath := writeTempCatalog(t, dir)
-	a := NewApp(testModel(), catalogPath)
+	a := NewApp(testModel(), catalogPath, "")
 	a = sendAppWindowSize(a, 120, 40)
 
 	// Добавить параметр через правую панель.
@@ -401,7 +397,7 @@ func TestRunConfigApp_DeleteRow(t *testing.T) {
 func TestRunConfigApp_NoDuplicateRows(t *testing.T) {
 	dir := t.TempDir()
 	catalogPath := writeTempCatalog(t, dir)
-	a := NewApp(testModel(), catalogPath)
+	a := NewApp(testModel(), catalogPath, "")
 	a = sendAppWindowSize(a, 120, 40)
 
 	// Добавить одну и ту же запись дважды.
@@ -417,7 +413,7 @@ func TestRunConfigApp_ResultModel(t *testing.T) {
 	dir := t.TempDir()
 	catalogPath := writeTempCatalog(t, dir)
 	m := testModel()
-	a := NewApp(m, catalogPath)
+	a := NewApp(m, catalogPath, "")
 
 	res := a.Result()
 	if res.Model != m {
@@ -426,7 +422,7 @@ func TestRunConfigApp_ResultModel(t *testing.T) {
 }
 
 func TestRunConfigApp_InitialStateBeforeResize(t *testing.T) {
-	a := NewApp(testModel(), "")
+	a := NewApp(testModel(), "", "")
 	// width == 0 → "Загрузка..."
 	v := a.View()
 	if v.Content == "" {

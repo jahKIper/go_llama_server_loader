@@ -15,7 +15,6 @@ import (
 	"llama-server-loader/internal/config"
 	"llama-server-loader/internal/webui"
 	"llama-server-loader/pkg/modelscan"
-	"llama-server-loader/pkg/servercmd"
 )
 
 func main() {
@@ -127,55 +126,9 @@ func runInteractive(ctx context.Context, c *cli.CLI) error {
 		log.Printf("Конфигурация сохранена в: %s", c.SaveConfig())
 	}
 
-	// Запускаем llama-server через servercmd если выбрана модель
-	if selectedModel != nil && (c.ModelName() != "" || c.SelectedModelName() != "") {
-		return startLlamaServer(ctx, selectedModel, c)
-	}
-
-	return nil
-}
-
-// startLlamaServer запускает llama-server через pkg/servercmd.
-func startLlamaServer(ctx context.Context, model *modelscan.Model, c *cli.CLI) error {
-	log.Printf("Запуск llama-server для модели: %s", model.Path)
-
-	cfg := &servercmd.Config{
-		Version: "1.0",
-		Models: []servercmd.ModelConfig{
-			{
-				Name:       strings.TrimSuffix(filepath.Base(model.Path), ".gguf"),
-				ModelPath:  model.Path,
-				MMProjPath: "",
-				MMProjOn:   false,
-				Size:       model.Size,
-				Flags: map[string]any{
-					"threads":     c.Threads(),
-					"temperature": c.Temperature(),
-					"port":        8080,
-				},
-			},
-		},
-	}
-
-	if len(model.MMProjPaths) > 0 {
-		cfg.Models[0].MMProjPath = model.MMProjPaths[0]
-		cfg.Models[0].MMProjOn = true
-	}
-
-	cmd, err := servercmd.BuildCommand(cfg)
-	if err != nil {
-		return fmt.Errorf("ошибка сборки команды: %w", err)
-	}
-
-	log.Println("Запуск llama-server...")
-	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("ошибка запуска сервера: %w", err)
-	}
-
-	// Ждем сигнал завершения
-	<-ctx.Done()
-	log.Println("llama-server остановлен")
-
+	// Запуск llama-server теперь полностью внутри cli.CLI.Run():
+	// на втором экране (runconfig) по клавише "r" вызывается runconfig.SaveAndRun,
+	// который собирает команду из выбранных параметров и стартует llama-server.
 	return nil
 }
 

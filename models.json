@@ -1,5 +1,32 @@
 {
   "version": "1.0",
   "scan_paths": [],
-  "models": []
+  "models": [
+    {
+      "name": "gemma-4-E4B-it-ultra-uncensored-heretic-Q6_K",
+      "model_path": "/home/kiper/src/go_llama_server_loader/models/llmfan46/gemma-4-E4B-it-ultra-uncensored-heretic-GGUF/gemma-4-E4B-it-ultra-uncensored-heretic-Q6_K.gguf",
+      "mmproj_path": "/home/kiper/src/go_llama_server_loader/models/llmfan46/gemma-4-E4B-it-ultra-uncensored-heretic-GGUF/gemma-4-E4B-it-mmproj-BF16.gguf",
+      "mmproj_on": true,
+      "size": 6217260896,
+      "last_scan": "2026-05-11T06:32:59Z",
+      "flags": {
+        "mmproj": "/home/kiper/src/go_llama_server_loader/models/llmfan46/gemma-4-E4B-it-ultra-uncensored-heretic-GGUF/gemma-4-E4B-it-mmproj-BF16.gguf",
+        "model": "/home/kiper/src/go_llama_server_loader/models/llmfan46/gemma-4-E4B-it-ultra-uncensored-heretic-GGUF/gemma-4-E4B-it-ultra-uncensored-heretic-Q6_K.gguf",
+        "no_mmproj_offload": ""
+      }
+    },
+    {
+      "name": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M",
+      "model_path": "/home/kiper/src/go_llama_server_loader/models/HauhauCS/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
+      "mmproj_path": "/home/kiper/src/go_llama_server_loader/models/HauhauCS/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive/mmproj-Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-BF16.gguf",
+      "mmproj_on": true,
+      "size": 5627044224,
+      "last_scan": "2026-05-11T06:34:05Z",
+      "flags": {
+        "mmproj": "/home/kiper/src/go_llama_server_loader/models/HauhauCS/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive/mmproj-Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-BF16.gguf",
+        "model": "/home/kiper/src/go_llama_server_loader/models/HauhauCS/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
+        "no_mmproj_offload": 1
+      }
+    }
+  ]
 }

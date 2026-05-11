@@ -515,10 +515,14 @@ func TestAppTabs_TabKey(t *testing.T) {
 	a := NewApp(testModels())
 	a = sendWindowSize(a, 120, 40)
 
-	// Только Models enabled → Tab должен быть no-op
+	// Models и Params enabled → Tab переключает между ними
 	a, _ = sendKey(a, "tab")
-	if a.tabs.Active() != 0 {
-		t.Errorf("Tab with single enabled tab should be no-op, got %d", a.tabs.Active())
+	if a.tabs.Active() != TabParams {
+		t.Errorf("Tab from Models should move to Params, got %d", a.tabs.Active())
+	}
+	a, _ = sendKey(a, "tab")
+	if a.tabs.Active() != TabModels {
+		t.Errorf("Tab from Params should wrap to Models, got %d", a.tabs.Active())
 	}
 }
 

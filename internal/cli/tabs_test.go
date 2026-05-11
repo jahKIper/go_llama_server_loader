@@ -12,14 +12,17 @@ func TestNewTabBar_DefaultState(t *testing.T) {
 	if tb.Active() != 0 {
 		t.Errorf("expected active=0, got %d", tb.Active())
 	}
-	if len(tb.tabs) != 3 {
-		t.Fatalf("expected 3 tabs, got %d", len(tb.tabs))
+	if len(tb.tabs) != 4 {
+		t.Fatalf("expected 4 tabs, got %d", len(tb.tabs))
 	}
-	if !tb.tabs[0].Enabled {
-		t.Error("tab 0 (Models) should be enabled")
+	if !tb.tabs[TabModels].Enabled {
+		t.Error("Models tab should be enabled")
 	}
-	if tb.tabs[1].Enabled || tb.tabs[2].Enabled {
-		t.Error("tabs 1,2 should be disabled")
+	if !tb.tabs[TabParams].Enabled {
+		t.Error("Params tab should be enabled")
+	}
+	if tb.tabs[TabRunning].Enabled || tb.tabs[TabLogs].Enabled {
+		t.Error("Running and Logs tabs should be disabled")
 	}
 }
 
@@ -38,26 +41,29 @@ func TestTabBar_SetActive(t *testing.T) {
 
 func TestTabBarNext_SkipsDisabled(t *testing.T) {
 	tb := NewTabBar(uistyle.GetStyles())
-	// Только один enabled таб (Models) — Next() должен быть no-op
+	// По умолчанию enabled: Models и Params → Next() ходит между ними.
 	tb.Next()
-	if tb.Active() != 0 {
-		t.Errorf("Next() with one enabled tab should be no-op, got active=%d", tb.Active())
+	if tb.Active() != TabParams {
+		t.Errorf("expected active=Params after Next from Models, got %d", tb.Active())
+	}
+	tb.Next()
+	if tb.Active() != TabModels {
+		t.Errorf("expected wrap to Models, got %d", tb.Active())
 	}
 }
 
 func TestTabBarPrev_SkipsDisabled(t *testing.T) {
 	tb := NewTabBar(uistyle.GetStyles())
 	tb.Prev()
-	if tb.Active() != 0 {
-		t.Errorf("Prev() with one enabled tab should be no-op, got active=%d", tb.Active())
+	if tb.Active() != TabParams {
+		t.Errorf("expected wrap to Params, got %d", tb.Active())
 	}
 }
 
 func TestTabBarNext_MultipleEnabled(t *testing.T) {
 	tb := NewTabBar(uistyle.GetStyles())
-	// Включаем все табы вручную
-	tb.tabs[1].Enabled = true
-	tb.tabs[2].Enabled = true
+	tb.tabs[TabRunning].Enabled = true
+	tb.tabs[TabLogs].Enabled = true
 
 	tb.SetActive(0)
 	tb.Next()
@@ -68,6 +74,10 @@ func TestTabBarNext_MultipleEnabled(t *testing.T) {
 	if tb.Active() != 2 {
 		t.Errorf("expected active=2, got %d", tb.Active())
 	}
+	tb.Next()
+	if tb.Active() != 3 {
+		t.Errorf("expected active=3, got %d", tb.Active())
+	}
 	// Wrap around
 	tb.Next()
 	if tb.Active() != 0 {
@@ -77,20 +87,20 @@ func TestTabBarNext_MultipleEnabled(t *testing.T) {
 
 func TestTabBarPrev_MultipleEnabled(t *testing.T) {
 	tb := NewTabBar(uistyle.GetStyles())
-	tb.tabs[1].Enabled = true
-	tb.tabs[2].Enabled = true
+	tb.tabs[TabRunning].Enabled = true
+	tb.tabs[TabLogs].Enabled = true
 
 	tb.SetActive(0)
 	tb.Prev()
-	if tb.Active() != 2 {
-		t.Errorf("expected wrap to 2, got %d", tb.Active())
+	if tb.Active() != 3 {
+		t.Errorf("expected wrap to 3, got %d", tb.Active())
 	}
 }
 
 func TestTabBar_Render_ContainsLabels(t *testing.T) {
 	tb := NewTabBar(uistyle.GetStyles())
 	out := tb.Render()
-	for _, label := range []string{"Models", "Running", "Logs"} {
+	for _, label := range []string{"Models", "Params", "Running", "Logs"} {
 		if !strings.Contains(out, label) {
 			t.Errorf("Render() missing label %q", label)
 		}

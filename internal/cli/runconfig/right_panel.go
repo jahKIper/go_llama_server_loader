@@ -191,9 +191,9 @@ func (p *RightPanel) applyFilter() {
 }
 
 // visibleListHeight — количество строк, доступных для списка элементов.
-// Вычитаем: 2 (рамка), 1 (строка фильтра), 1 (разделитель).
+// Вычитаем: 2 (внешняя рамка панели), 3 (бордюрное поле фильтра).
 func (p *RightPanel) visibleListHeight() int {
-	v := p.h - 4
+	v := p.h - 5
 	if v < 1 {
 		v = 1
 	}
@@ -289,14 +289,8 @@ func (p *RightPanel) Render(focused bool) string {
 		}
 	}
 
-	// ── Строка фильтра ────────────────────────────────────────────────────────
-	filterLine := p.renderFilterLine(contentW)
-
-	// ── Разделитель ───────────────────────────────────────────────────────────
-	sep := lipgloss.NewStyle().
-		Background(lipgloss.Color(st.BgPanel)).
-		Foreground(lipgloss.Color(st.BorderIdle)).
-		Render(strings.Repeat("─", contentW))
+	// ── Поле фильтра (бордюрное, как на первом экране) ───────────────────────
+	filterBlock := p.renderFilterLine(contentW)
 
 	// ── Строки списка + скроллбар ─────────────────────────────────────────────
 	var listBlock string
@@ -348,7 +342,7 @@ func (p *RightPanel) Render(focused bool) string {
 	}
 
 	// ── Сборка внутреннего содержимого ────────────────────────────────────────
-	inner := strings.Join([]string{filterLine, sep, listBlock}, "\n")
+	inner := strings.Join([]string{filterBlock, listBlock}, "\n")
 
 	// ── Рамка с цветом по фокусу ──────────────────────────────────────────────
 	borderColor := st.BorderIdle
@@ -378,41 +372,37 @@ func (p *RightPanel) Render(focused bool) string {
 	return injectBorderTitle(rendered, titleText, "")
 }
 
-// renderFilterLine рендерит строку фильтра шириной w.
+// renderFilterLine рендерит бордюрное поле фильтра шириной w —
+// визуально совпадает с фильтром первого экрана (uistyle.FilterInput*Style).
 func (p *RightPanel) renderFilterLine(w int) string {
 	st := p.st
+
+	// Внутренняя ширина поля — w минус рамка (2) и горизонтальный padding (2).
+	innerW := w - 4
+	if innerW < 1 {
+		innerW = 1
+	}
+
 	if p.filterActive {
-		cursorStr := lipgloss.NewStyle().
+		cursor := lipgloss.NewStyle().
 			Foreground(lipgloss.Color(st.NeonGreen)).
 			Background(lipgloss.Color(st.BgPanel)).
 			Render("▌")
 		var display string
 		if p.filterCursor < len(p.filterText) {
-			display = p.filterText[:p.filterCursor] + cursorStr + p.filterText[p.filterCursor:]
+			display = p.filterText[:p.filterCursor] + cursor + p.filterText[p.filterCursor:]
 		} else {
-			display = p.filterText + cursorStr
+			display = p.filterText + cursor
 		}
-		return lipgloss.NewStyle().
-			Background(lipgloss.Color(st.BgPanel)).
-			Foreground(lipgloss.Color(st.TextPrimary)).
-			Width(w).
-			Render("/ " + display)
+		return st.FilterInputActiveStyle().Width(innerW).Render("/  " + display)
 	}
-	// idle: отображаем подсказку
-	keyPart := lipgloss.NewStyle().
-		Bold(true).
-		Background(lipgloss.Color(st.BgPanel)).
-		Foreground(lipgloss.Color(st.KeyHint)).
-		Render("/")
-	hintPart := lipgloss.NewStyle().
+
+	// idle
+	placeholder := lipgloss.NewStyle().
 		Background(lipgloss.Color(st.BgPanel)).
 		Foreground(lipgloss.Color(st.TextMuted)).
-		Render(" поиск...")
-	hint := lipgloss.JoinHorizontal(lipgloss.Top, keyPart, hintPart)
-	return lipgloss.NewStyle().
-		Background(lipgloss.Color(st.BgPanel)).
-		Width(w).
-		Render(hint)
+		Render("поиск...")
+	return st.FilterInputIdleStyle().Width(innerW).Render("/  " + placeholder)
 }
 
 // renderItem рендерит элемент списка шириной w. Высота элемента — переменная:

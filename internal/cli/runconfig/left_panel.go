@@ -302,8 +302,8 @@ func (p *LeftPanel) renderItem(row ParamRow, selected bool, w int, editing bool)
 	const hintStr = "[?]"
 	const hintW = 4 // "[?] "
 
-	const removeStr = "[REMOVE]"
-	const removeW = 9
+	const removeStr = "[REMOVE (d)]"
+	const removeW = 13
 	removePad := 0
 	if selected && !editing {
 		removePad = removeW + 1 // пробел перед кнопкой

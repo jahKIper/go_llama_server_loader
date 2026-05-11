@@ -18,8 +18,9 @@ type ParamRow struct {
 type RunConfigAction int
 
 const (
-	ActionCancel RunConfigAction = iota // Esc/q — ничего не делать
+	ActionCancel RunConfigAction = iota // q — выйти из приложения
 	ActionRun                           // r — Save+Run
+	ActionBack                          // Backspace / клик на таб Models — вернуться к первому экрану
 )
 
 // RunConfigResult — результат экрана для caller-а в internal/cli/cli.go.

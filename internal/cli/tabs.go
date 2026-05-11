@@ -19,11 +19,21 @@ type TabBar struct {
 	styles *uistyle.StyleConfig
 }
 
-// NewTabBar создаёт TabBar с тремя табами: Models (enabled), Running, Logs (disabled).
+// Индексы табов: используются обоими экранами для SetActive.
+const (
+	TabModels  = 0
+	TabParams  = 1
+	TabRunning = 2
+	TabLogs    = 3
+)
+
+// NewTabBar создаёт TabBar с четырьмя табами: Models, Params (оба enabled),
+// Running, Logs (placeholder, disabled).
 func NewTabBar(st *uistyle.StyleConfig) *TabBar {
 	return &TabBar{
 		tabs: []Tab{
 			{Label: "Models", Enabled: true},
+			{Label: "Params", Enabled: true},
 			{Label: "Running", Enabled: false},
 			{Label: "Logs", Enabled: false},
 		},

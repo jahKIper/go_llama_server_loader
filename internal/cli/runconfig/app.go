@@ -54,7 +54,9 @@ type RunConfigApp struct {
 
 // NewApp создаёт RunConfigApp для заданной модели.
 // paramsFilePath — явный путь к params_ru.json (пустая строка = поиск по умолчанию).
-func NewApp(m *modelscan.Model, paramsFilePath string) *RunConfigApp {
+// modelsCfgPath — путь к models.json для подгрузки сохранённых параметров модели
+// (пустая строка = не подгружать).
+func NewApp(m *modelscan.Model, paramsFilePath string, modelsCfgPath string) *RunConfigApp {
 	a := &RunConfigApp{
 		model:          m,
 		rows:           []ParamRow{},
@@ -85,9 +87,14 @@ func NewApp(m *modelscan.Model, paramsFilePath string) *RunConfigApp {
 	a.catalog = FlattenCatalog(pf)
 	a.right = NewRightPanel(a.catalog, a.styles, 40, 20)
 	a.left = NewLeftPanel(a.styles, 60, 20)
-	a.left.Seed(PrefilledRowsForModel(a.catalog, m))
-	if rows := a.left.Rows(); len(rows) > 0 {
-		a.rows = rows
+
+	rows := PrefilledRowsForModel(a.catalog, m)
+	if saved, ok := LoadSavedFlagsForModel(modelsCfgPath, m); ok {
+		rows = MergeWithSavedFlags(a.catalog, rows, saved)
+	}
+	a.left.Seed(rows)
+	if got := a.left.Rows(); len(got) > 0 {
+		a.rows = got
 	}
 	return a
 }
@@ -187,6 +194,13 @@ func (a *RunConfigApp) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return a, nil
 		}
 
+		// Backspace — вернуться на первый экран (выбор моделей).
+		// Перехватываем только когда нет ввода в фильтре/редакторе.
+		if key == "backspace" && !filterActive && !editing {
+			a.action = ActionBack
+			return a, tea.Quit
+		}
+
 		// tab всегда переключает фокус
 		if key == "tab" {
 			if a.focus == FocusRight {
@@ -211,12 +225,9 @@ func (a *RunConfigApp) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			cmd := a.right.Update(msg, true)
 
-			// esc: если фильтр НЕ был активен — Cancel
-			if key == "esc" && !prevFilterActive {
-				a.action = ActionCancel
-				return a, tea.Quit
-			}
-			// q/r: работают только вне режима ввода
+			// q/r: выход и запуск — только вне режима ввода фильтра.
+			// Esc намеренно не закрывает приложение (правая панель сама очищает
+			// активный фильтр / текст фильтра при esc).
 			if !filterActive {
 				switch key {
 				case "q":
@@ -244,7 +255,7 @@ func (a *RunConfigApp) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "e", "enter":
 				cmd := a.left.StartEdit()
 				return a, cmd
-			case "esc", "q":
+			case "q":
 				a.action = ActionCancel
 				return a, tea.Quit
 			case "r":
@@ -255,7 +266,7 @@ func (a *RunConfigApp) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// Глобальные биндинги (фокус не определён или панели нет)
 		switch key {
-		case "esc", "q":
+		case "q":
 			a.action = ActionCancel
 			return a, tea.Quit
 		case "r":
@@ -304,16 +315,17 @@ func (a *RunConfigApp) rightPanelSize() (w, h int) {
 		}
 	}
 
-	// высота content-блока
+	// высота content-блока: учитываем top-bar (1 строка) + model header
 	headerStr := RenderHeader(a.model, a.styles, innerW)
-	headerH := strings.Count(headerStr, "\n") + 1
+	modelHeaderH := strings.Count(headerStr, "\n") + 1
+	topBarH := 1
 	// В узком режиме добавляем строку-таббар
 	tabBarH := 0
 	if a.narrowMode {
 		tabBarH = 1 + uistyle.BlockGap
 	}
 	footerH := 1
-	rh := a.height - 2*uistyle.OuterPadV - headerH - footerH - 2*uistyle.BlockGap - tabBarH
+	rh := a.height - 2*uistyle.OuterPadV - topBarH - modelHeaderH - footerH - 3*uistyle.BlockGap - tabBarH
 	if rh < 5 {
 		rh = 5
 	}
@@ -342,7 +354,10 @@ func (a *RunConfigApp) View() tea.View {
 		innerW = 1
 	}
 
-	// ── Block 1: Header ───────────────────────────────────────────────────────
+	// ── Block 0: TopBar (version + title + tabs, такая же как на первом экране)
+	topBar := RenderTopBar("llama-server-loader - Параметры запуска", "0.1.0", st, innerW)
+
+	// ── Block 1: Header модели ────────────────────────────────────────────────
 	header := RenderHeader(a.model, st, innerW)
 
 	// ── Block 2: Content ──────────────────────────────────────────────────────
@@ -372,7 +387,11 @@ func (a *RunConfigApp) View() tea.View {
 	footerLine := RenderFooter(st, innerW)
 
 	// ── Сборка стека ──────────────────────────────────────────────────────────
-	stackParts := []string{header}
+	stackParts := []string{topBar}
+	for i := 0; i < uistyle.BlockGap; i++ {
+		stackParts = append(stackParts, bgGap)
+	}
+	stackParts = append(stackParts, header)
 	for i := 0; i < uistyle.BlockGap; i++ {
 		stackParts = append(stackParts, bgGap)
 	}
