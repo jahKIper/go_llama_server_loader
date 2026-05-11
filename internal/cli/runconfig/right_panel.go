@@ -83,6 +83,35 @@ func (p *RightPanel) Update(msg tea.Msg, focused bool) tea.Cmd {
 			p.cursor++
 			p.clampOffset()
 		}
+	case "pgup":
+		step := p.visibleListHeight() / 2
+		if step < 1 {
+			step = 1
+		}
+		p.cursor -= step
+		if p.cursor < 0 {
+			p.cursor = 0
+		}
+		p.clampOffset()
+	case "pgdown":
+		step := p.visibleListHeight() / 2
+		if step < 1 {
+			step = 1
+		}
+		p.cursor += step
+		if p.cursor >= len(p.filtered) {
+			p.cursor = len(p.filtered) - 1
+		}
+		p.clampOffset()
+	case "home":
+		p.cursor = 0
+		p.clampOffset()
+	case "end":
+		p.cursor = len(p.filtered) - 1
+		if p.cursor < 0 {
+			p.cursor = 0
+		}
+		p.clampOffset()
 	case "/":
 		p.filterActive = true
 	case "esc":
@@ -171,13 +200,62 @@ func (p *RightPanel) visibleListHeight() int {
 	return v
 }
 
+// itemW вычисляет ширину одного item-блока (без скроллбара) для текущей панели.
+func (p *RightPanel) itemW() int {
+	contentW := p.w - 2
+	scrollW := uistyle.ScrollbarWidth
+	w := contentW - scrollW
+	if w < 4 {
+		w = 4
+	}
+	return w
+}
+
+// itemHeight возвращает суммарную высоту в строках для одного элемента списка:
+// 1 строка для флага + перенесённое описание + 1 строка-разделитель.
+func (p *RightPanel) itemHeight(e CatalogEntry, w int) int {
+	const indicW = 2
+	descMaxW := w - indicW
+	if descMaxW < 1 {
+		descMaxW = 1
+	}
+	descLines := 0
+	if e.Meta != nil && e.Meta.DescRU != "" {
+		wrapped := wordWrap(e.Meta.DescRU, descMaxW)
+		descLines = strings.Count(wrapped, "\n") + 1
+	}
+	return 1 + descLines + 1 // флаг + описание + пустая строка-разделитель
+}
+
+// fitsCount возвращает количество подряд идущих элементов, начиная с idx,
+// которые целиком помещаются в listH строк.
+func (p *RightPanel) fitsCount(idx, listH, w int) int {
+	used := 0
+	count := 0
+	for i := idx; i < len(p.filtered); i++ {
+		h := p.itemHeight(p.filtered[i], w)
+		if used+h > listH {
+			break
+		}
+		used += h
+		count++
+	}
+	return count
+}
+
 func (p *RightPanel) clampOffset() {
-	vis := p.visibleListHeight()
+	listH := p.visibleListHeight()
+	w := p.itemW()
 	if p.cursor < p.offset {
 		p.offset = p.cursor
 	}
-	if p.cursor >= p.offset+vis {
-		p.offset = p.cursor - vis + 1
+	// Прокручиваем offset вперёд, пока курсор не помещается в видимой области.
+	for p.offset < p.cursor {
+		fits := p.fitsCount(p.offset, listH, w)
+		if p.offset+fits > p.cursor {
+			break
+		}
+		p.offset++
 	}
 	if p.offset < 0 {
 		p.offset = 0
@@ -230,23 +308,40 @@ func (p *RightPanel) Render(focused bool) string {
 			Height(listH).
 			Render("каталог не найден")
 	} else {
-		scrollLines := renderScrollbarLines(p.offset, listH, len(p.filtered), listH, scrollW, st)
+		// Собираем последовательно линии всех видимых элементов до заполнения listH.
+		itemLines := make([]string, 0, listH)
+		linesUsed := 0
+		idx := p.offset
+		for linesUsed < listH && idx < len(p.filtered) {
+			h := p.itemHeight(p.filtered[idx], itemW)
+			if linesUsed+h > listH {
+				break
+			}
+			block := p.renderItem(p.filtered[idx], idx == p.cursor, itemW)
+			for _, ln := range strings.Split(block, "\n") {
+				itemLines = append(itemLines, ln)
+			}
+			linesUsed += h
+			idx++
+		}
+		// Добиваем пустыми строками
+		emptyLine := lipgloss.NewStyle().
+			Background(lipgloss.Color(st.BgPanel)).
+			Width(itemW).
+			Render("")
+		for linesUsed < listH {
+			itemLines = append(itemLines, emptyLine)
+			linesUsed++
+		}
+
+		visibleItems := idx - p.offset
+		scrollLines := renderScrollbarLines(p.offset, visibleItems, len(p.filtered), listH, scrollW, st)
 		rowLines := make([]string, listH)
 		for i := 0; i < listH; i++ {
-			idx := p.offset + i
-			var itemLine string
-			if idx < len(p.filtered) {
-				itemLine = p.renderItem(p.filtered[idx], idx == p.cursor, itemW)
-			} else {
-				itemLine = lipgloss.NewStyle().
-					Background(lipgloss.Color(st.BgPanel)).
-					Width(itemW).
-					Render("")
-			}
 			if scrollW > 0 {
-				rowLines[i] = lipgloss.JoinHorizontal(lipgloss.Top, itemLine, scrollLines[i])
+				rowLines[i] = lipgloss.JoinHorizontal(lipgloss.Top, itemLines[i], scrollLines[i])
 			} else {
-				rowLines[i] = itemLine
+				rowLines[i] = itemLines[i]
 			}
 		}
 		listBlock = strings.Join(rowLines, "\n")
@@ -320,7 +415,8 @@ func (p *RightPanel) renderFilterLine(w int) string {
 		Render(hint)
 }
 
-// renderItem рендерит одну строку списка шириной w.
+// renderItem рендерит элемент списка шириной w. Высота элемента — переменная:
+// строка с флагом + перенесённое описание + 1 пустая строка-разделитель.
 func (p *RightPanel) renderItem(e CatalogEntry, selected bool, w int) string {
 	st := p.st
 	const indicW = 2 // "▶ " или "  "
@@ -330,32 +426,24 @@ func (p *RightPanel) renderItem(e CatalogEntry, selected bool, w int) string {
 
 	flagPart := longF
 	if shortF != "" && shortF != longF {
-		flagPart += " " + shortF
+		flagPart += "  " + shortF
 	}
-	const maxFlagW = 24
-	if utf8.RuneCountInString(flagPart) > maxFlagW {
-		flagPart = truncatePath(flagPart, maxFlagW)
+	flagMaxW := w - indicW
+	if flagMaxW < 1 {
+		flagMaxW = 1
 	}
-	flagPartW := utf8.RuneCountInString(flagPart)
-
-	const addStr = "[ADD]"
-	const addStrW = 6 // "[ADD] "
-	addPartW := 0
-	if selected {
-		addPartW = addStrW
+	if utf8.RuneCountInString(flagPart) > flagMaxW {
+		flagPart = truncatePath(flagPart, flagMaxW)
 	}
 
-	descMaxW := w - indicW - flagPartW - 1 - addPartW // 1 for space after flag
-	if descMaxW < 0 {
-		descMaxW = 0
-	}
-
-	var bg string
+	bg := st.BgPanel
 	if selected {
 		bg = st.BgSelected
-	} else {
-		bg = st.BgPanel
 	}
+
+	rowFill := lipgloss.NewStyle().
+		Background(lipgloss.Color(bg)).
+		Width(w)
 
 	// Индикатор
 	var indicator string
@@ -371,48 +459,44 @@ func (p *RightPanel) renderItem(e CatalogEntry, selected bool, w int) string {
 	}
 
 	// Флаг
-	var flagRendered string
-	if selected {
-		flagRendered = lipgloss.NewStyle().
-			Bold(true).
-			Background(lipgloss.Color(bg)).
-			Foreground(lipgloss.Color(st.NeonGreen)).
-			Render(flagPart)
-	} else {
-		flagRendered = lipgloss.NewStyle().
-			Background(lipgloss.Color(bg)).
-			Foreground(lipgloss.Color(st.NeonGreen)).
-			Render(flagPart)
-	}
+	flagStyle := lipgloss.NewStyle().
+		Background(lipgloss.Color(bg)).
+		Foreground(lipgloss.Color(st.NeonGreen)).
+		Bold(selected)
+	flagLine := rowFill.Render(lipgloss.JoinHorizontal(lipgloss.Top, indicator, flagStyle.Render(flagPart)))
 
-	// [ADD] бейдж
-	var addRendered string
-	if selected {
-		addRendered = " " + lipgloss.NewStyle().
-			Bold(true).
-			Background(lipgloss.Color(st.NeonGreen)).
-			Foreground(lipgloss.Color(st.GreenDark)).
-			Render(addStr)
-	}
+	lines := []string{flagLine}
 
-	// Описание
-	var descRendered string
-	if descMaxW > 0 && e.Meta.DescRU != "" {
-		descText := truncatePath(e.Meta.DescRU, descMaxW)
+	// Описание — перенос по словам с отступом indicW
+	if e.Meta != nil && e.Meta.DescRU != "" {
+		descMaxW := w - indicW
+		if descMaxW < 1 {
+			descMaxW = 1
+		}
 		fg := st.TextMuted
 		if selected {
 			fg = st.TextSecondary
 		}
-		descRendered = lipgloss.NewStyle().
+		descStyle := lipgloss.NewStyle().
 			Background(lipgloss.Color(bg)).
-			Foreground(lipgloss.Color(fg)).
-			Render(" " + descText)
+			Foreground(lipgloss.Color(fg))
+		indentStyle := lipgloss.NewStyle().
+			Background(lipgloss.Color(bg))
+		indent := indentStyle.Render(strings.Repeat(" ", indicW))
+
+		wrapped := wordWrap(e.Meta.DescRU, descMaxW)
+		for _, dl := range strings.Split(wrapped, "\n") {
+			line := lipgloss.JoinHorizontal(lipgloss.Top, indent, descStyle.Render(dl))
+			lines = append(lines, rowFill.Render(line))
+		}
 	}
 
-	line := lipgloss.JoinHorizontal(lipgloss.Top, indicator, flagRendered, addRendered, descRendered)
-
-	return lipgloss.NewStyle().
-		Background(lipgloss.Color(bg)).
+	// Разделитель — пустая строка фоном панели (чтобы выделение не «слипалось» с соседом)
+	sepBg := lipgloss.NewStyle().
+		Background(lipgloss.Color(st.BgPanel)).
 		Width(w).
-		Render(line)
+		Render("")
+	lines = append(lines, sepBg)
+
+	return strings.Join(lines, "\n")
 }

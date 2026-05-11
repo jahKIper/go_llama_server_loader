@@ -118,6 +118,31 @@ func (p *LeftPanel) Add(meta *config.ParamMeta) {
 	p.clampOffset()
 }
 
+// Seed добавляет готовые строки в панель (используется для предзаполнения
+// параметров на основе выбранной модели). Дубликаты по Long пропускаются.
+func (p *LeftPanel) Seed(rows []ParamRow) {
+	for _, r := range rows {
+		if r.Long == "" {
+			continue
+		}
+		dup := false
+		for _, ex := range p.rows {
+			if ex.Long == r.Long {
+				dup = true
+				break
+			}
+		}
+		if dup {
+			continue
+		}
+		p.rows = append(p.rows, r)
+	}
+	if p.cursor >= len(p.rows) {
+		p.cursor = 0
+	}
+	p.clampOffset()
+}
+
 // Remove удаляет строку по индексу. Безопасен при выходе за границы.
 func (p *LeftPanel) Remove(i int) {
 	if i < 0 || i >= len(p.rows) {

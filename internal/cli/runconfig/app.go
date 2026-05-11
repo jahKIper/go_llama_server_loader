@@ -85,6 +85,10 @@ func NewApp(m *modelscan.Model, paramsFilePath string) *RunConfigApp {
 	a.catalog = FlattenCatalog(pf)
 	a.right = NewRightPanel(a.catalog, a.styles, 40, 20)
 	a.left = NewLeftPanel(a.styles, 60, 20)
+	a.left.Seed(PrefilledRowsForModel(a.catalog, m))
+	if rows := a.left.Rows(); len(rows) > 0 {
+		a.rows = rows
+	}
 	return a
 }
 
@@ -291,12 +295,12 @@ func (a *RunConfigApp) rightPanelSize() (w, h int) {
 		// В узком режиме — полная ширина
 		rw = innerW
 	} else {
-		rw = innerW * 30 / 100
-		if rw > 40 {
-			rw = 40
+		rw = innerW * 40 / 100
+		if rw > 56 {
+			rw = 56
 		}
-		if rw < 20 {
-			rw = 20
+		if rw < 28 {
+			rw = 28
 		}
 	}
 

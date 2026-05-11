@@ -62,11 +62,34 @@ func RenderHeader(m *modelscan.Model, st *uistyle.StyleConfig, innerW int) strin
 
 	badges := lipgloss.JoinHorizontal(lipgloss.Center, sizeBadge, " ", mmprojBadge, " ", ggufBadge)
 
-	block := lipgloss.JoinVertical(lipgloss.Left,
+	leftBlock := lipgloss.JoinVertical(lipgloss.Left,
 		nameStr,
 		pathStr,
 		badges,
 	)
+
+	runBtn := lipgloss.NewStyle().
+		Bold(true).
+		Background(lipgloss.Color(st.NeonGreen)).
+		Foreground(lipgloss.Color(st.DarkBg)).
+		Padding(0, 2).
+		Render("▶ ЗАПУСК (r)")
+	btnW := lipgloss.Width(runBtn)
+	bgCell := lipgloss.NewStyle().Background(lipgloss.Color(st.BgPanel))
+	emptyBtnLine := bgCell.Width(btnW).Render("")
+	btnBlock := lipgloss.JoinVertical(lipgloss.Left, emptyBtnLine, runBtn, emptyBtnLine)
+
+	// innerW уже минус padding(2,2)=4 и рамку(2). leftBlock + gap + btn должны влезть.
+	innerContentW := innerW - 6
+	leftW := lipgloss.Width(leftBlock)
+	gapW := innerContentW - leftW - btnW
+	if gapW < 1 {
+		gapW = 1
+	}
+	gapStrip := bgCell.Width(gapW).Render("")
+	gapBlock := lipgloss.JoinVertical(lipgloss.Left, gapStrip, gapStrip, gapStrip)
+
+	block := lipgloss.JoinHorizontal(lipgloss.Top, leftBlock, gapBlock, btnBlock)
 
 	return lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder(), true, true, true, true).

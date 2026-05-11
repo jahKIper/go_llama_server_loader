@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"llama-server-loader/internal/config"
+	"llama-server-loader/pkg/modelscan"
 )
 
 // CatalogEntry — одна запись в правой панели (каталог параметров).
@@ -96,4 +97,51 @@ func ParamKey(meta *config.ParamMeta) string {
 // errNotFound возвращает true, если ошибка означает «файл не найден».
 func errNotFound(err error) bool {
 	return errors.Is(err, os.ErrNotExist)
+}
+
+// FindMetaByLong ищет ParamMeta в каталоге по длинному флагу (без хвоста аргумента).
+func FindMetaByLong(catalog []CatalogEntry, longFlag string) *config.ParamMeta {
+	target := stripFlagArg(longFlag)
+	if target == "" {
+		return nil
+	}
+	for i := range catalog {
+		if stripFlagArg(catalog[i].Meta.LongFlag) == target {
+			return catalog[i].Meta
+		}
+	}
+	return nil
+}
+
+// PrefilledRowsForModel формирует список параметров, заполненных на основе
+// данных просканированной модели: --model = путь к .gguf; если найден mmproj —
+// также --mmproj = путь и --no-mmproj-offload = true.
+func PrefilledRowsForModel(catalog []CatalogEntry, m *modelscan.Model) []ParamRow {
+	if m == nil {
+		return nil
+	}
+	var rows []ParamRow
+	add := func(longFlag, value string) {
+		meta := FindMetaByLong(catalog, longFlag)
+		if meta == nil {
+			return
+		}
+		long := stripFlagArg(meta.LongFlag)
+		if long == "" {
+			return
+		}
+		rows = append(rows, ParamRow{
+			Long:  long,
+			Short: stripFlagArg(meta.ShortFlag),
+			Key:   ParamKey(meta),
+			Value: value,
+			Meta:  meta,
+		})
+	}
+	add("--model", m.Path)
+	if len(m.MMProjPaths) > 0 {
+		add("--mmproj", m.MMProjPaths[0])
+		add("--no-mmproj-offload", "true")
+	}
+	return rows
 }
