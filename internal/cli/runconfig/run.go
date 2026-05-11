@@ -14,7 +14,7 @@ import (
 // SaveAndRun сохраняет запись о модели в models.json и запускает llama-server.
 // Если файл models.json не существует — создаёт новый.
 // Если модель с таким именем уже есть — не меняет запись, использует её Flags для запуска.
-func SaveAndRun(modelsCfgPath string, m *modelscan.Model, rows []ParamRow) error {
+func SaveAndRun(modelsCfgPath string, m *modelscan.Model, rows []ParamRow, comment string) error {
 	if modelsCfgPath == "" {
 		modelsCfgPath = "models.json"
 	}
@@ -28,7 +28,15 @@ func SaveAndRun(modelsCfgPath string, m *modelscan.Model, rows []ParamRow) error
 		}
 	}
 
-	mc, _ := UpsertModelInConfig(cfg, m, rows, time.Now())
+	now := time.Now()
+	mc, _ := UpsertModelInConfig(cfg, m, rows, now)
+	for i := range cfg.Models {
+		if cfg.Models[i].Name == mc.Name {
+			cfg.Models[i].LastRun = now.UTC().Format(time.RFC3339)
+			cfg.Models[i].Comment = comment
+			break
+		}
+	}
 
 	if err := config.SaveConfig(cfg, modelsCfgPath); err != nil {
 		return fmt.Errorf("SaveAndRun: не удалось сохранить конфиг: %w", err)

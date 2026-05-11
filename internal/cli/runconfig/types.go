@@ -26,7 +26,8 @@ const (
 
 // RunConfigResult — результат экрана для caller-а в internal/cli/cli.go.
 type RunConfigResult struct {
-	Action RunConfigAction
-	Rows   []ParamRow
-	Model  *modelscan.Model
+	Action  RunConfigAction
+	Rows    []ParamRow
+	Model   *modelscan.Model
+	Comment string
 }

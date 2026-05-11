@@ -7,8 +7,11 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	tea "charm.land/bubbletea/v2"
@@ -18,6 +21,8 @@ import (
 	"llama-server-loader/internal/cli/modelparams"
 	"llama-server-loader/internal/cli/runconfig"
 	"llama-server-loader/internal/cli/uistyle"
+	"llama-server-loader/internal/config"
+	"llama-server-loader/internal/ggufmeta"
 	"llama-server-loader/pkg/modelscan"
 )
 
@@ -327,8 +332,58 @@ func (c *CLI) runInteractive() error {
 	for {
 		// Загружаем GGUF-параметры из models.json для обогащения карточек.
 		paramsLookup := modelparams.LoadFromFile(modelsCfgPath)
+
+		// Сортируем модели: недавно запущенные — вверх, остальные — по имени.
+		sortModelsByLastRun(enrichedModels, modelsCfgPath)
+		// Для моделей, отсутствующих в models.json, читаем GGUF напрямую.
+		// Показываем прогресс — чтение заголовков может занять несколько секунд.
+		missing := make([]*modelscan.Model, 0)
+		for _, m := range enrichedModels {
+			if !paramsLookup.HasModel(m.Path) {
+				missing = append(missing, m)
+			}
+		}
+		if len(missing) > 0 {
+			total := len(missing)
+			jobs := make(chan *modelscan.Model, total)
+			resultsCh := make(chan ggufReadResult, total)
+			var done atomic.Int32
+
+			const workers = 4
+			var wg sync.WaitGroup
+			for range min(workers, total) {
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					for m := range jobs {
+						ps, err := ggufmeta.ExtractParams(m.Path)
+						n := done.Add(1)
+						fmt.Fprintf(os.Stderr, "\rЧтение метаданных: %d / %d", n, total)
+						if err == nil {
+							resultsCh <- ggufReadResult{m, ps}
+						}
+					}
+				}()
+			}
+			for _, m := range missing {
+				jobs <- m
+			}
+			close(jobs)
+			wg.Wait()
+			close(resultsCh)
+			fmt.Fprintf(os.Stderr, "\r\033[K")
+
+			var readResults []ggufReadResult
+			for r := range resultsCh {
+				paramsLookup.AddFromParams(r.model.Path, r.ps)
+				readResults = append(readResults, r)
+			}
+			// Сохраняем в models.json фоново — TUI не ждёт.
+			go backfillModelsJSON(modelsCfgPath, readResults)
+		}
 		// ── Первый экран: выбор модели ───────────────────────────────────────
-		app := NewApp(enrichedModels, paramsLookup)
+		comments := loadComments(modelsCfgPath)
+		app := NewApp(enrichedModels, paramsLookup, comments)
 		p := tea.NewProgram(app)
 		if _, err = p.Run(); err != nil {
 			return fmt.Errorf("error running TUI: %w", err)
@@ -356,7 +411,7 @@ func (c *CLI) runInteractive() error {
 			continue
 		case runconfig.ActionRun:
 			ResetTerminalBackground()
-			return runconfig.SaveAndRun(modelsCfgPath, res.Model, res.Rows)
+			return runconfig.SaveAndRun(modelsCfgPath, res.Model, res.Rows, res.Comment)
 		default:
 			return nil
 		}
@@ -487,6 +542,104 @@ func (c *CLI) SelectedModel() *modelscan.Model {
 	return c.selectedModel
 }
 
+// sortModelsByLastRun сортирует срез моделей на месте: модели с last_run — сверху
+// (новее → выше), модели без last_run — снизу в алфавитном порядке.
+func sortModelsByLastRun(models []*modelscan.Model, cfgPath string) {
+	lastRun := map[string]string{}
+	if cfg, err := config.LoadConfig(cfgPath); err == nil {
+		for _, mc := range cfg.Models {
+			lastRun[mc.Name] = mc.LastRun
+		}
+	}
+	nameOf := func(m *modelscan.Model) string {
+		return strings.TrimSuffix(filepath.Base(m.Path), ".gguf")
+	}
+	sort.SliceStable(models, func(i, j int) bool {
+		ri := lastRun[nameOf(models[i])]
+		rj := lastRun[nameOf(models[j])]
+		switch {
+		case ri != "" && rj != "":
+			return ri > rj // оба запускались — свежее выше
+		case ri != "":
+			return true // i запускался, j нет
+		case rj != "":
+			return false // j запускался, i нет
+		default:
+			return nameOf(models[i]) < nameOf(models[j]) // оба новые — алфавит
+		}
+	})
+}
+
+type ggufReadResult struct {
+	model *modelscan.Model
+	ps    []ggufmeta.Param
+}
+
+// loadComments читает models.json и возвращает карту имя_модели → комментарий.
+func loadComments(cfgPath string) map[string]string {
+	cfg, err := config.LoadConfig(cfgPath)
+	if err != nil {
+		return nil
+	}
+	m := make(map[string]string, len(cfg.Models))
+	for _, mc := range cfg.Models {
+		if mc.Comment != "" {
+			m[mc.Name] = mc.Comment
+		}
+	}
+	return m
+}
+
+// backfillModelsJSON записывает свежепрочитанные GGUF-параметры в models.json.
+// Вызывается фоново; не перезаписывает существующие Flags и Params.
+func backfillModelsJSON(cfgPath string, results []ggufReadResult) {
+	cfg, err := config.LoadConfig(cfgPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			cfg = &config.Config{Version: "1.0"}
+		} else {
+			return
+		}
+	}
+	now := time.Now().UTC().Format(time.RFC3339)
+	changed := false
+	for _, r := range results {
+		name := strings.TrimSuffix(filepath.Base(r.model.Path), ".gguf")
+		params := make([]config.ModelParam, len(r.ps))
+		for i, p := range r.ps {
+			params[i] = config.ModelParam{Key: p.Key, Value: p.Value, DescriptionRU: p.DescriptionRU}
+		}
+		if _, ok := cfg.GetModel(name); ok {
+			for i := range cfg.Models {
+				if cfg.Models[i].Name == name && len(cfg.Models[i].Params) == 0 {
+					cfg.Models[i].Params = params
+					changed = true
+					break
+				}
+			}
+		} else {
+			mmproj := ""
+			if len(r.model.MMProjPaths) > 0 {
+				mmproj = r.model.MMProjPaths[0]
+			}
+			cfg.AddModel(config.ModelConfig{
+				Name:       name,
+				ModelPath:  r.model.Path,
+				MMProjPath: mmproj,
+				MMProjOn:   len(r.model.MMProjPaths) > 0,
+				Size:       r.model.Size,
+				LastScan:   now,
+				Flags:      map[string]interface{}{},
+				Params:     params,
+			})
+			changed = true
+		}
+	}
+	if changed {
+		config.SaveConfig(cfg, cfgPath)
+	}
+}
+
 // SelectedModelName returns the name of the selected model after UI interaction.
 func (c *CLI) SelectedModelName() string {
 	if c.selectedModel != nil {
@@ -527,17 +680,20 @@ type App struct {
 	helpPopup    *HelpPopup
 	helpExpanded bool // toggled by "?"
 	params       *modelparams.Lookup
+	comments     map[string]string
 	peekOpen     bool // toggled by "i"
 }
 
 // NewApp creates a new App with model list.
-func NewApp(models []*modelscan.Model, params *modelparams.Lookup) *App {
+// comments — карта имя_модели → комментарий (может быть nil).
+func NewApp(models []*modelscan.Model, params *modelparams.Lookup, comments map[string]string) *App {
 	st := uistyle.GetStyles()
 	dims := DefaultDimensions()
 
 	items := make([]list.Item, len(models))
 	for i, m := range models {
-		items[i] = NewListItem(m, params)
+		name := strings.TrimSuffix(filepath.Base(m.Path), ".gguf")
+		items[i] = NewListItem(m, params, comments[name])
 	}
 
 	delegate := &StyledDelegate{base: list.NewDefaultDelegate(), styles: st}
@@ -569,6 +725,7 @@ func NewApp(models []*modelscan.Model, params *modelparams.Lookup) *App {
 		tabs:        NewTabBar(st),
 		helpPopup:   NewHelpPopup(st),
 		params:      params,
+		comments:    comments,
 	}
 }
 
@@ -807,7 +964,8 @@ func (a *App) applyFilter() {
 func setListItems(a *App, models []*modelscan.Model) {
 	items := make([]list.Item, len(models))
 	for i, m := range models {
-		items[i] = NewListItem(m, a.params)
+		name := strings.TrimSuffix(filepath.Base(m.Path), ".gguf")
+		items[i] = NewListItem(m, a.params, a.comments[name])
 	}
 	a.list.SetItems(items)
 }

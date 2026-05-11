@@ -70,7 +70,7 @@ func viewContent(a *App) string {
 // ── Smoke 1: запуск с реальной папкой моделей ────────────────────────────────
 
 func TestAppSmoke1_InitialRender(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 120, 40)
 
 	if a.countTotal != 6 {
@@ -98,7 +98,7 @@ func TestAppSmoke1_InitialRender(t *testing.T) {
 // ── Smoke 2: нажать "/" → поле ввода фильтра ────────────────────────────────
 
 func TestAppSmoke2_SlashActivatesFilter(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 120, 40)
 
 	a, _ = sendKey(a, "/")
@@ -113,7 +113,7 @@ func TestAppSmoke2_SlashActivatesFilter(t *testing.T) {
 // ── Smoke 3: ввод текста фильтрует список ────────────────────────────────────
 
 func TestAppSmoke3_FilterReducesList(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 120, 40)
 
 	a, _ = sendKey(a, "/")
@@ -134,7 +134,7 @@ func TestAppSmoke3_FilterReducesList(t *testing.T) {
 }
 
 func TestAppSmoke3b_FilterPartialMatch(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 120, 40)
 
 	a, _ = sendKey(a, "/")
@@ -153,7 +153,7 @@ func TestAppSmoke3b_FilterPartialMatch(t *testing.T) {
 // ── Smoke 4: Esc восстанавливает полный список ───────────────────────────────
 
 func TestAppSmoke4_EscRestoresList(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 120, 40)
 
 	a, _ = sendKey(a, "/")
@@ -180,7 +180,7 @@ func TestAppSmoke4_EscRestoresList(t *testing.T) {
 // ── Smoke 5: ↑↓ навигация ───────────────────────────────────────────────────
 
 func TestAppSmoke5_ArrowNavigation(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 120, 40)
 
 	initialIndex := a.list.Index()
@@ -192,7 +192,7 @@ func TestAppSmoke5_ArrowNavigation(t *testing.T) {
 }
 
 func TestAppSmoke5b_ArrowInFilterMode(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 120, 40)
 
 	a, _ = sendKey(a, "/")
@@ -207,7 +207,7 @@ func TestAppSmoke5b_ArrowInFilterMode(t *testing.T) {
 
 func TestAppSmoke6_EnterSelectsModel(t *testing.T) {
 	models := testModels()
-	a := NewApp(models, nil)
+	a := NewApp(models, nil, nil)
 	a = sendWindowSize(a, 120, 40)
 
 	updated, cmd := sendKey(a, "enter")
@@ -225,7 +225,7 @@ func TestAppSmoke6_EnterSelectsModel(t *testing.T) {
 // ── Smoke 7: q — чистый выход ────────────────────────────────────────────────
 
 func TestAppSmoke7_QuitKey(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 120, 40)
 
 	_, cmd := sendKey(a, "q")
@@ -235,7 +235,7 @@ func TestAppSmoke7_QuitKey(t *testing.T) {
 }
 
 func TestAppSmoke7_CtrlC(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	_, cmd := sendKey(a, "ctrl+c")
 	if cmd == nil {
 		t.Error("'ctrl+c' should return tea.Quit cmd")
@@ -245,7 +245,7 @@ func TestAppSmoke7_CtrlC(t *testing.T) {
 // ── Smoke 8: resize окна ────────────────────────────────────────────────────
 
 func TestAppSmoke8_WindowResize(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 120, 40)
 	a = sendWindowSize(a, 80, 24)
 
@@ -259,7 +259,7 @@ func TestAppSmoke8_WindowResize(t *testing.T) {
 }
 
 func TestAppSmoke8_TinyWindow(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 40, 10)
 	_ = viewContent(a) // must not panic
 }
@@ -268,7 +268,7 @@ func TestAppSmoke8_TinyWindow(t *testing.T) {
 
 func TestNewApp_AllFieldsInitialized(t *testing.T) {
 	models := testModels()
-	a := NewApp(models, nil)
+	a := NewApp(models, nil, nil)
 
 	if a.styles == nil {
 		t.Error("styles must not be nil")
@@ -309,7 +309,7 @@ func TestExtractQuantization(t *testing.T) {
 		{"phi-3-mini-4k-instruct.Q4_0.gguf", "Q4_0"},
 		{"qwen2.5-7b-instruct-q3_k_m.gguf", "Q3_K_M"},
 		{"deepseek-r1-distill-qwen-7b.f16.gguf", "F16"},
-		{"unknown-model.gguf", "Q4_K_M"}, // fallback
+		{"unknown-model.gguf", ""}, // unknown quantization → empty
 	}
 	for _, c := range cases {
 		got := extractQuantization(c.name)
@@ -345,7 +345,7 @@ func TestFormatMetadataBadges_MMProj(t *testing.T) {
 // ── View: Loading guard ───────────────────────────────────────────────────────
 
 func TestAppView_LoadingBeforeResize(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	// width == 0 → Loading...
 	content := viewContent(a)
 	if !strings.Contains(content, "Loading") {
@@ -356,7 +356,7 @@ func TestAppView_LoadingBeforeResize(t *testing.T) {
 // ── Filter edge cases ────────────────────────────────────────────────────────
 
 func TestAppFilter_NoMatchShowsZero(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 120, 40)
 
 	a, _ = sendKey(a, "/")
@@ -455,7 +455,7 @@ func TestBuildFlagsString_ScanDirNotModel(t *testing.T) {
 // ── q в режиме фильтра не должно выходить ────────────────────────────────────
 
 func TestAppFilter_QInFilterIsTextNotQuit(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 120, 40)
 
 	a, _ = sendKey(a, "/")
@@ -470,7 +470,7 @@ func TestAppFilter_QInFilterIsTextNotQuit(t *testing.T) {
 }
 
 func TestAppFilter_QInIdleQuits(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 120, 40)
 	_, cmd := sendKey(a, "q")
 	if cmd == nil {
@@ -479,7 +479,7 @@ func TestAppFilter_QInIdleQuits(t *testing.T) {
 }
 
 func TestAppFilter_EscFromIdleIsNoop(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 120, 40)
 
 	// Esc while Idle — должен быть noop
@@ -495,7 +495,7 @@ func TestAppFilter_EscFromIdleIsNoop(t *testing.T) {
 // ── Tabs: 1/2/3 + Tab/Shift+Tab ──────────────────────────────────────────────
 
 func TestAppTabs_NumberKeys(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 120, 40)
 
 	// "2" — SetActive(1), но таб 1 disabled → индекс всё равно устанавливается
@@ -512,7 +512,7 @@ func TestAppTabs_NumberKeys(t *testing.T) {
 }
 
 func TestAppTabs_TabKey(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 120, 40)
 
 	// Models и Params enabled → Tab переключает между ними
@@ -529,7 +529,7 @@ func TestAppTabs_TabKey(t *testing.T) {
 // ── Help popup toggle ────────────────────────────────────────────────────────
 
 func TestAppHelp_QuestionMarkToggles(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 120, 40)
 
 	a, _ = sendKey(a, "?")
@@ -550,7 +550,7 @@ func TestAppHelp_QuestionMarkToggles(t *testing.T) {
 }
 
 func TestAppHelp_EscClosesPopup(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 120, 40)
 
 	a, _ = sendKey(a, "?")
@@ -569,7 +569,7 @@ func TestAppHelp_EscClosesPopup(t *testing.T) {
 }
 
 func TestAppHelp_PopupDoesNotQuit(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 120, 40)
 
 	a, _ = sendKey(a, "?")
@@ -583,7 +583,7 @@ func TestAppHelp_PopupDoesNotQuit(t *testing.T) {
 // ── ctrl+q — выход ───────────────────────────────────────────────────────────
 
 func TestAppCtrlQ_Quits(t *testing.T) {
-	a := NewApp(testModels(), nil)
+	a := NewApp(testModels(), nil, nil)
 	a = sendWindowSize(a, 120, 40)
 
 	_, cmd := a.Update(tea.KeyPressMsg{Code: rune('q'), Mod: tea.ModCtrl})
@@ -602,7 +602,7 @@ func TestApp_ScrollbarOffset_FollowsCursor(t *testing.T) {
 			Size: 4_000_000_000,
 		}
 	}
-	a := NewApp(models, nil)
+	a := NewApp(models, nil, nil)
 	m, _ := a.Update(tea.WindowSizeMsg{Width: 120, Height: 40})
 	app := m.(*App)
 

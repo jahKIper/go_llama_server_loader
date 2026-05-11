@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	tea "charm.land/bubbletea/v2"
+	"charm.land/bubbles/v2/textinput"
 	"charm.land/lipgloss/v2"
 
 	"llama-server-loader/internal/cli/modelparams"
@@ -55,6 +56,11 @@ type RunConfigApp struct {
 	// Конфликты флагов
 	showConflicts    bool
 	conflictWarnings []string
+
+	// Комментарий пользователя к модели
+	comment      string
+	showComment  bool
+	commentInput textinput.Model
 }
 
 // NewApp создаёт RunConfigApp для заданной модели.
@@ -110,6 +116,8 @@ func NewApp(m *modelscan.Model, paramsFilePath string, modelsCfgPath string) *Ru
 	if m != nil {
 		a.left.SetParams(a.params, m.Path)
 	}
+
+	a.comment = LoadCommentForModel(modelsCfgPath, m)
 
 	rows := PrefilledRowsForModel(a.catalog, m)
 	if saved, ok := LoadSavedFlagsForModel(modelsCfgPath, m); ok {
@@ -199,6 +207,22 @@ func (a *RunConfigApp) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return a, nil
 		}
 
+		// Попап комментария — перехватывает все клавиши
+		if a.showComment {
+			switch key {
+			case "enter":
+				a.comment = a.commentInput.Value()
+				a.showComment = false
+			case "esc":
+				a.showComment = false
+			default:
+				var cmd tea.Cmd
+				a.commentInput, cmd = a.commentInput.Update(msg)
+				return a, cmd
+			}
+			return a, nil
+		}
+
 		// В режиме редактирования — перехватываем Enter/Esc, остальное форвардим в input
 		if editing {
 			switch key {
@@ -218,6 +242,17 @@ func (a *RunConfigApp) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if key == "?" {
 			a.showDesc = true
 			a.descText = a.currentDescription()
+			return a, nil
+		}
+
+		// c — редактировать комментарий к модели
+		if key == "c" && !filterActive && !editing {
+			ti := textinput.New()
+			ti.SetValue(a.comment)
+			ti.SetWidth(60)
+			ti.Focus()
+			a.commentInput = ti
+			a.showComment = true
 			return a, nil
 		}
 
@@ -355,7 +390,7 @@ func (a *RunConfigApp) rightPanelSize() (w, h int) {
 	}
 
 	// высота content-блока: учитываем top-bar (1 строка) + model header
-	headerStr := RenderHeader(a.model, a.styles, innerW, a.curated)
+	headerStr := RenderHeader(a.model, a.styles, innerW, a.comment, a.curated)
 	modelHeaderH := strings.Count(headerStr, "\n") + 1
 	topBarH := 1
 	// В узком режиме добавляем строку-таббар
@@ -397,7 +432,7 @@ func (a *RunConfigApp) View() tea.View {
 	topBar := RenderTopBar("llama-server-loader - Параметры запуска", "0.1.0", st, innerW)
 
 	// ── Block 1: Header модели ────────────────────────────────────────────────
-	header := RenderHeader(a.model, st, innerW, a.curated)
+	header := RenderHeader(a.model, st, innerW, a.comment, a.curated)
 
 	// ── Block 2: Content ──────────────────────────────────────────────────────
 	rw, rh := a.rightPanelSize()
@@ -479,6 +514,9 @@ func (a *RunConfigApp) View() tea.View {
 		screen = lipgloss.Place(a.width, a.height, lipgloss.Center, lipgloss.Center, overlay)
 	} else if a.showDesc {
 		overlay := a.renderDescPopup(a.width, a.height)
+		screen = lipgloss.Place(a.width, a.height, lipgloss.Center, lipgloss.Center, overlay)
+	} else if a.showComment {
+		overlay := a.renderCommentPopup(a.width, a.height)
 		screen = lipgloss.Place(a.width, a.height, lipgloss.Center, lipgloss.Center, overlay)
 	}
 
@@ -743,10 +781,65 @@ func (a *RunConfigApp) Result() RunConfigResult {
 		rows = a.left.Rows()
 	}
 	return RunConfigResult{
-		Action: a.action,
-		Rows:   rows,
-		Model:  a.model,
+		Action:  a.action,
+		Rows:    rows,
+		Model:   a.model,
+		Comment: a.comment,
 	}
+}
+
+// renderCommentPopup рендерит попап редактирования комментария к модели.
+func (a *RunConfigApp) renderCommentPopup(sw, sh int) string {
+	st := a.styles
+
+	popupW := sw * 60 / 100
+	if popupW < 44 {
+		popupW = 44
+	}
+	if popupW > 80 {
+		popupW = 80
+	}
+	innerW := popupW - 4
+	if innerW < 10 {
+		innerW = 10
+	}
+
+	rowFill := lipgloss.NewStyle().
+		Background(lipgloss.Color(st.BgPanel)).
+		Width(innerW)
+
+	titleStyle := lipgloss.NewStyle().
+		Bold(true).
+		Background(lipgloss.Color(st.BgPanel)).
+		Foreground(lipgloss.Color(st.NeonGreen))
+
+	hintStyle := lipgloss.NewStyle().
+		Background(lipgloss.Color(st.BgPanel)).
+		Foreground(lipgloss.Color(st.TextMuted))
+
+	inputStyle := lipgloss.NewStyle().
+		Background(lipgloss.Color(st.BgPanel)).
+		Foreground(lipgloss.Color(st.TextSecondary))
+
+	empty := rowFill.Render("")
+	rows := []string{
+		rowFill.Render(titleStyle.Render("Комментарий к модели")),
+		empty,
+		rowFill.Render(inputStyle.Render(a.commentInput.View())),
+		empty,
+		rowFill.Render(hintStyle.Render("Enter — сохранить  ·  Esc — отмена")),
+	}
+
+	body := lipgloss.JoinVertical(lipgloss.Left, rows...)
+
+	return lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder(), true, true, true, true).
+		BorderForeground(lipgloss.Color(st.AccentPurple)).
+		BorderBackground(lipgloss.Color(st.BgPanel)).
+		Background(lipgloss.Color(st.BgPanel)).
+		Padding(0, 1).
+		Width(innerW).
+		Render(body)
 }
 
 // emptyPanel рендерит пустую панель с рамкой (заглушка когда панель nil).
