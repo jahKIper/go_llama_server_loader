@@ -147,6 +147,7 @@
         {"short_flag": "-ctkd", "long_flag": "--cache-type-k-draft TYPE", "description_ru": "Тип данных KV кэша K для драфта"},
         {"short_flag": "-ctvd", "long_flag": "--cache-type-v-draft TYPE", "description_ru": "Тип данных KV кэша V для драфта"},
         {"short_flag": "-dt", "long_flag": "--defrag-thold N", "description_ru": "Порог фрагментации KV кэша"},
+        {"short_flag": "-fa", "long_flag": "--flash-attn [on|off|auto]", "description_ru": "Использование Flash Attention (on/off/auto) — баланс производительности и ресурсов"},
         {"short_flag": "-np", "long_flag": "--parallel N", "description_ru": "Количество параллельных последовательностей"}
       ]
     },
@@ -198,7 +199,6 @@
         {"short_flag": "", "long_flag": "--warmup", "description_ru": "Разогрев"},
         {"short_flag": "", "long_flag": "--spm-infill", "description_ru": "SPM паттерн для fill"},
         {"short_flag": "", "long_flag": "--pooling", "description_ru": "Тип пулинга"},
-        {"short_flag": "-np", "long_flag": "--parallel N", "description_ru": "Количество слотов сервера"},
         {"short_flag": "-cb", "long_flag": "--cont-batching", "description_ru": "Непрерывное батчинг"},
         {"short-flag": " ", "long_flag": "--no-cont-batching", "description_ru": "Отключить непрерывное батчинг"},
         {"short_flag": "", "long_flag": "--alias STRING", "description_ru": "Алиасы модели"},
