@@ -8,11 +8,13 @@
       "mmproj_path": "/home/kiper/src/go_llama_server_loader/models/llmfan46/gemma-4-E4B-it-ultra-uncensored-heretic-GGUF/gemma-4-E4B-it-mmproj-BF16.gguf",
       "mmproj_on": true,
       "size": 6217260896,
-      "last_scan": "2026-05-11T06:32:59Z",
+      "last_scan": "2026-05-11T12:02:48Z",
       "flags": {
+        "ctx_size": 100000,
         "mmproj": "/home/kiper/src/go_llama_server_loader/models/llmfan46/gemma-4-E4B-it-ultra-uncensored-heretic-GGUF/gemma-4-E4B-it-mmproj-BF16.gguf",
         "model": "/home/kiper/src/go_llama_server_loader/models/llmfan46/gemma-4-E4B-it-ultra-uncensored-heretic-GGUF/gemma-4-E4B-it-ultra-uncensored-heretic-Q6_K.gguf",
-        "no_mmproj_offload": ""
+        "no_mmproj_offload": true,
+        "threads": 10
       },
       "params": [
         {
