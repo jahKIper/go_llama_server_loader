@@ -16,9 +16,11 @@ type footerHint struct {
 
 var footerHints = []footerHint{
 	{"Bksp", "← модели"},
-	{"Tab", "переключить"},
+	{"Tab", "панели"},
+	{"g", "CLI/GGUF"},
 	{"↑↓", "выбрать"},
 	{"Enter", "add/edit"},
+	{"m", "из модели"},
 	{"d", "удалить"},
 	{"?", "описание"},
 	{"/", "поиск"},

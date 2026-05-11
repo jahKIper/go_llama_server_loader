@@ -15,6 +15,7 @@ import (
 	"charm.land/bubbles/v2/list"
 	"charm.land/lipgloss/v2"
 
+	"llama-server-loader/internal/cli/modelparams"
 	"llama-server-loader/internal/cli/runconfig"
 	"llama-server-loader/internal/cli/uistyle"
 	"llama-server-loader/pkg/modelscan"
@@ -324,8 +325,10 @@ func (c *CLI) runInteractive() error {
 	// Навигация между экранами в цикле: первый экран → второй экран → (Back →
 	// снова первый, Run → запуск llama-server, Cancel/q → выход).
 	for {
+		// Загружаем GGUF-параметры из models.json для обогащения карточек.
+		paramsLookup := modelparams.LoadFromFile(modelsCfgPath)
 		// ── Первый экран: выбор модели ───────────────────────────────────────
-		app := NewApp(enrichedModels)
+		app := NewApp(enrichedModels, paramsLookup)
 		p := tea.NewProgram(app)
 		if _, err = p.Run(); err != nil {
 			return fmt.Errorf("error running TUI: %w", err)
@@ -523,16 +526,18 @@ type App struct {
 	tabs         *TabBar
 	helpPopup    *HelpPopup
 	helpExpanded bool // toggled by "?"
+	params       *modelparams.Lookup
+	peekOpen     bool // toggled by "i"
 }
 
 // NewApp creates a new App with model list.
-func NewApp(models []*modelscan.Model) *App {
+func NewApp(models []*modelscan.Model, params *modelparams.Lookup) *App {
 	st := uistyle.GetStyles()
 	dims := DefaultDimensions()
 
 	items := make([]list.Item, len(models))
 	for i, m := range models {
-		items[i] = NewListItem(m)
+		items[i] = NewListItem(m, params)
 	}
 
 	delegate := &StyledDelegate{base: list.NewDefaultDelegate(), styles: st}
@@ -563,6 +568,7 @@ func NewApp(models []*modelscan.Model) *App {
 		filterState: FilterIdle,
 		tabs:        NewTabBar(st),
 		helpPopup:   NewHelpPopup(st),
+		params:      params,
 	}
 }
 
@@ -605,10 +611,28 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return a, tea.Quit
 			}
 
+		case "i":
+			// Inline-peek: курируемая сводка GGUF-параметров по выбранной модели.
+			// В режиме фильтра — обычный символ.
+			if a.filterState == FilterIdle {
+				a.peekOpen = !a.peekOpen
+				a.recomputeListSize()
+				return a, nil
+			}
+			a.filterInput.HandleKey("i")
+			a.filterText = a.filterInput.Text()
+			a.applyFilter()
+			return a, nil
+
 		case "esc":
-			// Esc-иерархия: popup → filter → no-op
+			// Esc-иерархия: popup → peek → filter → no-op
 			if a.helpExpanded {
 				a.helpExpanded = false
+				return a, nil
+			}
+			if a.peekOpen {
+				a.peekOpen = false
+				a.recomputeListSize()
 				return a, nil
 			}
 			if a.filterState != FilterIdle {
@@ -698,7 +722,11 @@ func (a *App) recomputeListSize() {
 	// header(1) + footer(1) — фиксированные. Зазоры — 2*BlockGap.
 	headerH := 1
 	footerH := 1
-	contentH := a.height - 2*OuterPadV - headerH - 2*BlockGap - footerH
+	peekH := 0
+	if a.peekOpen {
+		peekH = peekPanelHeight + BlockGap
+	}
+	contentH := a.height - 2*OuterPadV - headerH - 2*BlockGap - footerH - peekH
 	if contentH < 7 {
 		contentH = 7
 	}
@@ -779,7 +807,7 @@ func (a *App) applyFilter() {
 func setListItems(a *App, models []*modelscan.Model) {
 	items := make([]list.Item, len(models))
 	for i, m := range models {
-		items[i] = NewListItem(m)
+		items[i] = NewListItem(m, a.params)
 	}
 	a.list.SetItems(items)
 }
@@ -867,6 +895,19 @@ func (a *App) View() tea.View {
 		stackParts = append(stackParts, gap)
 	}
 	stackParts = append(stackParts, content)
+	if a.peekOpen {
+		for i := 0; i < BlockGap; i++ {
+			stackParts = append(stackParts, gap)
+		}
+		var peekBlock string
+		if item, ok := a.list.SelectedItem().(*ListItem); ok && a.params != nil && a.params.HasModel(item.model.Path) {
+			c := a.params.ForPathCurated(item.model.Path)
+			peekBlock = renderPeekPanel(c, a.styles, innerW)
+		} else {
+			peekBlock = renderPeekEmpty(a.styles, innerW)
+		}
+		stackParts = append(stackParts, peekBlock)
+	}
 	for i := 0; i < BlockGap; i++ {
 		stackParts = append(stackParts, gap)
 	}

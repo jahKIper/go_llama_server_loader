@@ -7,6 +7,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
 
+	"llama-server-loader/internal/cli/modelparams"
 	"llama-server-loader/internal/cli/uistyle"
 	"llama-server-loader/pkg/modelscan"
 	"llama-server-loader/pkg/servercmd"
@@ -44,6 +45,10 @@ type RunConfigApp struct {
 	showDesc bool
 	descText string
 
+	// GGUF-параметры выбранной модели (загружаются из models.json).
+	params  *modelparams.Lookup
+	curated modelparams.Curated
+
 	// Узкий режим: одна панель за раз
 	narrowMode bool
 
@@ -66,12 +71,21 @@ func NewApp(m *modelscan.Model, paramsFilePath string, modelsCfgPath string) *Ru
 		focus:          FocusRight,
 	}
 
+	// GGUF-параметры выбранной модели: читаем из models.json по имени.
+	a.params = modelparams.LoadFromFile(modelsCfgPath)
+	if m != nil {
+		a.curated = a.params.ForPathCurated(m.Path)
+	}
+
 	resolved, err := ResolveParamsFile(paramsFilePath)
 	if err != nil {
 		a.catalogErr = err
 		log.Printf("runconfig: params file not found: %v", err)
 		a.right = NewRightPanel(nil, a.styles, 40, 20)
 		a.left = NewLeftPanel(a.styles, 60, 20)
+		if m != nil {
+			a.left.SetParams(a.params, m.Path)
+		}
 		return a
 	}
 	a.paramsFilePath = resolved
@@ -82,11 +96,20 @@ func NewApp(m *modelscan.Model, paramsFilePath string, modelsCfgPath string) *Ru
 		log.Printf("runconfig: failed to load catalog from %s: %v", resolved, err)
 		a.right = NewRightPanel(nil, a.styles, 40, 20)
 		a.left = NewLeftPanel(a.styles, 60, 20)
+		if m != nil {
+			a.left.SetParams(a.params, m.Path)
+		}
 		return a
 	}
 	a.catalog = FlattenCatalog(pf)
 	a.right = NewRightPanel(a.catalog, a.styles, 40, 20)
+	if m != nil {
+		a.right.SetGGUFParams(a.params.ForPath(m.Path))
+	}
 	a.left = NewLeftPanel(a.styles, 60, 20)
+	if m != nil {
+		a.left.SetParams(a.params, m.Path)
+	}
 
 	rows := PrefilledRowsForModel(a.catalog, m)
 	if saved, ok := LoadSavedFlagsForModel(modelsCfgPath, m); ok {
@@ -215,10 +238,18 @@ func (a *RunConfigApp) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if a.focus == FocusRight && a.right != nil {
 			prevFilterActive := a.right.IsFilterActive()
 
-			// Enter на правой — добавить параметр в левую
+			// 'g' — переключение вкладки CLI ↔ GGUF (вне режима фильтра).
+			if key == "g" && !prevFilterActive {
+				a.right.ToggleTab()
+				return a, nil
+			}
+
+			// Enter на правой — добавить параметр в левую (только в CLI-табе).
 			if key == "enter" && !prevFilterActive {
-				if sel := a.right.Selected(); sel != nil && a.left != nil {
-					a.left.Add(sel.Meta)
+				if a.right.Tab() == RightTabCLI {
+					if sel := a.right.Selected(); sel != nil && a.left != nil {
+						a.left.Add(sel.Meta)
+					}
 				}
 				return a, nil
 			}
@@ -251,6 +282,10 @@ func (a *RunConfigApp) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return a, nil
 			case "d", "delete":
 				a.left.Remove(a.left.CursorIndex())
+				return a, nil
+			case "m":
+				// Apply-from-model: подставить GGUF-значение в текущий CLI-флаг.
+				a.left.ApplyModelValue()
 				return a, nil
 			case "enter":
 				cmd := a.left.StartEdit()
@@ -316,7 +351,7 @@ func (a *RunConfigApp) rightPanelSize() (w, h int) {
 	}
 
 	// высота content-блока: учитываем top-bar (1 строка) + model header
-	headerStr := RenderHeader(a.model, a.styles, innerW)
+	headerStr := RenderHeader(a.model, a.styles, innerW, a.curated)
 	modelHeaderH := strings.Count(headerStr, "\n") + 1
 	topBarH := 1
 	// В узком режиме добавляем строку-таббар
@@ -358,7 +393,7 @@ func (a *RunConfigApp) View() tea.View {
 	topBar := RenderTopBar("llama-server-loader - Параметры запуска", "0.1.0", st, innerW)
 
 	// ── Block 1: Header модели ────────────────────────────────────────────────
-	header := RenderHeader(a.model, st, innerW)
+	header := RenderHeader(a.model, st, innerW, a.curated)
 
 	// ── Block 2: Content ──────────────────────────────────────────────────────
 	rw, rh := a.rightPanelSize()

@@ -9,18 +9,20 @@ import (
 	"charm.land/bubbles/v2/list"
 	"charm.land/lipgloss/v2"
 
+	"llama-server-loader/internal/cli/modelparams"
 	"llama-server-loader/internal/cli/uistyle"
 	"llama-server-loader/pkg/modelscan"
 )
 
 // ListItem представляет элемент списка моделей.
 type ListItem struct {
-	model *modelscan.Model
+	model  *modelscan.Model
+	params *modelparams.Lookup
 }
 
 // NewListItem создает новый ListItem.
-func NewListItem(m *modelscan.Model) *ListItem {
-	return &ListItem{model: m}
+func NewListItem(m *modelscan.Model, params *modelparams.Lookup) *ListItem {
+	return &ListItem{model: m, params: params}
 }
 
 // Title возвращает заголовок элемента.
@@ -74,14 +76,14 @@ func (l *ListItem) Render(w io.Writer, m list.Model, index int, item list.Item) 
 		Render("●")
 
 	if selected {
-		fmt.Fprint(w, renderSelected(model, dot, quant, itemWidth, st))
+		fmt.Fprint(w, renderSelected(model, dot, quant, itemWidth, st, listItem.params))
 	} else {
-		fmt.Fprint(w, renderNormal(model, dot, quant, itemWidth, st))
+		fmt.Fprint(w, renderNormal(model, dot, quant, itemWidth, st, listItem.params))
 	}
 }
 
 // renderSelected рендерит выбранный item.
-func renderSelected(model *modelscan.Model, dot, quant string, itemWidth int, st *uistyle.StyleConfig) string {
+func renderSelected(model *modelscan.Model, dot, quant string, itemWidth int, st *uistyle.StyleConfig, params *modelparams.Lookup) string {
 	bracketStyle := st.ItemSelectedStyle()
 	innerW := itemWidth - bracketStyle.GetHorizontalFrameSize()
 	if innerW < 1 {
@@ -97,7 +99,7 @@ func renderSelected(model *modelscan.Model, dot, quant string, itemWidth int, st
 		Background(lipgloss.Color(st.BgSelected)).
 		Foreground(lipgloss.Color(st.TextPrimary)).
 		Render(" " + model.Name)
-	metaBracket := formatMetaBracket(model, st, st.BgSelected)
+	metaBracket := formatMetaBracket(model, st, st.BgSelected, params)
 	nameSpacerW := innerW - lipgloss.Width(dot) - lipgloss.Width(nameRest) - lipgloss.Width(metaBracket)
 	if nameSpacerW < 1 {
 		nameSpacerW = 1
@@ -124,7 +126,7 @@ func renderSelected(model *modelscan.Model, dot, quant string, itemWidth int, st
 }
 
 // renderNormal рендерит обычный (не выбранный) item.
-func renderNormal(model *modelscan.Model, dot, quant string, itemWidth int, st *uistyle.StyleConfig) string {
+func renderNormal(model *modelscan.Model, dot, quant string, itemWidth int, st *uistyle.StyleConfig, params *modelparams.Lookup) string {
 	if itemWidth < 1 {
 		itemWidth = 1
 	}
@@ -141,7 +143,7 @@ func renderNormal(model *modelscan.Model, dot, quant string, itemWidth int, st *
 		Background(lipgloss.Color(st.DarkBg)).
 		Foreground(lipgloss.Color(st.TextPrimary)).
 		Render(" " + model.Name)
-	metaBracket := formatMetaBracket(model, st, st.DarkBg)
+	metaBracket := formatMetaBracket(model, st, st.DarkBg, params)
 	nameSpacerW := itemWidth - lipgloss.Width(leftPad2) - lipgloss.Width(dot) - lipgloss.Width(nameRest) - lipgloss.Width(metaBracket)
 	if nameSpacerW < 1 {
 		nameSpacerW = 1
@@ -208,8 +210,10 @@ func truncatePathLeft(path string, maxLen int) string {
 	return "..." + suffix
 }
 
-// formatMetaBracket возвращает «[ GGUF · Q6_K · 5.8GB · mmproj ]» для вставки в строку имени.
-func formatMetaBracket(m *modelscan.Model, st *uistyle.StyleConfig, parentBg string) string {
+// formatMetaBracket возвращает «[ gemma4 · 131K ctx · 7.5B · 38 params ]» для
+// вставки в строку имени. Поля, для которых нет значения в GGUF-параметрах,
+// скрываются. При полном отсутствии params возвращает прежний бейдж GGUF/quant.
+func formatMetaBracket(m *modelscan.Model, st *uistyle.StyleConfig, parentBg string, params *modelparams.Lookup) string {
 	if st == nil {
 		return ""
 	}
@@ -220,9 +224,27 @@ func formatMetaBracket(m *modelscan.Model, st *uistyle.StyleConfig, parentBg str
 		Background(lipgloss.Color(parentBg)).
 		Foreground(lipgloss.Color(st.TextSecondary))
 
-	parts := []string{"GGUF", extractQuantization(m.Name), formatSize(m.Size)}
-	if len(m.MMProjPaths) > 0 {
-		parts = append(parts, "mmproj")
+	var parts []string
+	if params != nil {
+		c := params.ForPathCurated(m.Path)
+		if c.Architecture != "" {
+			parts = append(parts, c.Architecture)
+		}
+		if c.ContextLength > 0 {
+			parts = append(parts, modelparams.FormatContext(c.ContextLength)+" ctx")
+		}
+		if c.SizeLabel != "" {
+			parts = append(parts, c.SizeLabel)
+		}
+		if c.TotalCount > 0 {
+			parts = append(parts, fmt.Sprintf("%d params", c.TotalCount))
+		}
+	}
+	if len(parts) == 0 {
+		parts = []string{"GGUF", extractQuantization(m.Name)}
+		if len(m.MMProjPaths) > 0 {
+			parts = append(parts, "mmproj")
+		}
 	}
 
 	pieces := make([]string, 0, len(parts)*2+1)

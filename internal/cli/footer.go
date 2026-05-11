@@ -29,6 +29,7 @@ func NewFooter(styles *uistyle.StyleConfig) *Footer {
 		leftRows: []HelpRow{
 			{Keys: "↑↓", Label: "навигация"},
 			{Keys: "/", Label: "фильтр"},
+			{Keys: "i", Label: "детали"},
 			{Keys: "?", Label: "помощь"},
 			{Keys: "Tab", Label: "таб"},
 		},

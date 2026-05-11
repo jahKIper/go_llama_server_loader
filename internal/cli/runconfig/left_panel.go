@@ -8,6 +8,7 @@ import (
 	"charm.land/bubbles/v2/textinput"
 	"charm.land/lipgloss/v2"
 
+	"llama-server-loader/internal/cli/modelparams"
 	"llama-server-loader/internal/cli/uistyle"
 	"llama-server-loader/internal/config"
 )
@@ -21,6 +22,34 @@ type LeftPanel struct {
 	st      *uistyle.StyleConfig
 	editing bool
 	input   textinput.Model
+
+	// GGUF-параметры для inline-подсказок «из модели: …» и apply-from-model (m).
+	params    *modelparams.Lookup
+	modelPath string
+}
+
+// SetParams задаёт источник GGUF-параметров и путь модели для inline-подсказок.
+func (p *LeftPanel) SetParams(lookup *modelparams.Lookup, modelPath string) {
+	p.params = lookup
+	p.modelPath = modelPath
+}
+
+// ApplyModelValue подставляет GGUF-значение в значение текущей строки, если
+// для её --long-флага есть маппинг в FlagApplyMap. Возвращает true при успехе.
+func (p *LeftPanel) ApplyModelValue() bool {
+	if p.params == nil || p.modelPath == "" {
+		return false
+	}
+	if p.cursor < 0 || p.cursor >= len(p.rows) {
+		return false
+	}
+	flag := "--" + strings.TrimPrefix(p.rows[p.cursor].Long, "--")
+	_, disp, ok := p.params.ResolveGGUFKeyForFlag(p.modelPath, flag)
+	if !ok {
+		return false
+	}
+	p.rows[p.cursor].Value = disp
+	return true
 }
 
 // NewLeftPanel создаёт пустую левую панель.
@@ -302,6 +331,18 @@ func (p *LeftPanel) renderItem(row ParamRow, selected bool, w int, editing bool)
 	const hintStr = "[?]"
 	const hintW = 4 // "[?] "
 
+	// inline-подсказка «из модели: …» (если есть GGUF-значение для этого флага)
+	var modelHintText string
+	if p.params != nil && p.modelPath != "" {
+		if _, disp, ok := p.params.ResolveGGUFKeyForFlag(p.modelPath, "--"+strings.TrimPrefix(row.Long, "--")); ok {
+			modelHintText = "из модели: " + disp
+		}
+	}
+	modelHintW := 0
+	if modelHintText != "" {
+		modelHintW = utf8.RuneCountInString(modelHintText) + 2 // "  prefix"
+	}
+
 	const removeStr = "[REMOVE (d)]"
 	const removeW = 13
 	removePad := 0
@@ -343,7 +384,7 @@ func (p *LeftPanel) renderItem(row ParamRow, selected bool, w int, editing bool)
 		Render(" " + hintStr)
 
 	// Value или textinput
-	valueMaxW := w - indicW - flagW - 1 - hintW - removePad
+	valueMaxW := w - indicW - flagW - 1 - hintW - removePad - modelHintW
 	if valueMaxW < 0 {
 		valueMaxW = 0
 	}
@@ -383,8 +424,17 @@ func (p *LeftPanel) renderItem(row ParamRow, selected bool, w int, editing bool)
 			Render(removeStr)
 	}
 
+	// inline-подсказка «из модели: …» — серый текст справа от значения
+	var modelHintRendered string
+	if modelHintText != "" {
+		modelHintRendered = "  " + lipgloss.NewStyle().
+			Background(lipgloss.Color(bg)).
+			Foreground(lipgloss.Color(st.AccentPurpleMuted)).
+			Render(modelHintText)
+	}
+
 	line := lipgloss.JoinHorizontal(lipgloss.Top,
-		indicator, flagRendered, valueRendered, hintRendered, removeRendered)
+		indicator, flagRendered, valueRendered, modelHintRendered, hintRendered, removeRendered)
 
 	return lipgloss.NewStyle().
 		Background(lipgloss.Color(bg)).

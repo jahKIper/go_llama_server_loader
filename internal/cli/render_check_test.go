@@ -23,7 +23,7 @@ func TestRenderVerification(t *testing.T) {
 		},
 	}
 
-	a := NewApp(models)
+	a := NewApp(models, nil)
 	m, _ := a.Update(tea.WindowSizeMsg{Width: 120, Height: 40})
 	app := m.(*App)
 	content := app.View().Content
@@ -65,7 +65,7 @@ func TestRenderVerification(t *testing.T) {
 	}
 
 	// Help popup — свежий app чтобы filterState был Idle
-	aHelp := NewApp(models)
+	aHelp := NewApp(models, nil)
 	mHelp, _ := aHelp.Update(tea.WindowSizeMsg{Width: 120, Height: 40})
 	appHelp := mHelp.(*App)
 	mHelp2, _ := appHelp.Update(tea.KeyPressMsg{Text: "?"})
@@ -82,7 +82,7 @@ func TestRenderVerification(t *testing.T) {
 
 	// Tiny window — не паникует
 	t.Log("=== Tiny window ===")
-	aTiny := NewApp(models[:2])
+	aTiny := NewApp(models[:2], nil)
 	mTiny, _ := aTiny.Update(tea.WindowSizeMsg{Width: 40, Height: 12})
 	appTiny := mTiny.(*App)
 	_ = appTiny.View()

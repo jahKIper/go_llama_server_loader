@@ -8,7 +8,18 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
 
+	"llama-server-loader/internal/cli/modelparams"
 	"llama-server-loader/internal/cli/uistyle"
+	"llama-server-loader/internal/config"
+)
+
+
+// RightTab — переключаемые вкладки правой панели.
+type RightTab int
+
+const (
+	RightTabCLI  RightTab = iota // CLI-параметры (каталог llama-server)
+	RightTabGGUF                 // GGUF-параметры выбранной модели
 )
 
 // RightPanel — правая панель: каталог параметров с фильтром и скроллом.
@@ -18,6 +29,14 @@ type RightPanel struct {
 	cursor   int
 	offset   int
 
+	// GGUF-таб: параметры модели (read-only).
+	ggufAll      []config.ModelParam
+	ggufFiltered []config.ModelParam
+	ggufCursor   int
+	ggufOffset   int
+
+	tab RightTab
+
 	filterText   string
 	filterCursor int
 	filterActive bool
@@ -25,6 +44,32 @@ type RightPanel struct {
 	st *uistyle.StyleConfig
 	w  int
 	h  int
+}
+
+// SetGGUFParams задаёт срез GGUF-параметров для второй вкладки.
+func (p *RightPanel) SetGGUFParams(params []config.ModelParam) {
+	p.ggufAll = params
+	p.ggufFiltered = params
+	p.ggufCursor = 0
+	p.ggufOffset = 0
+}
+
+// Tab возвращает активную вкладку.
+func (p *RightPanel) Tab() RightTab {
+	return p.tab
+}
+
+// ToggleTab переключает активную вкладку. Сбрасывает текст фильтра.
+func (p *RightPanel) ToggleTab() {
+	if p.tab == RightTabCLI {
+		p.tab = RightTabGGUF
+	} else {
+		p.tab = RightTabCLI
+	}
+	p.filterText = ""
+	p.filterCursor = 0
+	p.filterActive = false
+	p.applyFilter()
 }
 
 // NewRightPanel создаёт правую панель с заданными записями и размерами.
@@ -46,8 +91,12 @@ func (p *RightPanel) SetSize(w, h int) {
 	p.clampOffset()
 }
 
-// Selected возвращает текущую выбранную запись или nil.
+// Selected возвращает текущую выбранную CLI-запись или nil.
+// Для GGUF-таба возвращает nil (там нет CatalogEntry).
 func (p *RightPanel) Selected() *CatalogEntry {
+	if p.tab != RightTabCLI {
+		return nil
+	}
 	if len(p.filtered) == 0 || p.cursor < 0 || p.cursor >= len(p.filtered) {
 		return nil
 	}
@@ -79,7 +128,7 @@ func (p *RightPanel) Update(msg tea.Msg, focused bool) tea.Cmd {
 			p.clampOffset()
 		}
 	case "down":
-		if p.cursor < len(p.filtered)-1 {
+		if p.cursor < p.currentLen()-1 {
 			p.cursor++
 			p.clampOffset()
 		}
@@ -99,15 +148,15 @@ func (p *RightPanel) Update(msg tea.Msg, focused bool) tea.Cmd {
 			step = 1
 		}
 		p.cursor += step
-		if p.cursor >= len(p.filtered) {
-			p.cursor = len(p.filtered) - 1
+		if p.cursor >= p.currentLen() {
+			p.cursor = p.currentLen() - 1
 		}
 		p.clampOffset()
 	case "home":
 		p.cursor = 0
 		p.clampOffset()
 	case "end":
-		p.cursor = len(p.filtered) - 1
+		p.cursor = p.currentLen() - 1
 		if p.cursor < 0 {
 			p.cursor = 0
 		}
@@ -173,6 +222,24 @@ func (p *RightPanel) handleFilterKey(key string) tea.Cmd {
 func (p *RightPanel) applyFilter() {
 	p.cursor = 0
 	p.offset = 0
+	if p.tab == RightTabGGUF {
+		if p.filterText == "" {
+			p.ggufFiltered = p.ggufAll
+			return
+		}
+		q := strings.ToLower(p.filterText)
+		res := make([]config.ModelParam, 0, len(p.ggufAll))
+		for _, m := range p.ggufAll {
+			k := strings.ToLower(m.Key)
+			d := strings.ToLower(m.DescriptionRU)
+			v := strings.ToLower(modelparams.FormatValue(m.Value, 64))
+			if strings.Contains(k, q) || strings.Contains(d, q) || strings.Contains(v, q) {
+				res = append(res, m)
+			}
+		}
+		p.ggufFiltered = res
+		return
+	}
 	if p.filterText == "" {
 		p.filtered = p.all
 		return
@@ -188,6 +255,14 @@ func (p *RightPanel) applyFilter() {
 		}
 	}
 	p.filtered = result
+}
+
+// currentLen возвращает длину видимого списка с учётом активного таба.
+func (p *RightPanel) currentLen() int {
+	if p.tab == RightTabGGUF {
+		return len(p.ggufFiltered)
+	}
+	return len(p.filtered)
 }
 
 // visibleListHeight — количество строк, доступных для списка элементов.
@@ -243,11 +318,62 @@ func (p *RightPanel) fitsCount(idx, listH, w int) int {
 	return count
 }
 
+// ggufItemHeight возвращает высоту GGUF-элемента в строках:
+// 1 (ключ+значение) + строки описания (только для выбранного элемента).
+func (p *RightPanel) ggufItemHeight(idx int) int {
+	if idx < 0 || idx >= len(p.ggufFiltered) {
+		return 1
+	}
+	if idx != p.cursor {
+		return 1
+	}
+	m := p.ggufFiltered[idx]
+	if m.DescriptionRU == "" {
+		return 1
+	}
+	const indicW = 2
+	descMaxW := p.itemW() - indicW
+	if descMaxW < 1 {
+		descMaxW = 1
+	}
+	wrapped := wordWrap(m.DescriptionRU, descMaxW)
+	return 1 + strings.Count(wrapped, "\n") + 1
+}
+
+// ggufFitsCount возвращает количество GGUF-элементов, начиная с idx,
+// которые целиком помещаются в listH строк.
+func (p *RightPanel) ggufFitsCount(idx, listH int) int {
+	used := 0
+	count := 0
+	for i := idx; i < len(p.ggufFiltered); i++ {
+		h := p.ggufItemHeight(i)
+		if used+h > listH {
+			break
+		}
+		used += h
+		count++
+	}
+	return count
+}
+
 func (p *RightPanel) clampOffset() {
 	listH := p.visibleListHeight()
 	w := p.itemW()
 	if p.cursor < p.offset {
 		p.offset = p.cursor
+	}
+	if p.tab == RightTabGGUF {
+		for p.offset < p.cursor {
+			fits := p.ggufFitsCount(p.offset, listH)
+			if p.offset+fits > p.cursor {
+				break
+			}
+			p.offset++
+		}
+		if p.offset < 0 {
+			p.offset = 0
+		}
+		return
 	}
 	// Прокручиваем offset вперёд, пока курсор не помещается в видимой области.
 	for p.offset < p.cursor {
@@ -294,7 +420,9 @@ func (p *RightPanel) Render(focused bool) string {
 
 	// ── Строки списка + скроллбар ─────────────────────────────────────────────
 	var listBlock string
-	if len(p.all) == 0 {
+	if p.tab == RightTabGGUF {
+		listBlock = p.renderGGUFList(listH, itemW, scrollW)
+	} else if len(p.all) == 0 {
 		listBlock = lipgloss.NewStyle().
 			Background(lipgloss.Color(st.BgPanel)).
 			Foreground(lipgloss.Color(st.TextMuted)).
@@ -358,18 +486,138 @@ func (p *RightPanel) Render(focused bool) string {
 		Render(inner)
 
 	// ── Title в рамку ─────────────────────────────────────────────────────────
-	titleText := "Все параметры"
-	if len(p.filtered) < len(p.all) && len(p.all) > 0 {
-		titleText = "Поиск"
-	}
-	countText := ""
-	if len(p.all) > 0 {
-		if len(p.filtered) < len(p.all) {
-			countText = strings.Repeat("", 0) // пусто справа, count в левом лейбле через пробел
-		}
-		_ = countText
+	var titleText string
+	switch p.tab {
+	case RightTabGGUF:
+		titleText = "▣ Параметры модели  │  CLI"
+	default:
+		titleText = "▣ CLI  │  Параметры модели"
 	}
 	return injectBorderTitle(rendered, titleText, "")
+}
+
+// renderGGUFList рендерит список GGUF-параметров: «ключ  значение».
+// Описание показывается под выбранной строкой (multi-line wordWrap).
+func (p *RightPanel) renderGGUFList(listH, itemW, scrollW int) string {
+	st := p.st
+	if len(p.ggufAll) == 0 {
+		empty := lipgloss.NewStyle().
+			Background(lipgloss.Color(st.BgPanel)).
+			Foreground(lipgloss.Color(st.TextMuted)).
+			Width(itemW + scrollW).
+			Height(listH).
+			Render("GGUF-параметры не найдены. Откройте модель — они запишутся в models.json.")
+		return empty
+	}
+
+	lines := make([]string, 0, listH)
+	idx := p.offset
+	visibleItems := 0
+	for len(lines) < listH && idx < len(p.ggufFiltered) {
+		itemLines := p.renderGGUFItem(p.ggufFiltered[idx], idx == p.cursor, itemW)
+		for _, l := range itemLines {
+			if len(lines) < listH {
+				lines = append(lines, l)
+			}
+		}
+		visibleItems++
+		idx++
+	}
+	emptyLine := lipgloss.NewStyle().
+		Background(lipgloss.Color(st.BgPanel)).
+		Width(itemW).
+		Render("")
+	for len(lines) < listH {
+		lines = append(lines, emptyLine)
+	}
+
+	scrollLines := renderScrollbarLines(p.offset, visibleItems, len(p.ggufFiltered), listH, scrollW, st)
+	rowLines := make([]string, listH)
+	for i := 0; i < listH; i++ {
+		if scrollW > 0 {
+			rowLines[i] = lipgloss.JoinHorizontal(lipgloss.Top, lines[i], scrollLines[i])
+		} else {
+			rowLines[i] = lines[i]
+		}
+	}
+	return strings.Join(rowLines, "\n")
+}
+
+// renderGGUFItem — строки «ключ  значение» (+ описание под выделенной).
+// Возвращает срез строк: 1 строка для обычного элемента, 2+ для выделенного с описанием.
+func (p *RightPanel) renderGGUFItem(m config.ModelParam, selected bool, w int) []string {
+	st := p.st
+	bg := st.BgPanel
+	if selected {
+		bg = st.BgSelected
+	}
+	const indicW = 2
+	keyMaxW := w / 2
+	if keyMaxW > 36 {
+		keyMaxW = 36
+	}
+	if keyMaxW < 8 {
+		keyMaxW = 8
+	}
+	key := m.Key
+	if utf8.RuneCountInString(key) > keyMaxW {
+		key = truncatePath(key, keyMaxW)
+	}
+	valStr := modelparams.FormatValue(m.Value, w-indicW-keyMaxW-2)
+	valStyleFg := st.TextSecondary
+	if !selected {
+		valStyleFg = st.TextMuted
+	}
+	var indicator string
+	if selected {
+		indicator = lipgloss.NewStyle().
+			Background(lipgloss.Color(bg)).
+			Foreground(lipgloss.Color(st.NeonGreen)).
+			Render("▶ ")
+	} else {
+		indicator = lipgloss.NewStyle().
+			Background(lipgloss.Color(bg)).
+			Render("  ")
+	}
+	keyStyled := lipgloss.NewStyle().
+		Bold(selected).
+		Background(lipgloss.Color(bg)).
+		Foreground(lipgloss.Color(st.NeonGreen)).
+		Width(keyMaxW).
+		Render(key)
+	valStyled := lipgloss.NewStyle().
+		Background(lipgloss.Color(bg)).
+		Foreground(lipgloss.Color(valStyleFg)).
+		Render("  " + valStr)
+	mainLine := lipgloss.NewStyle().
+		Background(lipgloss.Color(bg)).
+		Width(w).
+		Render(lipgloss.JoinHorizontal(lipgloss.Top, indicator, keyStyled, valStyled))
+
+	result := []string{mainLine}
+
+	if selected && m.DescriptionRU != "" {
+		descMaxW := w - indicW
+		if descMaxW < 1 {
+			descMaxW = 1
+		}
+		indent := lipgloss.NewStyle().
+			Background(lipgloss.Color(bg)).
+			Render(strings.Repeat(" ", indicW))
+		descStyle := lipgloss.NewStyle().
+			Background(lipgloss.Color(bg)).
+			Foreground(lipgloss.Color(st.TextMuted))
+		rowFill := lipgloss.NewStyle().
+			Background(lipgloss.Color(bg)).
+			Width(w)
+		wrapped := wordWrap(m.DescriptionRU, descMaxW)
+		for _, dl := range strings.Split(wrapped, "\n") {
+			dl := lipgloss.JoinHorizontal(lipgloss.Top, indent, descStyle.Render(dl))
+			result = append(result, rowFill.Render(dl))
+		}
+	}
+
+	return result
 }
 
 // renderFilterLine рендерит бордюрное поле фильтра шириной w —
