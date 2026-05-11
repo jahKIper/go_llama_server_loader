@@ -13,7 +13,262 @@
         "mmproj": "/home/kiper/src/go_llama_server_loader/models/llmfan46/gemma-4-E4B-it-ultra-uncensored-heretic-GGUF/gemma-4-E4B-it-mmproj-BF16.gguf",
         "model": "/home/kiper/src/go_llama_server_loader/models/llmfan46/gemma-4-E4B-it-ultra-uncensored-heretic-GGUF/gemma-4-E4B-it-ultra-uncensored-heretic-Q6_K.gguf",
         "no_mmproj_offload": ""
-      }
+      },
+      "params": [
+        {
+          "key": "general.architecture",
+          "value": "gemma4",
+          "description_ru": "Идентификатор архитектуры (llama, qwen3, gemma3, gemma4, qwen35 и т.п.) — определяет LLM_ARCH в llama.cpp"
+        },
+        {
+          "key": "general.type",
+          "value": "model",
+          "description_ru": "Тип артефакта: \"model\", \"adapter\" (LoRA) и т.п."
+        },
+        {
+          "key": "general.sampling.top_k",
+          "value": 64,
+          "description_ru": "Рекомендуемый top-k по умолчанию"
+        },
+        {
+          "key": "general.sampling.top_p",
+          "value": 0.95,
+          "description_ru": "Рекомендуемый top-p (nucleus) по умолчанию"
+        },
+        {
+          "key": "general.sampling.temp",
+          "value": 1,
+          "description_ru": "Рекомендуемая авторами модели температура семплирования по умолчанию"
+        },
+        {
+          "key": "general.name",
+          "value": "Gemma 4 E4B It Ultra Uncensored Heretic",
+          "description_ru": "Человекочитаемое имя модели"
+        },
+        {
+          "key": "general.size_label",
+          "value": "7.5B",
+          "description_ru": "Метка размера модели (\"4B\", \"9B\", \"70B\"), используется в имени файла"
+        },
+        {
+          "key": "gemma4.block_count",
+          "value": 42,
+          "description_ru": "Количество трансформерных блоков (слоёв)"
+        },
+        {
+          "key": "gemma4.context_length",
+          "value": 131072,
+          "description_ru": "Максимальная длина контекста в токенах, на которую модель обучена (training-time, без YARN/rope-scaling)"
+        },
+        {
+          "key": "gemma4.embedding_length",
+          "value": 2560,
+          "description_ru": "Размерность скрытого состояния (hidden size, d_model)"
+        },
+        {
+          "key": "gemma4.feed_forward_length",
+          "value": 10240,
+          "description_ru": "Размерность промежуточного слоя FFN (intermediate size)"
+        },
+        {
+          "key": "gemma4.attention.head_count",
+          "value": 8,
+          "description_ru": "Число голов внимания (Q)"
+        },
+        {
+          "key": "gemma4.attention.head_count_kv",
+          "value": 2,
+          "description_ru": "Число KV-голов (для GQA/MQA; равно head_count при обычном MHA)"
+        },
+        {
+          "key": "gemma4.rope.freq_base",
+          "value": 1000000,
+          "description_ru": "Базовая частота θ для RoPE (обычно 10000; 1e6 у global-слоёв Gemma 3+ и моделей с расширенным контекстом)"
+        },
+        {
+          "key": "gemma4.rope.freq_base_swa",
+          "value": 10000,
+          "description_ru": "Базовая частота θ для RoPE в SWA-слоях (у Gemma 3+ обычно 10000, тогда как global — 1e6)"
+        },
+        {
+          "key": "gemma4.attention.layer_norm_rms_epsilon",
+          "value": 0.000001,
+          "description_ru": "Epsilon в RMSNorm перед attention/FFN (типично 1e-5…1e-6)"
+        },
+        {
+          "key": "gemma4.attention.key_length",
+          "value": 512,
+          "description_ru": "Размерность одной K-головы (head_dim для ключей) в обычных (global/full) слоях"
+        },
+        {
+          "key": "gemma4.attention.value_length",
+          "value": 512,
+          "description_ru": "Размерность одной V-головы в обычных (global/full) слоях"
+        },
+        {
+          "key": "gemma4.final_logit_softcapping",
+          "value": 30,
+          "description_ru": "Коэффициент soft-cap для выходных логитов (logits = cap·tanh(logits/cap); типично 30 у Gemma)"
+        },
+        {
+          "key": "gemma4.attention.sliding_window",
+          "value": 512,
+          "description_ru": "Размер окна для sliding-window attention в токенах (Gemma 3 — 1024, Gemma 3n — 512)"
+        },
+        {
+          "key": "gemma4.attention.shared_kv_layers",
+          "value": 18,
+          "description_ru": "Количество последних слоёв, переиспользующих KV-проекции более ранних слоёв (оптимизация Gemma 3+ для экономии KV-cache)"
+        },
+        {
+          "key": "gemma4.embedding_length_per_layer_input",
+          "value": 256,
+          "description_ru": "Per-layer input embedding (PLE) — специфика Gemma 3n/E4B: для каждого слоя добавляется отдельный вектор поверх общего эмбеддинга (обычно d=256)"
+        },
+        {
+          "key": "gemma4.attention.sliding_window_pattern",
+          "value": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false
+          ],
+          "description_ru": "Шаблон чередования local(SWA)/global слоёв: у Gemma 3 целое N (каждый N-й — global, типично 6); у Gemma 4 — bool-массив длиной block_count с пометкой SWA-слоёв"
+        },
+        {
+          "key": "gemma4.attention.key_length_swa",
+          "value": 256,
+          "description_ru": "Размерность K-головы в слоях со sliding-window attention (Gemma 3+: у SWA-слоёв может отличаться от global)"
+        },
+        {
+          "key": "gemma4.attention.value_length_swa",
+          "value": 256,
+          "description_ru": "Размерность V-головы в слоях со sliding-window attention"
+        },
+        {
+          "key": "gemma4.rope.dimension_count",
+          "value": 512,
+          "description_ru": "Число измерений head_dim, на которые применяется RoPE (обычно равно key_length)"
+        },
+        {
+          "key": "gemma4.rope.dimension_count_swa",
+          "value": 256,
+          "description_ru": "Число RoPE-измерений в SWA-слоях (Gemma 3+, может отличаться от global)"
+        },
+        {
+          "key": "tokenizer.ggml.model",
+          "value": "gemma4",
+          "description_ru": "Тип токенизатора: \"gpt2\" (BPE), \"llama\" (SentencePiece), \"bert\" (WordPiece), \"no_vocab\" и т.д."
+        },
+        {
+          "key": "tokenizer.ggml.tokens",
+          "value": "\u003carray len=262144 type=String\u003e",
+          "description_ru": "Массив всех токенов словаря (строки)"
+        },
+        {
+          "key": "tokenizer.ggml.scores",
+          "value": "\u003carray len=262144 type=Float32\u003e",
+          "description_ru": "Массив log-prob/score для каждого токена (используется SentencePiece-моделями)"
+        },
+        {
+          "key": "tokenizer.ggml.token_type",
+          "value": "\u003carray len=262144 type=Int32\u003e",
+          "description_ru": "Массив типов токенов (1=normal, 2=unknown, 3=control, 4=user-defined, 5=unused, 6=byte)"
+        },
+        {
+          "key": "tokenizer.ggml.merges",
+          "value": "\u003carray len=514906 type=String\u003e",
+          "description_ru": "Массив BPE-merge правил (\"a b\" → \"ab\") для BPE-токенизаторов"
+        },
+        {
+          "key": "tokenizer.ggml.bos_token_id",
+          "value": 2,
+          "description_ru": "ID токена начала последовательности (BOS)"
+        },
+        {
+          "key": "tokenizer.ggml.eos_token_id",
+          "value": 1,
+          "description_ru": "ID токена конца последовательности (EOS)"
+        },
+        {
+          "key": "tokenizer.ggml.unknown_token_id",
+          "value": 3,
+          "description_ru": "ID unknown-токена (UNK)"
+        },
+        {
+          "key": "tokenizer.ggml.padding_token_id",
+          "value": 0,
+          "description_ru": "ID padding-токена"
+        },
+        {
+          "key": "tokenizer.ggml.mask_token_id",
+          "value": 4,
+          "description_ru": "ID mask-токена (BERT-подобные модели для MLM)"
+        },
+        {
+          "key": "tokenizer.chat_template",
+          "value": "{%- macro format_parameters(properties, required) -%}\n    {%- set standard_keys = ['description', 'type', 'properties', 'required', 'nullable'] -%}\n    {%- set ns = namespace(found_first=false) -%}\n    {%- for key, value in properties | dictsort -%}\n        {%- set add_comma = false -%}\n        {%- if key not in standard_keys -%}\n            {%- if ns.found_first %},{% endif -%}\n            {%- set ns.found_first = true -%}\n            {{ key }}:{\n            {%- if value['description'] -%}\n                description:\u003c|\"|\u003e{{ value['description'] }}\u003c|\"|\u003e\n                {%- set add_comma = true -%}\n            {%- endif -%}\n            {%- if value['type'] | upper == 'STRING' -%}\n                {%- if value['enum'] -%}\n                    {%- if add_comma %},{%- else -%} {%- set add_comma = true -%} {% endif -%}\n                    enum:{{ format_argument(value['enum']) }}\n                {%- endif -%}\n            {%- elif value['type'] | upper == 'ARRAY' -%}\n                {%- if value['items'] is mapping and value['items'] -%}\n                    {%- if add_comma %},{%- else -%} {%- set add_comma = true -%} {% endif -%}\n                    items:{\n                    {%- set ns_items = namespace(found_first=false) -%}\n                    {%- for item_key, item_value in value['items'] | dictsort -%}\n                        {%- if item_value is not none -%}\n                            {%- if ns_items.found_first %},{% endif -%}\n                            {%- set ns_items.found_first = true -%}\n                            {%- if item_key == 'properties' -%}\n                                properties:{\n                                {%- if item_value is mapping -%}\n                                    {{- format_parameters(item_value, value['items']['required'] | default([])) -}}\n                                {%- endif -%}\n                                }\n                            {%- elif item_key == 'required' -%}\n                                required:[\n                                {%- for req_item in item_value -%}\n                                    \u003c|\"|\u003e{{- req_item -}}\u003c|\"|\u003e\n                                    {%- if not loop.last %},{% endif -%}\n                                {%- endfor -%}\n                                ]\n                            {%- elif item_key == 'type' -%}\n                                {%- if item_value is string -%}\n                                    type:{{ format_argument(item_value | upper) }}\n                                {%- else -%}\n                                    type:{{ format_argument(item_value | map('upper') | list) }}\n                                {%- endif -%}\n                            {%- else -%}\n                                {{ item_key }}:{{ format_argument(item_value) }}\n                            {%- endif -%}\n                        {%- endif -%}\n                    {%- endfor -%}\n                    }\n                {%- endif -%}\n            {%- endif -%}\n            {%- if value['nullable'] %}\n                {%- if add_comma %},{%- else -%} {%- set add_comma = true -%} {% endif -%}\n                nullable:true\n            {%- endif -%}\n            {%- if value['type'] | upper == 'OBJECT' -%}\n                {%- if value['properties'] is defined and value['properties'] is mapping -%}\n                    {%- if add_comma %},{%- else -%} {%- set add_comma = true -%} {% endif -%}\n                    properties:{\n                    {{- format_parameters(value['properties'], value['required'] | default([])) -}}\n                    }\n                {%- elif value is mapping -%}\n                    {%- if add_comma %},{%- else -%} {%- set add_comma = true -%} {% endif -%}\n                    properties:{\n                    {{- format_parameters(value, value['required'] | default([])) -}}\n                    }\n                {%- endif -%}\n                {%- if value['required'] -%}\n                    {%- if add_comma %},{%- else -%} {%- set add_comma = true -%} {% endif -%}\n                    required:[\n                    {%- for item in value['required'] | default([]) -%}\n                        \u003c|\"|\u003e{{- item -}}\u003c|\"|\u003e\n                        {%- if not loop.last %},{% endif -%}\n                    {%- endfor -%}\n                    ]\n                {%- endif -%}\n            {%- endif -%}\n            {%- if add_comma %},{%- else -%} {%- set add_comma = true -%} {% endif -%}\n            type:\u003c|\"|\u003e{{ value['type'] | upper }}\u003c|\"|\u003e}\n        {%- endif -%}\n    {%- endfor -%}\n{%- endmacro -%}\n{%- macro format_function_declaration(tool_data) -%}\n    declaration:{{- tool_data['function']['name'] -}}{description:\u003c|\"|\u003e{{- tool_data['function']['description'] -}}\u003c|\"|\u003e\n    {%- set params = tool_data['function']['parameters'] -%}\n    {%- if params -%}\n        ,parameters:{\n        {%- if params['properties'] -%}\n            properties:{ {{- format_parameters(params['properties'], params['required']) -}} },\n        {%- endif -%}\n        {%- if params['required'] -%}\n            required:[\n            {%- for item in params['required'] -%}\n                \u003c|\"|\u003e{{- item -}}\u003c|\"|\u003e\n                {{- ',' if not loop.last -}}\n            {%- endfor -%}\n            ],\n        {%- endif -%}\n        {%- if params['type'] -%}\n            type:\u003c|\"|\u003e{{- params['type'] | upper -}}\u003c|\"|\u003e}\n        {%- endif -%}\n    {%- endif -%}\n    {%- if 'response' in tool_data['function'] -%}\n        {%- set response_declaration = tool_data['function']['response'] -%}\n        ,response:{\n        {%- if response_declaration['description'] -%}\n            description:\u003c|\"|\u003e{{- response_declaration['description'] -}}\u003c|\"|\u003e,\n        {%- endif -%}\n        {%- if response_declaration['type'] | upper == 'OBJECT' -%}\n            type:\u003c|\"|\u003e{{- response_declaration['type'] | upper -}}\u003c|\"|\u003e}\n        {%- endif -%}\n    {%- endif -%}\n    }\n{%- endmacro -%}\n{%- macro format_argument(argument, escape_keys=True) -%}\n    {%- if argument is string -%}\n        {{- '\u003c|\"|\u003e' + argument + '\u003c|\"|\u003e' -}}\n    {%- elif argument is boolean -%}\n        {{- 'true' if argument else 'false' -}}\n    {%- elif argument is mapping -%}\n        {{- '{' -}}\n        {%- set ns = namespace(found_first=false) -%}\n        {%- for key, value in argument | dictsort -%}\n            {%- if ns.found_first %},{% endif -%}\n            {%- set ns.found_first = true -%}\n            {%- if escape_keys -%}\n                {{- '\u003c|\"|\u003e' + key + '\u003c|\"|\u003e' -}}\n            {%- else -%}\n                {{- key -}}\n            {%- endif -%}\n            :{{- format_argument(value, escape_keys=escape_keys) -}}\n        {%- endfor -%}\n        {{- '}' -}}\n    {%- elif argument is sequence -%}\n        {{- '[' -}}\n        {%- for item in argument -%}\n            {{- format_argument(item, escape_keys=escape_keys) -}}\n            {%- if not loop.last %},{% endif -%}\n        {%- endfor -%}\n        {{- ']' -}}\n    {%- else -%}\n        {{- argument -}}\n    {%- endif -%}\n{%- endmacro -%}\n{%- macro strip_thinking(text) -%}\n    {%- set ns = namespace(result='') -%}\n    {%- for part in text.split('\u003cchannel|\u003e') -%}\n        {%- if '\u003c|channel\u003e' in part -%}\n            {%- set ns.result = ns.result + part.split('\u003c|channel\u003e')[0] -%}\n        {%- else -%}\n            {%- set ns.result = ns.result + part -%}\n        {%- endif -%}\n    {%- endfor -%}\n    {{- ns.result | trim -}}\n{%- endmacro -%}\n\n{%- macro format_tool_response_block(tool_name, response) -%}\n    {{- '\u003c|tool_response\u003e' -}}\n    {%- if response is mapping -%}\n        {{- 'response:' + tool_name + '{' -}}\n        {%- for key, value in response | dictsort -%}\n            {{- key -}}:{{- format_argument(value, escape_keys=False) -}}\n            {%- if not loop.last %},{% endif -%}\n        {%- endfor -%}\n        {{- '}' -}}\n    {%- else -%}\n        {{- 'response:' + tool_name + '{value:' + format_argument(response, escape_keys=False) + '}' -}}\n    {%- endif -%}\n    {{- '\u003ctool_response|\u003e' -}}\n{%- endmacro -%}\n\n{%- set ns = namespace(prev_message_type=None) -%}\n{%- set loop_messages = messages -%}\n{{- bos_token -}}\n{#- Handle System/Tool Definitions Block -#}\n{%- if (enable_thinking is defined and enable_thinking) or tools or messages[0]['role'] in ['system', 'developer'] -%}\n    {{- '\u003c|turn\u003esystem\\n' -}}\n\n    {#- Inject Thinking token at the very top of the FIRST system turn -#}\n    {%- if enable_thinking is defined and enable_thinking -%}\n        {{- '\u003c|think|\u003e\\n' -}}\n        {%- set ns.prev_message_type = 'think' -%}\n    {%- endif -%}\n\n    {%- if messages[0]['role'] in ['system', 'developer'] -%}\n        {{- messages[0]['content'] | trim -}}\n        {%- set loop_messages = messages[1:] -%}\n    {%- endif -%}\n\n    {%- if tools -%}\n        {%- for tool in tools %}\n            {{- '\u003c|tool\u003e' -}}\n            {{- format_function_declaration(tool) | trim -}}\n            {{- '\u003ctool|\u003e' -}}\n        {%- endfor %}\n        {%- set ns.prev_message_type = 'tool' -%}\n    {%- endif -%}\n\n    {{- '\u003cturn|\u003e\\n' -}}\n{%- endif %}\n\n{#- Pre-scan: find last user message index for reasoning guard -#}\n{%- set ns_turn = namespace(last_user_idx=-1) -%}\n{%- for i in range(loop_messages | length) -%}\n    {%- if loop_messages[i]['role'] == 'user' -%}\n        {%- set ns_turn.last_user_idx = i -%}\n    {%- endif -%}\n{%- endfor -%}\n\n{#- Loop through messages -#}\n{%- for message in loop_messages -%}\n    {%- if message['role'] != 'tool' -%}\n    {%- set ns.prev_message_type = None -%}\n    {%- set role = 'model' if message['role'] == 'assistant' else message['role'] -%}\n    {#- Detect continuation: suppress duplicate \u003c|turn\u003emodel when previous non-tool message was also assistant -#}\n    {%- set prev_nt = namespace(role=None, found=false) -%}\n    {%- if loop.index0 \u003e 0 -%}\n        {%- for j in range(loop.index0 - 1, -1, -1) -%}\n            {%- if not prev_nt.found -%}\n                {%- if loop_messages[j]['role'] != 'tool' -%}\n                    {%- set prev_nt.role = loop_messages[j]['role'] -%}\n                    {%- set prev_nt.found = true -%}\n                {%- endif -%}\n            {%- endif -%}\n        {%- endfor -%}\n    {%- endif -%}\n    {%- set continue_same_model_turn = (role == 'model' and prev_nt.role == 'assistant') -%}\n    {%- if not continue_same_model_turn -%}\n        {{- '\u003c|turn\u003e' + role + '\\n' }}\n    {%- endif -%}\n\n    {#- Render reasoning/reasoning_content as thinking channel -#}\n    {%- set thinking_text = message.get('reasoning') or message.get('reasoning_content') -%}\n    {%- if thinking_text and loop.index0 \u003e ns_turn.last_user_idx and message.get('tool_calls') -%}\n        {{- '\u003c|channel\u003ethought\\n' + thinking_text + '\\n\u003cchannel|\u003e' -}}\n    {%- endif -%}\n\n            {%- if message['tool_calls'] -%}\n                {%- for tool_call in message['tool_calls'] -%}\n                    {%- set function = tool_call['function'] -%}\n                    {{- '\u003c|tool_call\u003ecall:' + function['name'] + '{' -}}\n                    {%- if function['arguments'] is mapping -%}\n                        {%- set ns_args = namespace(found_first=false) -%}\n                        {%- for key, value in function['arguments'] | dictsort -%}\n                            {%- if ns_args.found_first %},{% endif -%}\n                            {%- set ns_args.found_first = true -%}\n                            {{- key -}}:{{- format_argument(value, escape_keys=False) -}}\n                        {%- endfor -%}\n                    {%- elif function['arguments'] is string -%}\n                        {{- function['arguments'] -}}\n                    {%- endif -%}\n                    {{- '}\u003ctool_call|\u003e' -}}\n                {%- endfor -%}\n                {%- set ns.prev_message_type = 'tool_call' -%}\n            {%- endif -%}\n\n            {%- set ns_tr_out = namespace(flag=false) -%}\n            {%- if message.get('tool_responses') -%}\n                {#- Legacy: tool_responses embedded on the assistant message (Google/Gemma native) -#}\n                {%- for tool_response in message['tool_responses'] -%}\n                    {{- format_tool_response_block(tool_response['name'] | default('unknown'), tool_response['response']) -}}\n                    {%- set ns_tr_out.flag = true -%}\n                    {%- set ns.prev_message_type = 'tool_response' -%}\n                {%- endfor -%}\n            {%- elif message.get('tool_calls') -%}\n                {#- OpenAI Chat Completions: forward-scan consecutive role:tool messages -#}\n                {%- set ns_tool_scan = namespace(stopped=false) -%}\n                {%- for k in range(loop.index0 + 1, loop_messages | length) -%}\n                    {%- if ns_tool_scan.stopped -%}\n                    {%- elif loop_messages[k]['role'] != 'tool' -%}\n                        {%- set ns_tool_scan.stopped = true -%}\n                    {%- else -%}\n                        {%- set follow = loop_messages[k] -%}\n                        {#- Resolve tool_call_id to function name -#}\n                        {%- set ns_tname = namespace(name=follow.get('name') | default('unknown')) -%}\n                        {%- for tc in message['tool_calls'] -%}\n                            {%- if tc.get('id') == follow.get('tool_call_id') -%}\n                                {%- set ns_tname.name = tc['function']['name'] -%}\n                            {%- endif -%}\n                        {%- endfor -%}\n                        {#- Handle content as string or content-parts array -#}\n                        {%- set tool_body = follow.get('content') -%}\n                        {%- if tool_body is string -%}\n                            {{- format_tool_response_block(ns_tname.name, tool_body) -}}\n                        {%- elif tool_body is sequence and tool_body is not string -%}\n                            {%- set ns_txt = namespace(s='') -%}\n                            {%- for part in tool_body -%}\n                                {%- if part.get('type') == 'text' -%}\n                                    {%- set ns_txt.s = ns_txt.s + (part.get('text') | default('')) -%}\n                                {%- endif -%}\n                            {%- endfor -%}\n                            {{- format_tool_response_block(ns_tname.name, ns_txt.s) -}}\n                        {%- else -%}\n                            {{- format_tool_response_block(ns_tname.name, tool_body) -}}\n                        {%- endif -%}\n                        {%- set ns_tr_out.flag = true -%}\n                        {%- set ns.prev_message_type = 'tool_response' -%}\n                    {%- endif -%}\n                {%- endfor -%}\n            {%- endif -%}\n\n            {%- if message['content'] is string -%}\n                {%- if role == 'model' -%}\n                    {{- strip_thinking(message['content']) -}}\n                {%- else -%}\n                    {{- message['content'] | trim -}}\n                {%- endif -%}\n            {%- elif message['content'] is sequence -%}\n                {%- for item in message['content'] -%}\n                    {%- if item['type'] == 'text' -%}\n                        {%- if role == 'model' -%}\n                            {{- strip_thinking(item['text']) -}}\n                        {%- else -%}\n                            {{- item['text'] | trim -}}\n                        {%- endif -%}\n                    {%- elif item['type'] == 'image' -%}\n                        {{- '\u003c|image|\u003e' -}}\n                        {%- set ns.prev_message_type = 'image' -%}\n                    {%- elif item['type'] == 'audio' -%}\n                        {{- '\u003c|audio|\u003e' -}}\n                        {%- set ns.prev_message_type = 'audio' -%}\n                    {%- elif item['type'] == 'video' -%}\n                        {{- '\u003c|video|\u003e' -}}\n                        {%- set ns.prev_message_type = 'video' -%}\n                    {%- endif -%}\n                {%- endfor -%}\n            {%- endif -%}\n\n        {%- if ns.prev_message_type == 'tool_call' and not ns_tr_out.flag -%}\n            {{- '\u003c|tool_response\u003e' -}}\n        {%- elif not (ns_tr_out.flag and not message.get('content')) -%}\n            {{- '\u003cturn|\u003e\\n' -}}\n        {%- endif -%}\n    {%- endif -%}\n{%- endfor -%}\n\n{%- if add_generation_prompt -%}\n    {%- if ns.prev_message_type != 'tool_response' and ns.prev_message_type != 'tool_call' -%}\n        {{- '\u003c|turn\u003emodel\\n' -}}\n    {%- endif -%}\n{%- endif -%}",
+          "description_ru": "Jinja-шаблон чат-промпта (форматирование ролей user/assistant/system)"
+        },
+        {
+          "key": "tokenizer.ggml.add_space_prefix",
+          "value": false,
+          "description_ru": "Добавлять ли пробел в начало текста перед токенизацией (особенность SentencePiece у LLaMA)"
+        },
+        {
+          "key": "tokenizer.ggml.add_bos_token",
+          "value": true,
+          "description_ru": "Добавлять ли BOS автоматически при токенизации"
+        },
+        {
+          "key": "general.quantization_version",
+          "value": 2,
+          "description_ru": "Версия формата квантизации GGUF (текущая — 2)"
+        },
+        {
+          "key": "general.file_type",
+          "value": "18 (Q6_K)",
+          "description_ru": "Числовой код общей квантизации файла (enum LLAMA_FTYPE_*: 0=F32, 1=F16, 2=Q4_0, 7=Q8_0, 15=Q4_K_M, 18=Q6_K и т.д.)"
+        }
+      ]
     },
     {
       "name": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M",
@@ -26,7 +281,179 @@
         "mmproj": "/home/kiper/src/go_llama_server_loader/models/HauhauCS/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive/mmproj-Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-BF16.gguf",
         "model": "/home/kiper/src/go_llama_server_loader/models/HauhauCS/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
         "no_mmproj_offload": 1
-      }
+      },
+      "params": [
+        {
+          "key": "general.architecture",
+          "value": "qwen35",
+          "description_ru": "Идентификатор архитектуры (llama, qwen3, gemma3, gemma4, qwen35 и т.п.) — определяет LLM_ARCH в llama.cpp"
+        },
+        {
+          "key": "general.type",
+          "value": "model",
+          "description_ru": "Тип артефакта: \"model\", \"adapter\" (LoRA) и т.п."
+        },
+        {
+          "key": "general.name",
+          "value": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-BF16",
+          "description_ru": "Человекочитаемое имя модели"
+        },
+        {
+          "key": "general.basename",
+          "value": "Qwen3.5",
+          "description_ru": "Базовое имя модели без суффиксов квантизации/размера (например, \"Gemma-4-E4B-it\")"
+        },
+        {
+          "key": "general.size_label",
+          "value": "9B",
+          "description_ru": "Метка размера модели (\"4B\", \"9B\", \"70B\"), используется в имени файла"
+        },
+        {
+          "key": "qwen35.block_count",
+          "value": 32,
+          "description_ru": "Количество трансформерных блоков (слоёв)"
+        },
+        {
+          "key": "qwen35.context_length",
+          "value": 262144,
+          "description_ru": "Максимальная длина контекста в токенах, на которую модель обучена (training-time, без YARN/rope-scaling)"
+        },
+        {
+          "key": "qwen35.embedding_length",
+          "value": 4096,
+          "description_ru": "Размерность скрытого состояния (hidden size, d_model)"
+        },
+        {
+          "key": "qwen35.feed_forward_length",
+          "value": 12288,
+          "description_ru": "Размерность промежуточного слоя FFN (intermediate size)"
+        },
+        {
+          "key": "qwen35.attention.head_count",
+          "value": 16,
+          "description_ru": "Число голов внимания (Q)"
+        },
+        {
+          "key": "qwen35.attention.head_count_kv",
+          "value": 4,
+          "description_ru": "Число KV-голов (для GQA/MQA; равно head_count при обычном MHA)"
+        },
+        {
+          "key": "qwen35.rope.dimension_sections",
+          "value": [
+            11,
+            11,
+            10,
+            0
+          ],
+          "description_ru": "Разбиение RoPE-измерений на секции для multi-axis M-RoPE (Qwen3-VL/3.5: длины секций time/height/width)"
+        },
+        {
+          "key": "qwen35.rope.freq_base",
+          "value": 10000000,
+          "description_ru": "Базовая частота θ для RoPE (обычно 10000; 1e6 у global-слоёв Gemma 3+ и моделей с расширенным контекстом)"
+        },
+        {
+          "key": "qwen35.attention.layer_norm_rms_epsilon",
+          "value": 0.000001,
+          "description_ru": "Epsilon в RMSNorm перед attention/FFN (типично 1e-5…1e-6)"
+        },
+        {
+          "key": "qwen35.attention.key_length",
+          "value": 256,
+          "description_ru": "Размерность одной K-головы (head_dim для ключей) в обычных (global/full) слоях"
+        },
+        {
+          "key": "qwen35.attention.value_length",
+          "value": 256,
+          "description_ru": "Размерность одной V-головы в обычных (global/full) слоях"
+        },
+        {
+          "key": "qwen35.ssm.conv_kernel",
+          "value": 4,
+          "description_ru": "Размер 1D-свёрточного ядра в SSM-блоке (Mamba-2; типично 4)"
+        },
+        {
+          "key": "qwen35.ssm.state_size",
+          "value": 128,
+          "description_ru": "Размер скрытого состояния SSM (d_state; типично 64/128/256)"
+        },
+        {
+          "key": "qwen35.ssm.group_count",
+          "value": 16,
+          "description_ru": "Число групп в multi-group SSM (аналог GQA для state-space; разделяет B/C-проекции между головами)"
+        },
+        {
+          "key": "qwen35.ssm.time_step_rank",
+          "value": 32,
+          "description_ru": "Ранг низкоранговой параметризации шага Δt в SSM (dt_rank; обычно ceil(d_model/16))"
+        },
+        {
+          "key": "qwen35.ssm.inner_size",
+          "value": 4096,
+          "description_ru": "Внутренняя размерность SSM-блока (d_inner; обычно 2·embedding_length)"
+        },
+        {
+          "key": "qwen35.full_attention_interval",
+          "value": 4,
+          "description_ru": "Интервал full-attention слоёв в гибридной SSM/Attn архитектуре (Qwen3-Next/3.5): full-attn только на каждом N-м слое (обычно 4), остальные — SSM"
+        },
+        {
+          "key": "qwen35.rope.dimension_count",
+          "value": 64,
+          "description_ru": "Число измерений head_dim, на которые применяется RoPE (обычно равно key_length)"
+        },
+        {
+          "key": "tokenizer.ggml.model",
+          "value": "gpt2",
+          "description_ru": "Тип токенизатора: \"gpt2\" (BPE), \"llama\" (SentencePiece), \"bert\" (WordPiece), \"no_vocab\" и т.д."
+        },
+        {
+          "key": "tokenizer.ggml.pre",
+          "value": "qwen35",
+          "description_ru": "Имя pre-tokenizer'а для BPE-моделей (\"llama-bpe\", \"qwen2\", \"gemma\" и т.д.) — задаёт regex-разбиение текста перед BPE"
+        },
+        {
+          "key": "tokenizer.ggml.tokens",
+          "value": "\u003carray len=248320 type=String\u003e",
+          "description_ru": "Массив всех токенов словаря (строки)"
+        },
+        {
+          "key": "tokenizer.ggml.token_type",
+          "value": "\u003carray len=248320 type=Int32\u003e",
+          "description_ru": "Массив типов токенов (1=normal, 2=unknown, 3=control, 4=user-defined, 5=unused, 6=byte)"
+        },
+        {
+          "key": "tokenizer.ggml.merges",
+          "value": "\u003carray len=247587 type=String\u003e",
+          "description_ru": "Массив BPE-merge правил (\"a b\" → \"ab\") для BPE-токенизаторов"
+        },
+        {
+          "key": "tokenizer.ggml.eos_token_id",
+          "value": 248046,
+          "description_ru": "ID токена конца последовательности (EOS)"
+        },
+        {
+          "key": "tokenizer.ggml.padding_token_id",
+          "value": 248044,
+          "description_ru": "ID padding-токена"
+        },
+        {
+          "key": "tokenizer.chat_template",
+          "value": "{%- set image_count = namespace(value=0) %}\n{%- set video_count = namespace(value=0) %}\n{%- macro render_content(content, do_vision_count, is_system_content=false) %}\n    {%- if content is string %}\n        {{- content }}\n    {%- elif content is iterable and content is not mapping %}\n        {%- for item in content %}\n            {%- if 'image' in item or 'image_url' in item or item.type == 'image' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain images.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set image_count.value = image_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Picture ' ~ image_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|image_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'video' in item or item.type == 'video' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain videos.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set video_count.value = video_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Video ' ~ video_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|video_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'text' in item %}\n                {{- item.text }}\n            {%- else %}\n                {{- raise_exception('Unexpected item type in content.') }}\n            {%- endif %}\n        {%- endfor %}\n    {%- elif content is none or content is undefined %}\n        {{- '' }}\n    {%- else %}\n        {{- raise_exception('Unexpected content type.') }}\n    {%- endif %}\n{%- endmacro %}\n{%- if not messages %}\n    {{- raise_exception('No messages provided.') }}\n{%- endif %}\n{%- if tools and tools is iterable and tools is not mapping %}\n    {{- '\u003c|im_start|\u003esystem\\n' }}\n    {{- \"# Tools\\n\\nYou have access to the following functions:\\n\\n\u003ctools\u003e\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n\u003c/tools\u003e\" }}\n    {{- '\\n\\nIf you choose to call a function ONLY reply in the following format with NO suffix:\\n\\n\u003ctool_call\u003e\\n\u003cfunction=example_function_name\u003e\\n\u003cparameter=example_parameter_1\u003e\\nvalue_1\\n\u003c/parameter\u003e\\n\u003cparameter=example_parameter_2\u003e\\nThis is the value for the second parameter\\nthat can span\\nmultiple lines\\n\u003c/parameter\u003e\\n\u003c/function\u003e\\n\u003c/tool_call\u003e\\n\\n\u003cIMPORTANT\u003e\\nReminder:\\n- Function calls MUST follow the specified format: an inner \u003cfunction=...\u003e\u003c/function\u003e block must be nested within \u003ctool_call\u003e\u003c/tool_call\u003e XML tags\\n- Required parameters MUST be specified\\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\\n\u003c/IMPORTANT\u003e' }}\n    {%- if messages[0].role == 'system' %}\n        {%- set content = render_content(messages[0].content, false, true)|trim %}\n        {%- if content %}\n            {{- '\\n\\n' + content }}\n        {%- endif %}\n    {%- endif %}\n    {{- '\u003c|im_end|\u003e\\n' }}\n{%- else %}\n    {%- if messages[0].role == 'system' %}\n        {%- set content = render_content(messages[0].content, false, true)|trim %}\n        {{- '\u003c|im_start|\u003esystem\\n' + content + '\u003c|im_end|\u003e\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for message in messages[::-1] %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- if ns.multi_step_tool and message.role == \"user\" %}\n        {%- set content = render_content(message.content, false)|trim %}\n        {%- if not(content.startswith('\u003ctool_response\u003e') and content.endswith('\u003c/tool_response\u003e')) %}\n            {%- set ns.multi_step_tool = false %}\n            {%- set ns.last_query_index = index %}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if ns.multi_step_tool %}\n    {{- raise_exception('No user query found in messages.') }}\n{%- endif %}\n{%- for message in messages %}\n    {%- set content = render_content(message.content, true)|trim %}\n    {%- if message.role == \"system\" %}\n        {%- if not loop.first %}\n            {{- raise_exception('System message must be at the beginning.') }}\n        {%- endif %}\n    {%- elif message.role == \"user\" %}\n        {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content + '\u003c|im_end|\u003e' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is string %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '\u003c/think\u003e' in content %}\n                {%- set reasoning_content = content.split('\u003c/think\u003e')[0].rstrip('\\n').split('\u003cthink\u003e')[-1].lstrip('\\n') %}\n                {%- set content = content.split('\u003c/think\u003e')[-1].lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n        {%- set reasoning_content = reasoning_content|trim %}\n        {%- if loop.index0 \u003e ns.last_query_index %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n\u003cthink\u003e\\n' + reasoning_content + '\\n\u003c/think\u003e\\n\\n' + content }}\n        {%- else %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls and message.tool_calls is iterable and message.tool_calls is not mapping %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if tool_call.function is defined %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {%- if loop.first %}\n                    {%- if content|trim %}\n                        {{- '\\n\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- else %}\n                        {{- '\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- endif %}\n                {%- else %}\n                    {{- '\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                {%- endif %}\n                {%- if tool_call.arguments is defined %}\n                    {%- for args_name, args_value in tool_call.arguments|items %}\n                        {{- '\u003cparameter=' + args_name + '\u003e\\n' }}\n                        {%- set args_value = args_value | tojson | safe if args_value is mapping or (args_value is sequence and args_value is not string) else args_value | string %}\n                        {{- args_value }}\n                        {{- '\\n\u003c/parameter\u003e\\n' }}\n                    {%- endfor %}\n                {%- endif %}\n                {{- '\u003c/function\u003e\\n\u003c/tool_call\u003e' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '\u003c|im_end|\u003e\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.previtem and loop.previtem.role != \"tool\" %}\n            {{- '\u003c|im_start|\u003euser' }}\n        {%- endif %}\n        {{- '\\n\u003ctool_response\u003e\\n' }}\n        {{- content }}\n        {{- '\\n\u003c/tool_response\u003e' }}\n        {%- if not loop.last and loop.nextitem.role != \"tool\" %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- elif loop.last %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- endif %}\n    {%- else %}\n        {{- raise_exception('Unexpected message role.') }}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '\u003c|im_start|\u003eassistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '\u003cthink\u003e\\n\\n\u003c/think\u003e\\n\\n' }}\n    {%- else %}\n        {{- '\u003cthink\u003e\\n' }}\n    {%- endif %}\n{%- endif %}",
+          "description_ru": "Jinja-шаблон чат-промпта (форматирование ролей user/assistant/system)"
+        },
+        {
+          "key": "general.quantization_version",
+          "value": 2,
+          "description_ru": "Версия формата квантизации GGUF (текущая — 2)"
+        },
+        {
+          "key": "general.file_type",
+          "value": "15 (Q4_K_M)",
+          "description_ru": "Числовой код общей квантизации файла (enum LLAMA_FTYPE_*: 0=F32, 1=F16, 2=Q4_0, 7=Q8_0, 15=Q4_K_M, 18=Q6_K и т.д.)"
+        }
+      ]
     }
   ]
 }

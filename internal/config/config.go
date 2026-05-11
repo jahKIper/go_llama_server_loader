@@ -23,6 +23,14 @@ type ModelConfig struct {
 	Size       int64                  `json:"size"`
 	LastScan   string                 `json:"last_scan"`
 	Flags      map[string]interface{} `json:"flags"`
+	Params     []ModelParam           `json:"params,omitempty"`
+}
+
+// ModelParam — одна запись метаданных GGUF, сохраняемая в models.json.
+type ModelParam struct {
+	Key           string `json:"key"`
+	Value         any    `json:"value"`
+	DescriptionRU string `json:"description_ru"`
 }
 
 // LoadConfig loads and parses a models.json file from the given path.

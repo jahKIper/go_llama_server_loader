@@ -143,10 +143,10 @@ func TestRunConfigApp_ScenarioA_AddEditRun(t *testing.T) {
 		t.Fatalf("focus want FocusLeft after Tab, got %v", a.focus)
 	}
 
-	// e — начать редактирование значения.
-	a, _ = sendAppKey(a, "e")
+	// Enter — начать редактирование значения.
+	a, _ = sendAppKey(a, "enter")
 	if !a.left.IsEditing() {
-		t.Fatal("left panel should be in edit mode after 'e'")
+		t.Fatal("left panel should be in edit mode after Enter")
 	}
 
 	// Ввести "4096" в textinput.

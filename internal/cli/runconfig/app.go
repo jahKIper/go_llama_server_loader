@@ -252,7 +252,7 @@ func (a *RunConfigApp) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "d", "delete":
 				a.left.Remove(a.left.CursorIndex())
 				return a, nil
-			case "e", "enter":
+			case "enter":
 				cmd := a.left.StartEdit()
 				return a, cmd
 			case "q":
