@@ -435,13 +435,39 @@ func (a *RunConfigApp) View() tea.View {
 		stackParts = append(stackParts, bgGap)
 	}
 	stackParts = append(stackParts, footerLine)
-	stack := lipgloss.JoinVertical(lipgloss.Left, stackParts...)
 
-	screen := lipgloss.NewStyle().
+	// Каждую строку из всех stackParts оборачиваем в Width(innerW) + Background(DarkBg),
+	// затем добавляем горизонтальные padding-стрипы того же фона слева и справа.
+	// Это надёжнее, чем outer Padding+Width — lipgloss не всегда красит свободные
+	// колонки в недостающих по ширине строках многострочного контента.
+	rowFill := lipgloss.NewStyle().
 		Background(lipgloss.Color(st.DarkBg)).
-		Padding(uistyle.OuterPadV, padH).
+		Width(innerW)
+	padCell := lipgloss.NewStyle().
+		Background(lipgloss.Color(st.DarkBg)).
+		Width(padH).
+		Render("")
+	fullRowStrip := lipgloss.NewStyle().
+		Background(lipgloss.Color(st.DarkBg)).
 		Width(a.width).
-		Render(stack)
+		Render("")
+
+	var lines []string
+	// Верхний vertical padding.
+	for i := 0; i < uistyle.OuterPadV; i++ {
+		lines = append(lines, fullRowStrip)
+	}
+	for _, part := range stackParts {
+		for _, ln := range strings.Split(part, "\n") {
+			painted := rowFill.Render(ln)
+			lines = append(lines, padCell+painted+padCell)
+		}
+	}
+	// Нижний vertical padding.
+	for i := 0; i < uistyle.OuterPadV; i++ {
+		lines = append(lines, fullRowStrip)
+	}
+	screen := strings.Join(lines, "\n")
 
 	// ── Overlays ─────────────────────────────────────────────────────────────
 	if a.showConflicts {
@@ -474,10 +500,21 @@ func (a *RunConfigApp) renderWideContent(lw, rw int, st *uistyle.StyleConfig) st
 		leftBlock = emptyPanel(st, lw)
 	}
 
-	gap := lipgloss.NewStyle().
+	// gap должен быть многострочным, иначе все строки кроме первой при JoinHorizontal
+	// заполняются нестилизованными пробелами, через которые просвечивает фон терминала.
+	gapH := strings.Count(leftBlock, "\n") + 1
+	if rh := strings.Count(rightBlock, "\n") + 1; rh > gapH {
+		gapH = rh
+	}
+	gapCell := lipgloss.NewStyle().
 		Background(lipgloss.Color(st.DarkBg)).
 		Width(uistyle.BlockGap).
 		Render("")
+	gapLines := make([]string, gapH)
+	for i := 0; i < gapH; i++ {
+		gapLines[i] = gapCell
+	}
+	gap := strings.Join(gapLines, "\n")
 
 	return lipgloss.JoinHorizontal(lipgloss.Top, leftBlock, gap, rightBlock)
 }

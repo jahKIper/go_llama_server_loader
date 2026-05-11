@@ -25,10 +25,13 @@ func RenderHeader(m *modelscan.Model, st *uistyle.StyleConfig, innerW int, curat
 
 	name := strings.TrimSuffix(filepath.Base(m.Path), ".gguf")
 
+	// Фон header'а — DarkBg (как у unselected-карточки модели на первом экране).
+	headerBg := st.DarkBg
+
 	nameStr := lipgloss.NewStyle().
 		Bold(true).
 		Foreground(lipgloss.Color(st.NeonGreen)).
-		Background(lipgloss.Color(st.BgPanel)).
+		Background(lipgloss.Color(headerBg)).
 		Render(name)
 
 	// innerW минус padding блока (2*2=4) и рамка (2)
@@ -38,21 +41,26 @@ func RenderHeader(m *modelscan.Model, st *uistyle.StyleConfig, innerW int, curat
 	}
 	pathStr := lipgloss.NewStyle().
 		Foreground(lipgloss.Color(st.TextMuted)).
-		Background(lipgloss.Color(st.BgPanel)).
+		Background(lipgloss.Color(headerBg)).
 		Render(truncatePath(m.Path, pathMaxW))
 
-	sizeBadge := st.SizeBadgeStyle(st.BgPanel).Render(formatSizeLocal(m.Size))
+	sizeBadge := st.SizeBadgeStyle(headerBg).Render(formatSizeLocal(m.Size))
+
+	// Бэйджи трёхстрочные (border сверху/середина/снизу) — делаем разделитель тоже
+	// трёхстрочным с фоном, иначе по краям просвечивает фон терминала.
+	badgeSepCell := lipgloss.NewStyle().Background(lipgloss.Color(headerBg)).Render(" ")
+	badgeSep := badgeSepCell + "\n" + badgeSepCell + "\n" + badgeSepCell
 
 	var mmprojBadge string
 	if len(m.MMProjPaths) > 0 {
-		mmprojBadge = st.MMProjBadgeStyle(st.BgPanel).Render("mmproj")
+		mmprojBadge = st.MMProjBadgeStyle(headerBg).Render("mmproj")
 	} else {
 		mmprojBadge = lipgloss.NewStyle().
 			Padding(0, 1).
 			Border(lipgloss.NormalBorder(), true, true, true, true).
 			BorderForeground(lipgloss.Color(st.TextMuted)).
-			BorderBackground(lipgloss.Color(st.BgPanel)).
-			Background(lipgloss.Color(st.BgPanel)).
+			BorderBackground(lipgloss.Color(headerBg)).
+			Background(lipgloss.Color(headerBg)).
 			Foreground(lipgloss.Color(st.TextMuted)).
 			Render("no-mmproj")
 	}
@@ -61,21 +69,15 @@ func RenderHeader(m *modelscan.Model, st *uistyle.StyleConfig, innerW int, curat
 		Padding(0, 1).
 		Border(lipgloss.NormalBorder(), true, true, true, true).
 		BorderForeground(lipgloss.Color(st.TextSecondary)).
-		BorderBackground(lipgloss.Color(st.BgPanel)).
-		Background(lipgloss.Color(st.BgPanel)).
+		BorderBackground(lipgloss.Color(headerBg)).
+		Background(lipgloss.Color(headerBg)).
 		Foreground(lipgloss.Color(st.TextSecondary)).
 		Render("gguf")
 
-	badges := lipgloss.JoinHorizontal(lipgloss.Center, sizeBadge, " ", mmprojBadge, " ", ggufBadge)
+	badges := lipgloss.JoinHorizontal(lipgloss.Center, sizeBadge, badgeSep, mmprojBadge, badgeSep, ggufBadge)
 
 	// passport — компактная строка "паспорта" модели (arch · ctx · size · quant · sampling).
-	passport := formatPassport(c, st)
-
-	leftBlockParts := []string{nameStr, pathStr, badges}
-	if passport != "" {
-		leftBlockParts = append(leftBlockParts, passport)
-	}
-	leftBlock := lipgloss.JoinVertical(lipgloss.Left, leftBlockParts...)
+	passport := formatPassport(c, st, headerBg)
 
 	runBtn := lipgloss.NewStyle().
 		Bold(true).
@@ -84,27 +86,75 @@ func RenderHeader(m *modelscan.Model, st *uistyle.StyleConfig, innerW int, curat
 		Padding(0, 2).
 		Render("▶ ЗАПУСК (r)")
 	btnW := lipgloss.Width(runBtn)
-	bgCell := lipgloss.NewStyle().Background(lipgloss.Color(st.BgPanel))
+	bgCell := lipgloss.NewStyle().Background(lipgloss.Color(headerBg))
 	emptyBtnLine := bgCell.Width(btnW).Render("")
-	btnBlock := lipgloss.JoinVertical(lipgloss.Left, emptyBtnLine, runBtn, emptyBtnLine)
 
-	// innerW уже минус padding(2,2)=4 и рамку(2). leftBlock + gap + btn должны влезть.
+	// innerW уже минус padding(2,2)=4 и рамку(2). leftBlock + gap=1 + btn должны влезть.
 	innerContentW := innerW - 6
-	leftW := lipgloss.Width(leftBlock)
-	gapW := innerContentW - leftW - btnW
-	if gapW < 1 {
-		gapW = 1
+	const gapW = 1
+	leftBlockW := innerContentW - btnW - gapW
+	if leftBlockW < 10 {
+		leftBlockW = 10
 	}
+
+	// rowFill — каждая строка leftBlock проходит через стиль с Width и Background.
+	// Это гарантирует, что свободные колонки заполнены фоном headerBg, а не пробелами
+	// без стиля (через которые просвечивает фон терминала).
+	rowFill := lipgloss.NewStyle().
+		Background(lipgloss.Color(headerBg)).
+		Width(leftBlockW)
+
+	leftRowParts := []string{
+		rowFill.Render(nameStr),
+		rowFill.Render(pathStr),
+		rowFill.Render(badges),
+	}
+	if passport != "" {
+		// badges — многострочный (border'ы у бэйджей дают 3 строки).
+		// Каждую визуальную строку badges уже обернули rowFill'ом выше — этого мало,
+		// т.к. rowFill применяется к строке целиком, lipgloss может не покрыть
+		// все вертикальные сегменты. Прогоняем построчно ниже.
+	}
+	// Развернём каждый блок (некоторые из них многострочные) построчно, чтобы
+	// каждая визуальная строка прошла через rowFill.
+	expanded := make([]string, 0, 6)
+	for _, part := range leftRowParts {
+		for _, ln := range strings.Split(part, "\n") {
+			expanded = append(expanded, rowFill.Render(ln))
+		}
+	}
+	if passport != "" {
+		expanded = append(expanded, rowFill.Render(passport))
+	}
+	leftBlock := lipgloss.JoinVertical(lipgloss.Left, expanded...)
+	leftRows := len(expanded)
+
+	// Выравниваем btnBlock по высоте leftBlock, добиваем пустыми строками.
+	btnParts := make([]string, leftRows)
+	for i := 0; i < leftRows; i++ {
+		btnParts[i] = emptyBtnLine
+	}
+	if leftRows >= 2 {
+		btnParts[1] = runBtn
+	} else {
+		btnParts[0] = runBtn
+	}
+	btnBlock := lipgloss.JoinVertical(lipgloss.Left, btnParts...)
+
 	gapStrip := bgCell.Width(gapW).Render("")
-	gapBlock := lipgloss.JoinVertical(lipgloss.Left, gapStrip, gapStrip, gapStrip)
+	gapParts := make([]string, leftRows)
+	for i := 0; i < leftRows; i++ {
+		gapParts[i] = gapStrip
+	}
+	gapBlock := lipgloss.JoinVertical(lipgloss.Left, gapParts...)
 
 	block := lipgloss.JoinHorizontal(lipgloss.Top, leftBlock, gapBlock, btnBlock)
 
 	return lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder(), true, true, true, true).
 		BorderForeground(lipgloss.Color(st.AccentPurple)).
-		BorderBackground(lipgloss.Color(st.BgPanel)).
-		Background(lipgloss.Color(st.BgPanel)).
+		BorderBackground(lipgloss.Color(headerBg)).
+		Background(lipgloss.Color(headerBg)).
 		Padding(0, 2).
 		Width(innerW).
 		Render(block)
@@ -113,7 +163,7 @@ func RenderHeader(m *modelscan.Model, st *uistyle.StyleConfig, innerW int, curat
 // formatPassport собирает однострочную сводку «паспорта» модели для шапки
 // (arch · ctx · size · quant · sampling). Поля, для которых нет значения, пропускаются.
 // Возвращает пустую строку, если ни одного поля нет.
-func formatPassport(c modelparams.Curated, st *uistyle.StyleConfig) string {
+func formatPassport(c modelparams.Curated, st *uistyle.StyleConfig, bg string) string {
 	var parts []string
 	if c.Architecture != "" {
 		parts = append(parts, c.Architecture)
@@ -132,10 +182,10 @@ func formatPassport(c modelparams.Curated, st *uistyle.StyleConfig) string {
 		return ""
 	}
 	textStyle := lipgloss.NewStyle().
-		Background(lipgloss.Color(st.BgPanel)).
+		Background(lipgloss.Color(bg)).
 		Foreground(lipgloss.Color(st.TextMuted))
 	sepStyle := lipgloss.NewStyle().
-		Background(lipgloss.Color(st.BgPanel)).
+		Background(lipgloss.Color(bg)).
 		Foreground(lipgloss.Color(st.TextSecondary))
 	pieces := make([]string, 0, len(parts)*2-1)
 	for i, p := range parts {

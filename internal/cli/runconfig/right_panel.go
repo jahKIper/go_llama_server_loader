@@ -477,12 +477,18 @@ func (p *RightPanel) Render(focused bool) string {
 	if focused {
 		borderColor = st.NeonGreen
 	}
+	// Высота content-блока внутри рамки = p.h - 2 (две строки на рамку).
+	innerH := p.h - 2
+	if innerH < 1 {
+		innerH = 1
+	}
 	rendered := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder(), true, true, true, true).
 		BorderForeground(lipgloss.Color(borderColor)).
 		BorderBackground(lipgloss.Color(st.BgPanel)).
 		Background(lipgloss.Color(st.BgPanel)).
 		Width(contentW).
+		Height(innerH).
 		Render(inner)
 
 	// ── Title в рамку ─────────────────────────────────────────────────────────
@@ -563,7 +569,16 @@ func (p *RightPanel) renderGGUFItem(m config.ModelParam, selected bool, w int) [
 	if utf8.RuneCountInString(key) > keyMaxW {
 		key = truncatePath(key, keyMaxW)
 	}
-	valStr := modelparams.FormatValue(m.Value, w-indicW-keyMaxW-2)
+	// Бюджет ширины для значения: вся ширина w минус индикатор, ключ и 2 пробела между ними.
+	// Жёстко обрезаем, чтобы lipgloss не переносил строку на второй ряд (что ломает учёт высоты).
+	valBudget := w - indicW - keyMaxW - 2
+	if valBudget < 1 {
+		valBudget = 1
+	}
+	valStr := modelparams.FormatValue(m.Value, valBudget)
+	if utf8.RuneCountInString(valStr) > valBudget {
+		valStr = truncatePath(valStr, valBudget)
+	}
 	valStyleFg := st.TextSecondary
 	if !selected {
 		valStyleFg = st.TextMuted
