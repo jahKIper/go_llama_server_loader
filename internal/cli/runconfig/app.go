@@ -115,6 +115,10 @@ func NewApp(m *modelscan.Model, paramsFilePath string, modelsCfgPath string) *Ru
 	if saved, ok := LoadSavedFlagsForModel(modelsCfgPath, m); ok {
 		rows = MergeWithSavedFlags(a.catalog, rows, saved)
 	}
+	// Автодефолты добавляются всегда; LeftPanel.Seed дедуплицирует по Long,
+	// поэтому уже сохранённые пользователем флаги не перезаписываются — а
+	// недостающие подмешиваются с бейджем [default].
+	rows = append(rows, ComputeModelDefaults(a.catalog, m, a.params)...)
 	a.left.Seed(rows)
 	if got := a.left.Rows(); len(got) > 0 {
 		a.rows = got

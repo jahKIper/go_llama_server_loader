@@ -34,7 +34,10 @@ func SaveAndRun(modelsCfgPath string, m *modelscan.Model, rows []ParamRow) error
 		return fmt.Errorf("SaveAndRun: не удалось сохранить конфиг: %w", err)
 	}
 
-	runCfg := buildServercmdConfig(cfg, mc)
+	// Для запуска используем все флаги, включая нетронутые автодефолты
+	// (которые в mc.Flags не попали — они не сохраняются).
+	runFlags := BuildFlagsMap(rows, m.Path)
+	runCfg := buildServercmdConfig(cfg, mc, runFlags)
 
 	ctx := context.Background()
 	cmd, err := servercmd.BuildCommandWithContext(ctx, runCfg)
@@ -50,7 +53,9 @@ func SaveAndRun(modelsCfgPath string, m *modelscan.Model, rows []ParamRow) error
 }
 
 // buildServercmdConfig конвертирует *config.ModelConfig в *servercmd.Config для запуска.
-func buildServercmdConfig(cfg *config.Config, mc *config.ModelConfig) *servercmd.Config {
+// flags — карта флагов для использования при запуске (может включать нетронутые
+// автодефолты, которых нет в mc.Flags).
+func buildServercmdConfig(cfg *config.Config, mc *config.ModelConfig, flags map[string]any) *servercmd.Config {
 	scMC := servercmd.ModelConfig{
 		Name:       mc.Name,
 		ModelPath:  mc.ModelPath,
@@ -58,9 +63,9 @@ func buildServercmdConfig(cfg *config.Config, mc *config.ModelConfig) *servercmd
 		MMProjOn:   mc.MMProjOn,
 		Size:       mc.Size,
 		LastScan:   mc.LastScan,
-		Flags:      make(map[string]any, len(mc.Flags)),
+		Flags:      make(map[string]any, len(flags)),
 	}
-	for k, v := range mc.Flags {
+	for k, v := range flags {
 		scMC.Flags[k] = v
 	}
 

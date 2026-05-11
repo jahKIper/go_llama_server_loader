@@ -2,7 +2,6 @@ package runconfig
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -66,8 +65,9 @@ func TestUpsertAddsNewModel(t *testing.T) {
 	}
 }
 
-// TestUpsertDoesNotModifyExisting проверяет, что существующая запись не меняется.
-func TestUpsertDoesNotModifyExisting(t *testing.T) {
+// TestUpsertUpdatesExistingWithUserRows проверяет, что повторный upsert
+// обновляет Flags существующей записи пользовательскими (не-default) значениями.
+func TestUpsertUpdatesExistingWithUserRows(t *testing.T) {
 	cfg := makeTestConfig()
 	existingFlags := map[string]interface{}{"ctx_size": 2048, "model": "/models/llama-7b.gguf"}
 	cfg.Models = []config.ModelConfig{
@@ -91,11 +91,11 @@ func TestUpsertDoesNotModifyExisting(t *testing.T) {
 	if added {
 		t.Fatal("expected added=false для уже существующей модели")
 	}
-	if mc.Flags["ctx_size"] != 2048 {
-		t.Errorf("existing Flags должны сохраниться: expected ctx_size=2048, got %v", mc.Flags["ctx_size"])
+	if mc.Flags["ctx_size"] != 8192 {
+		t.Errorf("Flags должны обновиться: expected ctx_size=8192, got %v", mc.Flags["ctx_size"])
 	}
-	if _, hasThreads := mc.Flags["threads"]; hasThreads {
-		t.Error("не должно быть нового флага threads в существующей записи")
+	if mc.Flags["threads"] != 16 {
+		t.Errorf("новый флаг должен сохраниться: expected threads=16, got %v", mc.Flags["threads"])
 	}
 	if len(cfg.Models) != 1 {
 		t.Errorf("количество моделей не должно измениться, got %d", len(cfg.Models))
@@ -198,12 +198,13 @@ func TestFirstOrEmpty(t *testing.T) {
 	}
 }
 
-// TestUpsertConfigNotChangedOnDisk проверяет, что повторный upsert не меняет файл.
-func TestUpsertConfigNotChangedOnDisk(t *testing.T) {
+// TestUpsertUpdatesExistingFlags проверяет, что повторный upsert обновляет
+// Flags существующей записи пользовательскими (не-default) значениями.
+func TestUpsertUpdatesExistingFlags(t *testing.T) {
 	tmpDir := t.TempDir()
 	cfgPath := filepath.Join(tmpDir, "models.json")
 
-	// Первый upsert
+	// Первый upsert: пользователь задал ctx_size=4096
 	cfg := makeTestConfig()
 	m := makeTestModel("/models/qwen.gguf", 2_000_000_000, nil)
 	rows := []ParamRow{{Long: "--ctx-size", Key: "ctx_size", Value: "4096"}}
@@ -212,21 +213,32 @@ func TestUpsertConfigNotChangedOnDisk(t *testing.T) {
 		t.Fatalf("первый SaveConfig: %v", err)
 	}
 
-	data1, _ := os.ReadFile(cfgPath)
-
-	// Второй upsert с другими rows
+	// Второй upsert: пользователь поменял значение на 8192
 	cfg2, _ := config.LoadConfig(cfgPath)
 	newRows := []ParamRow{{Long: "--ctx-size", Key: "ctx_size", Value: "8192"}}
-	_, added := UpsertModelInConfig(cfg2, m, newRows, time.Now())
+	mc, added := UpsertModelInConfig(cfg2, m, newRows, time.Now())
 	if added {
 		t.Fatal("повторный upsert не должен добавлять модель")
 	}
-	if err := config.SaveConfig(cfg2, cfgPath); err != nil {
-		t.Fatalf("второй SaveConfig: %v", err)
+	if mc.Flags["ctx_size"] != 8192 {
+		t.Errorf("Flags[ctx_size] expected 8192, got %v", mc.Flags["ctx_size"])
 	}
+}
 
-	data2, _ := os.ReadFile(cfgPath)
-	if string(data1) != string(data2) {
-		t.Error("файл models.json не должен меняться при повторном upsert той же модели")
+// TestUpsertSkipsDefaultRows проверяет, что строки с IsDefault=true не попадают
+// в сохранённые Flags.
+func TestUpsertSkipsDefaultRows(t *testing.T) {
+	cfg := makeTestConfig()
+	m := makeTestModel("/models/qwen.gguf", 2_000_000_000, nil)
+	rows := []ParamRow{
+		{Long: "--ctx-size", Key: "ctx_size", Value: "4096"},                  // пользователь
+		{Long: "--gpu-layers", Key: "gpu_layers", Value: "40", IsDefault: true}, // дефолт
+	}
+	mc, _ := UpsertModelInConfig(cfg, m, rows, time.Now())
+	if _, ok := mc.Flags["gpu_layers"]; ok {
+		t.Errorf("IsDefault строка не должна попадать в Flags, got %v", mc.Flags)
+	}
+	if mc.Flags["ctx_size"] != 4096 {
+		t.Errorf("Flags[ctx_size] expected 4096, got %v", mc.Flags["ctx_size"])
 	}
 }

@@ -532,6 +532,7 @@ func TestScanDirNoReadPermission(t *testing.T) {
 	if err := os.Chmod(noAccessDir, 0300); err != nil {
 		t.Fatalf("Failed to chmod: %v", err)
 	}
+	t.Cleanup(func() { _ = os.Chmod(noAccessDir, 0755) })
 
 	result, err := ScanDir(tmpDir)
 	if err != nil {
@@ -666,6 +667,7 @@ func TestScanDirWalkError(t *testing.T) {
 	if err := os.Chmod(noAccessDir, 0300); err != nil {
 		t.Fatalf("Failed to chmod: %v", err)
 	}
+	t.Cleanup(func() { _ = os.Chmod(noAccessDir, 0755) })
 
 	result, err := ScanDir(tmpDir)
 	if err != nil {

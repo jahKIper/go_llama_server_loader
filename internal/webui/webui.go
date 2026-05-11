@@ -260,7 +260,8 @@ func (s *Server) handleStartServer(params json.RawMessage) interface{} {
 	if err != nil {
 		s.status = "error"
 		return map[string]string{
-			"error": fmt.Sprintf("Failed to build command: %v", err),
+			"error":  fmt.Sprintf("Failed to build command: %v", err),
+			"status": s.status,
 		}
 	}
 
@@ -273,7 +274,8 @@ func (s *Server) handleStartServer(params json.RawMessage) interface{} {
 		cancel()
 		s.status = "error"
 		return map[string]string{
-			"error": fmt.Sprintf("Failed to start server: %v", err),
+			"error":  fmt.Sprintf("Failed to start server: %v", err),
+			"status": s.status,
 		}
 	}
 
@@ -390,9 +392,12 @@ func formatSize(bytes int64) string {
 }
 
 // FormatModelName extracts a model name from its path.
+// Accepts both Unix ("/") and Windows ("\\") separators regardless of host OS.
 func FormatModelName(path string) string {
-	base := filepath.Base(path)
-	name := strings.TrimSuffix(base, filepath.Ext(base))
+	if i := strings.LastIndexAny(path, `/\`); i >= 0 {
+		path = path[i+1:]
+	}
+	name := strings.TrimSuffix(path, filepath.Ext(path))
 	// Remove common suffixes like -v1, q4_k_m etc. for cleaner names
 	name = strings.Split(name, "-")[0]
 	return strings.ToLower(name)

@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"llama-server-loader/internal/config"
+	"llama-server-loader/internal/ggufmeta"
 )
 
 // Lookup — индексированный реестр GGUF-параметров для моделей.
@@ -88,6 +89,8 @@ type Curated struct {
 	TopP            float64
 	Temp            float64
 	RopeFreqBase    float64
+	ExpertCount     int64
+	FileType        string // "Q6_K", "IQ3_M", … (из general.file_type)
 	TokenizerModel  string
 	HasChatTemplate bool
 	HasTokens       bool
@@ -126,6 +129,8 @@ func ExtractCurated(params []config.ModelParam) Curated {
 			c.TopP = asFloat(v)
 		case "general.sampling.temp":
 			c.Temp = asFloat(v)
+		case "general.file_type":
+			c.FileType = parseFileType(v)
 		case "tokenizer.ggml.model":
 			if s, ok := v.(string); ok {
 				c.TokenizerModel = s
@@ -155,10 +160,41 @@ func ExtractCurated(params []config.ModelParam) Curated {
 				c.KeyLength = asInt(v)
 			case "rope.freq_base":
 				c.RopeFreqBase = asFloat(v)
+			case "expert_count":
+				c.ExpertCount = asInt(v)
 			}
 		}
 	}
 	return c
+}
+
+// parseFileType извлекает имя квантизации из general.file_type. Значение может
+// быть строкой "16 (Q5_K_S)" (после ggufmeta.ExtractParams), голым числом
+// (uint*/int*/float64) или уже именем кванта.
+func parseFileType(v any) string {
+	switch x := v.(type) {
+	case string:
+		// "16 (Q5_K_S)" → "Q5_K_S"
+		if l := strings.Index(x, "("); l >= 0 {
+			if r := strings.Index(x[l+1:], ")"); r >= 0 {
+				return x[l+1 : l+1+r]
+			}
+		}
+		// Чисто числовая строка — попробуем как uint64
+		if u, err := strconv.ParseUint(strings.TrimSpace(x), 10, 64); err == nil {
+			if name, ok := ggufmeta.FileTypeName[u]; ok {
+				return name
+			}
+		}
+		return x
+	default:
+		if u := uint64(asInt(v)); u != 0 {
+			if name, ok := ggufmeta.FileTypeName[u]; ok {
+				return name
+			}
+		}
+	}
+	return ""
 }
 
 // ForPathCurated — удобный шорткат: lookup + extract.
@@ -167,6 +203,8 @@ func (l *Lookup) ForPathCurated(path string) Curated {
 }
 
 // FormatContext форматирует длину контекста как «131K» / «8K» / «262K» / «1M».
+// Делитель десятичный (1000), чтобы 131072 → "131K" — как принято в карточках
+// моделей (HF, LM Studio), а не «128K» при делении на 1024.
 func FormatContext(n int64) string {
 	if n <= 0 {
 		return ""
@@ -178,18 +216,10 @@ func FormatContext(n int64) string {
 		}
 		return strconv.FormatFloat(v, 'f', 1, 64) + "M"
 	}
-	if n >= 1024 {
-		k := n / 1024
-		if k*1024 == n {
-			return strconv.FormatInt(k, 10) + "K"
-		}
-	}
 	if n >= 1000 {
-		k := float64(n) / 1000
-		if k == float64(int64(k)) {
-			return strconv.FormatInt(int64(k), 10) + "K"
-		}
-		return strconv.FormatFloat(k, 'f', 1, 64) + "K"
+		// Округление до ближайшего тысячи: 131072 → 131K, 131500 → 132K.
+		k := (n + 500) / 1000
+		return strconv.FormatInt(k, 10) + "K"
 	}
 	return strconv.FormatInt(n, 10)
 }

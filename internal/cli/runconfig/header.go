@@ -174,6 +174,12 @@ func formatPassport(c modelparams.Curated, st *uistyle.StyleConfig, bg string) s
 	if c.SizeLabel != "" {
 		parts = append(parts, c.SizeLabel)
 	}
+	if c.BlockCount > 0 {
+		parts = append(parts, fmt.Sprintf("%dL", c.BlockCount))
+	}
+	if c.FileType != "" {
+		parts = append(parts, c.FileType)
+	}
 	sampling := formatPassportSampling(c)
 	if sampling != "" {
 		parts = append(parts, sampling)

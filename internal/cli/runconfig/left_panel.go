@@ -49,6 +49,7 @@ func (p *LeftPanel) ApplyModelValue() bool {
 		return false
 	}
 	p.rows[p.cursor].Value = disp
+	p.rows[p.cursor].IsDefault = false
 	return true
 }
 
@@ -82,11 +83,13 @@ func (p *LeftPanel) StartEdit() tea.Cmd {
 }
 
 // ConfirmEdit сохраняет значение из input и выходит из режима редактирования.
+// Ручное редактирование снимает пометку IsDefault.
 func (p *LeftPanel) ConfirmEdit() {
 	if !p.editing || len(p.rows) == 0 {
 		return
 	}
 	p.rows[p.cursor].Value = p.input.Value()
+	p.rows[p.cursor].IsDefault = false
 	p.editing = false
 	p.input.Blur()
 }
@@ -331,6 +334,12 @@ func (p *LeftPanel) renderItem(row ParamRow, selected bool, w int, editing bool)
 	const hintStr = "[?]"
 	const hintW = 4 // "[?] "
 
+	const defaultBadgeStr = "[default]"
+	defaultBadgeW := 0
+	if row.IsDefault {
+		defaultBadgeW = utf8.RuneCountInString(defaultBadgeStr) + 1 // " [default]"
+	}
+
 	// inline-подсказка «из модели: …» (если есть GGUF-значение для этого флага)
 	var modelHintText string
 	if p.params != nil && p.modelPath != "" {
@@ -377,6 +386,15 @@ func (p *LeftPanel) renderItem(row ParamRow, selected bool, w int, editing bool)
 		Foreground(lipgloss.Color(st.NeonGreen)).
 		Render(flagName)
 
+	// [default] badge — для строк, добавленных автодефолтами.
+	var defaultBadgeRendered string
+	if row.IsDefault {
+		defaultBadgeRendered = " " + lipgloss.NewStyle().
+			Background(lipgloss.Color(bg)).
+			Foreground(lipgloss.Color(st.AccentPurpleMuted)).
+			Render(defaultBadgeStr)
+	}
+
 	// [?] hint
 	hintRendered := lipgloss.NewStyle().
 		Background(lipgloss.Color(bg)).
@@ -384,7 +402,7 @@ func (p *LeftPanel) renderItem(row ParamRow, selected bool, w int, editing bool)
 		Render(" " + hintStr)
 
 	// Value или textinput
-	valueMaxW := w - indicW - flagW - 1 - hintW - removePad - modelHintW
+	valueMaxW := w - indicW - flagW - defaultBadgeW - 1 - hintW - removePad - modelHintW
 	if valueMaxW < 0 {
 		valueMaxW = 0
 	}
@@ -434,7 +452,7 @@ func (p *LeftPanel) renderItem(row ParamRow, selected bool, w int, editing bool)
 	}
 
 	line := lipgloss.JoinHorizontal(lipgloss.Top,
-		indicator, flagRendered, valueRendered, modelHintRendered, hintRendered, removeRendered)
+		indicator, flagRendered, defaultBadgeRendered, valueRendered, modelHintRendered, hintRendered, removeRendered)
 
 	return lipgloss.NewStyle().
 		Background(lipgloss.Color(bg)).

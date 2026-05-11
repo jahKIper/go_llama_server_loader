@@ -25,9 +25,13 @@ func fillParams(path string) []config.ModelParam {
 	return out
 }
 
-// UpsertModelInConfig сохраняет модель в конфиг по правилу upsert:
-// если модель с таким именем уже есть — возвращает существующий *ModelConfig без изменений;
-// если нет — формирует запись из (m, rows, now) и добавляет через AddModel.
+// UpsertModelInConfig сохраняет модель в конфиг:
+//   - если записи нет — создаёт её;
+//   - если есть — обновляет Flags пользовательскими значениями (без IsDefault-строк)
+//     и LastScan. Params (GGUF-метаданные) бэкфиллятся, если пустые.
+//
+// IsDefault-строки сюда не попадают: они и так автоматически подмешиваются при
+// следующем открытии экрана через ComputeModelDefaults.
 func UpsertModelInConfig(
 	cfg *config.Config,
 	m *modelscan.Model,
@@ -35,18 +39,20 @@ func UpsertModelInConfig(
 	now time.Time,
 ) (mc *config.ModelConfig, added bool) {
 	name := strings.TrimSuffix(filepath.Base(m.Path), ".gguf")
+	savedFlags := BuildSavedFlagsMap(rows, m.Path)
 
-	if existing, ok := cfg.GetModel(name); ok {
-		// Бэкфилл: если у существующей записи нет GGUF-параметров — заполняем.
-		if len(existing.Params) == 0 {
-			for i := range cfg.Models {
-				if cfg.Models[i].Name == name {
-					cfg.Models[i].Params = fillParams(cfg.Models[i].ModelPath)
-					return &cfg.Models[i], false
-				}
+	if _, ok := cfg.GetModel(name); ok {
+		for i := range cfg.Models {
+			if cfg.Models[i].Name != name {
+				continue
 			}
+			cfg.Models[i].Flags = savedFlags
+			cfg.Models[i].LastScan = now.UTC().Format(time.RFC3339)
+			if len(cfg.Models[i].Params) == 0 {
+				cfg.Models[i].Params = fillParams(cfg.Models[i].ModelPath)
+			}
+			return &cfg.Models[i], false
 		}
-		return existing, false
 	}
 
 	newMC := config.ModelConfig{
@@ -56,12 +62,11 @@ func UpsertModelInConfig(
 		MMProjOn:   len(m.MMProjPaths) > 0,
 		Size:       m.Size,
 		LastScan:   now.UTC().Format(time.RFC3339),
-		Flags:      BuildFlagsMap(rows, m.Path),
+		Flags:      savedFlags,
 		Params:     fillParams(m.Path),
 	}
 	cfg.AddModel(newMC)
 
-	// Получаем указатель на только что добавленный элемент среза.
 	added_mc, _ := cfg.GetModel(name)
 	return added_mc, true
 }
