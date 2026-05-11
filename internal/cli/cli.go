@@ -15,21 +15,25 @@ import (
 	"charm.land/bubbles/v2/list"
 	"charm.land/lipgloss/v2"
 
+	"llama-server-loader/internal/cli/runconfig"
+	"llama-server-loader/internal/cli/uistyle"
 	"llama-server-loader/pkg/modelscan"
 )
 
 // CLI represents the command-line interface application.
 type CLI struct {
-	scanDir        string
-	modelName      string
-	threads        int
-	temperature    float64
-	startWebUI     bool
-	webPort        int
-	saveConfig     string
-	generateParams bool
-	output         string
-	selectedModel  *modelscan.Model // Selected model after UI interaction
+	scanDir          string
+	modelName        string
+	threads          int
+	temperature      float64
+	startWebUI       bool
+	webPort          int
+	saveConfig       string
+	generateParams   bool
+	output           string
+	selectedModel    *modelscan.Model // Selected model after UI interaction
+	modelsConfigPath string           // путь к models.json (--models-config)
+	paramsFile       string           // путь к params_ru.json (--params-file)
 }
 
 // Flags holds all CLI flag values.
@@ -43,20 +47,24 @@ type Flags struct {
 	SaveConfig     string  `long:"save-config" description:"Save configuration file"`
 	GenerateParams bool    `long:"generate-params" description:"Generate parameters"`
 	Output         string  `long:"output" description:"Output file for generated params"`
+	ParamsFile     string  `long:"params-file"   description:"Path to params_ru.json"`
+	ModelsConfig   string  `long:"models-config" description:"Path to models.json (default: ./models.json)"`
 }
 
 // NewCLI creates a new CLI instance with the given flags.
 func NewCLI(flags *Flags) *CLI {
 	c := &CLI{
-		scanDir:        flags.ScanDir,
-		modelName:      flags.Model,
-		threads:        flags.Threads,
-		temperature:    flags.Temperature,
-		startWebUI:     flags.StartWebUI,
-		webPort:        flags.WebPort,
-		saveConfig:     flags.SaveConfig,
-		generateParams: flags.GenerateParams,
-		output:         flags.Output,
+		scanDir:          flags.ScanDir,
+		modelName:        flags.Model,
+		threads:          flags.Threads,
+		temperature:      flags.Temperature,
+		startWebUI:       flags.StartWebUI,
+		webPort:          flags.WebPort,
+		saveConfig:       flags.SaveConfig,
+		generateParams:   flags.GenerateParams,
+		output:           flags.Output,
+		paramsFile:       flags.ParamsFile,
+		modelsConfigPath: flags.ModelsConfig,
 	}
 	if c.webPort == 0 {
 		c.webPort = 8080
@@ -131,6 +139,18 @@ func ParseFlags(args []string) (*Flags, error) {
 			}
 			flags.Output = args[i+1]
 			i += 2
+		case "--params-file":
+			if i+1 >= len(args) {
+				return nil, fmt.Errorf("--params-file requires a value")
+			}
+			flags.ParamsFile = args[i+1]
+			i += 2
+		case "--models-config":
+			if i+1 >= len(args) {
+				return nil, fmt.Errorf("--models-config requires a value")
+			}
+			flags.ModelsConfig = args[i+1]
+			i += 2
 		case "--help", "-h":
 			printHelp()
 			os.Exit(0)
@@ -170,6 +190,10 @@ func ParseFlags(args []string) (*Flags, error) {
 					flags.GenerateParams = true
 				case "--output":
 					flags.Output = value
+				case "--params-file":
+					flags.ParamsFile = value
+				case "--models-config":
+					flags.ModelsConfig = value
 				default:
 					return nil, fmt.Errorf("unknown flag: %s", arg)
 				}
@@ -199,6 +223,8 @@ Options:
   --save-config <file>     Save configuration to file
   --generate-params        Generate parameter configuration
   --output <file>          Output file for generated params
+  --params-file <file>     Path to params_ru.json (parameter catalog)
+  --models-config <file>   Path to models.json (default: ./models.json)
   -h, --help               Show this help message
 
 Examples:
@@ -206,6 +232,7 @@ Examples:
   llama-server-loader --scan-dir=/models --model=gemma-4
   llama-server-loader --start-webui --port=8080
   llama-server-loader --scan-dir=./models --threads=16 --temperature=0.9
+  llama-server-loader --scan-dir=./models --params-file=./params_ru.json --models-config=./models.json
 `
 	fmt.Println(help)
 }
@@ -307,10 +334,25 @@ func (c *CLI) runInteractive() error {
 	}
 
 	log.Printf("Selected model: %+v", c.selectedModel)
-	fmt.Printf("\nВыбрана модель: %s\n", c.selectedModel.Path)
 
-	if len(c.selectedModel.MMProjPaths) > 0 {
-		fmt.Printf("MMProj: %s\n", strings.Join(c.selectedModel.MMProjPaths, ", "))
+	// Запускаем второй экран — параметры запуска модели
+	paramsFilePath, _ := runconfig.ResolveParamsFile(c.paramsFile)
+	rcApp := runconfig.NewApp(c.selectedModel, paramsFilePath)
+	p2 := tea.NewProgram(rcApp)
+	if _, err = p2.Run(); err != nil {
+		return fmt.Errorf("error running run config TUI: %w", err)
+	}
+
+	res := rcApp.Result()
+	log.Printf("runconfig: action=%v rows=%d", res.Action, len(res.Rows))
+
+	if res.Action == runconfig.ActionRun {
+		modelsCfgPath := c.modelsConfigPath
+		if modelsCfgPath == "" {
+			modelsCfgPath = "models.json"
+		}
+		ResetTerminalBackground()
+		return runconfig.SaveAndRun(modelsCfgPath, res.Model, res.Rows)
 	}
 
 	return nil
@@ -452,12 +494,11 @@ func (c *CLI) SelectedModelName() string {
 // Terminal UI components using charm.land/bubbles/v2/list and bubbletea/v2
 // ============================================================================
 
-// Layout-константы «воздуха»: симметричный outer-padding и зазоры между блоками.
-// Меньшие значения сделают UI плотным, большие — растянут.
+// Layout-константы — алиасы из uistyle для совместимости с пакетом cli.
 const (
-	OuterPadH = 4 // горизонтальный gutter (≈3% от 130-col терминала)
-	OuterPadV = 1 // вертикальный padding сверху/снизу
-	BlockGap  = 1 // зазор между header↔content↔footer
+	OuterPadH = uistyle.OuterPadH
+	OuterPadV = uistyle.OuterPadV
+	BlockGap  = uistyle.BlockGap
 )
 
 // App represents the main TUI application.
@@ -474,7 +515,7 @@ type App struct {
 	version      string
 	width        int
 	height       int
-	styles       *StyleConfig
+	styles       *uistyle.StyleConfig
 	dims         *Dimensions
 	footer       *Footer
 	tabs         *TabBar
@@ -484,7 +525,7 @@ type App struct {
 
 // NewApp creates a new App with model list.
 func NewApp(models []*modelscan.Model) *App {
-	st := GetStyles()
+	st := uistyle.GetStyles()
 	dims := DefaultDimensions()
 
 	items := make([]list.Item, len(models))

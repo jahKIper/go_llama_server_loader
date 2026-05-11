@@ -8,6 +8,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
 
+	"llama-server-loader/internal/cli/uistyle"
 	"llama-server-loader/pkg/modelscan"
 )
 
@@ -42,10 +43,10 @@ type filterInput struct {
 	state   FilterState
 	text    string
 	cursor  int
-	styles  *StyleConfig
+	styles  *uistyle.StyleConfig
 }
 
-func newFilterInput(styles *StyleConfig) *filterInput {
+func newFilterInput(styles *uistyle.StyleConfig) *filterInput {
 	return &filterInput{
 		visible: false,
 		state:   FilterIdle,
@@ -80,14 +81,13 @@ func (f *filterInput) Text() string {
 	return f.text
 }
 
-// Clear сбрасывает текст и позицию курсора. Состояние visibility/state не трогается.
+// Clear сбрасывает текст и позицию курсора.
 func (f *filterInput) Clear() {
 	f.text = ""
 	f.cursor = 0
 }
 
 // HandleKey обрабатывает нажатия клавиш в поле ввода фильтра.
-// UTF-8 safe: cursor работает на rune-границах.
 func (f *filterInput) HandleKey(key string) tea.Cmd {
 	switch key {
 	case "backspace", "ctrl+h":
@@ -129,7 +129,6 @@ func (f *filterInput) HandleKey(key string) tea.Cmd {
 }
 
 // Render — единая точка рендера: возвращает idle или active вид по состоянию.
-// blockWidth — ширина content-блока (0 = без явного width).
 func (f *filterInput) Render(blockWidth int) string {
 	if f.state == FilterIdle {
 		return f.RenderFilterIdle(blockWidth)
@@ -137,8 +136,7 @@ func (f *filterInput) Render(blockWidth int) string {
 	return f.RenderFilterActive(blockWidth)
 }
 
-// RenderFilterIdle рендерит поле в idle-состоянии: приглушённая рамка + placeholder.
-// blockWidth — полная итоговая ширина поля (lipgloss v2 .Width() — total width).
+// RenderFilterIdle рендерит поле в idle-состоянии.
 func (f *filterInput) RenderFilterIdle(blockWidth int) string {
 	if f.styles == nil {
 		return "[/ поиск...]"
@@ -147,7 +145,6 @@ func (f *filterInput) RenderFilterIdle(blockWidth int) string {
 	if blockWidth > 0 {
 		st = st.Width(blockWidth)
 	}
-	// Placeholder рендерим с фоном фильтра (BgPanel), а не FooterLabelStyle (DarkBg).
 	placeholder := lipgloss.NewStyle().
 		Background(lipgloss.Color(f.styles.BgPanel)).
 		Foreground(lipgloss.Color(f.styles.TextMuted)).
@@ -155,7 +152,7 @@ func (f *filterInput) RenderFilterIdle(blockWidth int) string {
 	return st.Render("/  " + placeholder)
 }
 
-// RenderFilterActive рендерит поле в активном состоянии: неоновая рамка + cursor.
+// RenderFilterActive рендерит поле в активном состоянии.
 func (f *filterInput) RenderFilterActive(blockWidth int) string {
 	if f.styles == nil {
 		cursorChar := "│"

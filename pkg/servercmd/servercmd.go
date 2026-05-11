@@ -492,6 +492,12 @@ func splitCamelCase(s string) []string {
 	return parts
 }
 
+// DetectFlagConflicts — публичная обёртка над detectFlagConflicts.
+// Возвращает список описаний конфликтов или nil если конфликтов нет.
+func DetectFlagConflicts(flags map[string]any) []string {
+	return detectFlagConflicts(flags)
+}
+
 // RunCommand executes the built command and waits for completion.
 func RunCommand(cmd *exec.Cmd) error {
 	fmt.Printf("Executing: %s %s\n", cmd.Path, strings.Join(cmd.Args[1:], " "))

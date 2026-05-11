@@ -2,15 +2,17 @@ package cli
 
 import (
 	"charm.land/lipgloss/v2"
+
+	"llama-server-loader/internal/cli/uistyle"
 )
 
 // HelpPopup рендерит полноэкранный centered popup со всеми биндингами.
 type HelpPopup struct {
-	styles *StyleConfig
+	styles *uistyle.StyleConfig
 }
 
 // NewHelpPopup создаёт HelpPopup.
-func NewHelpPopup(st *StyleConfig) *HelpPopup {
+func NewHelpPopup(st *uistyle.StyleConfig) *HelpPopup {
 	return &HelpPopup{styles: st}
 }
 
@@ -39,7 +41,6 @@ var helpBindings = []helpBinding{
 func (h *HelpPopup) Render(screenWidth, screenHeight int) string {
 	st := h.styles
 
-	// Ширина popup: ~50% экрана, clamp [40, 80]
 	popupW := screenWidth / 2
 	if popupW < 40 {
 		popupW = 40
@@ -48,16 +49,11 @@ func (h *HelpPopup) Render(screenWidth, screenHeight int) string {
 		popupW = 80
 	}
 
-	// innerW — ширина области внутри border+padding HelpPopupStyle,
-	// которую заполняют наши rowFill-обёртки.
 	innerW := popupW - st.HelpPopupStyle().GetHorizontalFrameSize()
 	if innerW < 10 {
 		innerW = 10
 	}
 
-	// rowFill — фон BgPanel + Width=innerW. Каждый видимый rows-сегмент
-	// оборачиваем им, чтобы добить пустоту справа фоном popup'а
-	// (lipgloss v2 теряет родительский bg после inner ANSI-reset).
 	rowFill := lipgloss.NewStyle().
 		Background(lipgloss.Color(st.BgPanel)).
 		Width(innerW)
@@ -98,8 +94,6 @@ func (h *HelpPopup) Render(screenWidth, screenHeight int) string {
 
 	popup := st.HelpPopupStyle().Width(innerW).Render(body)
 
-	// Центрируем на экране. BackgroundColor задаётся в View() через v.BackgroundColor,
-	// поэтому WithWhitespaceStyle не нужен — он ломает измерение contentWidth в v2.
 	return lipgloss.Place(
 		screenWidth, screenHeight,
 		lipgloss.Center, lipgloss.Center,

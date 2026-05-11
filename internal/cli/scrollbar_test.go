@@ -4,10 +4,12 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+
+	"llama-server-loader/internal/cli/uistyle"
 )
 
-func testStyles() *StyleConfig {
-	return GetStyles()
+func testStyles() *uistyle.StyleConfig {
+	return uistyle.GetStyles()
 }
 
 func countLines(s string) int {

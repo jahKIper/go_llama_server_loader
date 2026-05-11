@@ -7,6 +7,7 @@ import (
 
 	tea "charm.land/bubbletea/v2"
 
+	"llama-server-loader/internal/cli/uistyle"
 	"llama-server-loader/pkg/modelscan"
 )
 
@@ -329,7 +330,7 @@ func TestFormatMetadataBadges_NilStyle(t *testing.T) {
 }
 
 func TestFormatMetadataBadges_MMProj(t *testing.T) {
-	st := GetStyles()
+	st := uistyle.GetStyles()
 	m := &modelscan.Model{
 		Name:        "llava.Q4_K_M.gguf",
 		Size:        4_000_000_000,
@@ -374,7 +375,7 @@ func TestAppFilter_NoMatchShowsZero(t *testing.T) {
 // ── UTF-8 в фильтре ──────────────────────────────────────────────────────────
 
 func TestFilterInput_CyrillicInput(t *testing.T) {
-	f := newFilterInput(GetStyles())
+	f := newFilterInput(uistyle.GetStyles())
 	f.Toggle()
 	for _, ch := range "тест" {
 		f.HandleKey(string(ch))
@@ -389,7 +390,7 @@ func TestFilterInput_CyrillicInput(t *testing.T) {
 }
 
 func TestFilterInput_LeftRightCyrillic(t *testing.T) {
-	f := newFilterInput(GetStyles())
+	f := newFilterInput(uistyle.GetStyles())
 	f.Toggle()
 	for _, ch := range "абв" {
 		f.HandleKey(string(ch))
@@ -408,7 +409,7 @@ func TestFilterInput_LeftRightCyrillic(t *testing.T) {
 }
 
 func TestFilterInput_NonPrintableIgnored(t *testing.T) {
-	f := newFilterInput(GetStyles())
+	f := newFilterInput(uistyle.GetStyles())
 	f.Toggle()
 	f.HandleKey("\x01")
 	if f.Text() != "" {
