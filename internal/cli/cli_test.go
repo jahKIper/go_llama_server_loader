@@ -73,26 +73,6 @@ func TestParseFlags(t *testing.T) {
 			validate:  nil,
 		},
 		{
-			name:    "start-webui flag",
-			args:    []string{"--start-webui"},
-			wantErr: false,
-			validate: func(t *testing.T, f *Flags) {
-				if !f.StartWebUI {
-					t.Error("expected start-webui to be true")
-				}
-			},
-		},
-		{
-			name:   "port flag",
-			args:   []string{"--port", "9090"},
-			wantErr: false,
-			validate: func(t *testing.T, f *Flags) {
-				if f.WebPort != 9090 {
-					t.Errorf("expected port=9090, got %d", f.WebPort)
-				}
-			},
-		},
-		{
 			name:   "save-config flag",
 			args:   []string{"--save-config", "models.json"},
 			wantErr: false,
@@ -229,7 +209,6 @@ func TestNewCLI(t *testing.T) {
 		wantModel          string
 		wantThreads        int
 		wantTemp           float64
-		wantWebPort        int
 		wantParamsFile     string
 		wantModelsConfig   string
 	}{
@@ -240,21 +219,11 @@ func TestNewCLI(t *testing.T) {
 				Model: "gemma-4",
 				Threads: 16,
 				Temperature: 0.9,
-				StartWebUI: true,
-				WebPort: 9090,
 			},
 			wantScanDir: "/models",
 			wantModel:   "gemma-4",
 			wantThreads: 16,
 			wantTemp:    0.9,
-			wantWebPort: 9090,
-		},
-		{
-			name: "default web port",
-			flags: &Flags{
-				StartWebUI: true,
-			},
-			wantWebPort: 8080,
 		},
 		{
 			name: "params-file and models-config propagated",
@@ -262,7 +231,6 @@ func TestNewCLI(t *testing.T) {
 				ParamsFile:   "/data/params_ru.json",
 				ModelsConfig: "/data/models.json",
 			},
-			wantWebPort:      8080,
 			wantParamsFile:   "/data/params_ru.json",
 			wantModelsConfig: "/data/models.json",
 		},
@@ -282,9 +250,6 @@ func TestNewCLI(t *testing.T) {
 			}
 			if c.temperature != tt.wantTemp {
 				t.Errorf("temperature = %.1f, want %.1f", c.temperature, tt.wantTemp)
-			}
-			if c.webPort != tt.wantWebPort {
-				t.Errorf("webPort = %d, want %d", c.webPort, tt.wantWebPort)
 			}
 			if c.paramsFile != tt.wantParamsFile {
 				t.Errorf("paramsFile = %s, want %s", c.paramsFile, tt.wantParamsFile)

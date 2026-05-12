@@ -27,8 +27,6 @@ type CLI struct {
 	modelName        string
 	threads          int
 	temperature      float64
-	startWebUI       bool
-	webPort          int
 	saveConfig       string
 	generateParams   bool
 	output           string
@@ -43,8 +41,6 @@ type Flags struct {
 	Model          string  `long:"model" description:"Model name to run"`
 	Threads        int     `long:"threads" description:"Number of threads"`
 	Temperature    float64 `long:"temperature" description:"Temperature for inference"`
-	StartWebUI     bool    `long:"start-webui" description:"Start Web UI server"`
-	WebPort        int     `long:"port" description:"Web UI port (default 8080)"`
 	SaveConfig     string  `long:"save-config" description:"Save configuration file"`
 	GenerateParams bool    `long:"generate-params" description:"Generate parameters"`
 	Output         string  `long:"output" description:"Output file for generated params"`
@@ -59,16 +55,11 @@ func NewCLI(flags *Flags) *CLI {
 		modelName:        flags.Model,
 		threads:          flags.Threads,
 		temperature:      flags.Temperature,
-		startWebUI:       flags.StartWebUI,
-		webPort:          flags.WebPort,
 		saveConfig:       flags.SaveConfig,
 		generateParams:   flags.GenerateParams,
 		output:           flags.Output,
 		paramsFile:       flags.ParamsFile,
 		modelsConfigPath: flags.ModelsConfig,
-	}
-	if c.webPort == 0 {
-		c.webPort = 8080
 	}
 	return c
 }
@@ -111,19 +102,6 @@ func ParseFlags(args []string) (*Flags, error) {
 				return nil, fmt.Errorf("invalid --temperature value: %s", args[i+1])
 			}
 			flags.Temperature = val
-			i += 2
-		case "--start-webui":
-			flags.StartWebUI = true
-			i++
-		case "--port":
-			if i+1 >= len(args) {
-				return nil, fmt.Errorf("--port requires a value")
-			}
-			val, err := strconv.Atoi(args[i+1])
-			if err != nil {
-				return nil, fmt.Errorf("invalid --port value: %s", args[i+1])
-			}
-			flags.WebPort = val
 			i += 2
 		case "--save-config":
 			if i+1 >= len(args) {
@@ -177,14 +155,6 @@ func ParseFlags(args []string) (*Flags, error) {
 						return nil, fmt.Errorf("invalid --temperature=value: %s", value)
 					}
 					flags.Temperature = val
-				case "--start-webui":
-					flags.StartWebUI = true
-				case "--port":
-					val, err := strconv.Atoi(value)
-					if err != nil {
-						return nil, fmt.Errorf("invalid --port=value: %s", value)
-					}
-					flags.WebPort = val
 				case "--save-config":
 					flags.SaveConfig = value
 				case "--generate-params":
@@ -219,8 +189,6 @@ Options:
   --model <name>           Model name to run (from scanned list)
   --threads <count>        Number of CPU threads (default: auto-detect)
   --temperature <float>    Sampling temperature (default: 0.8)
-  --start-webui            Start the embedded Web UI server
-  --port <number>          Web UI port (default: 8080)
   --save-config <file>     Save configuration to file
   --generate-params        Generate parameter configuration
   --output <file>          Output file for generated params
@@ -231,7 +199,6 @@ Options:
 Examples:
   llama-server-loader --scan-dir=./models
   llama-server-loader --scan-dir=/models --model=gemma-4
-  llama-server-loader --start-webui --port=8080
   llama-server-loader --scan-dir=./models --threads=16 --temperature=0.9
   llama-server-loader --scan-dir=./models --params-file=./params_ru.json --models-config=./models.json
 `
@@ -248,12 +215,6 @@ func (c *CLI) Run() error {
 	// Handle --generate-params
 	if c.generateParams {
 		return c.generateParameters()
-	}
-
-	// Handle --start-webui without scan
-	if c.startWebUI && c.scanDir == "" {
-		fmt.Println("Starting Web UI server on port", c.webPort)
-		return nil // TODO: Start web UI
 	}
 
 	// Interactive mode: scan and show model list

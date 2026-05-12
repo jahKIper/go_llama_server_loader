@@ -9,11 +9,9 @@ import (
 	"path/filepath"
 	"strings"
 	"syscall"
-	"time"
 
 	"llama-server-loader/internal/cli"
 	"llama-server-loader/internal/config"
-	"llama-server-loader/internal/webui"
 	"llama-server-loader/pkg/modelscan"
 )
 
@@ -49,19 +47,6 @@ func main() {
 		}
 	}()
 
-	if flags.StartWebUI && c.ScanDir() == "" {
-		log.Printf("Запуск Web UI сервера на %s", fmt.Sprintf(":%d", flags.WebPort))
-		ws := webui.NewServer(fmt.Sprintf(":%d", flags.WebPort))
-		if err := ws.Start(ctx); err != nil {
-			log.Fatalf("Ошибка запуска Web UI: %v", err)
-		}
-		<-ctx.Done()
-		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer shutdownCancel()
-		ws.Shutdown(shutdownCtx)
-		return
-	}
-
 	if c.GenerateParams() {
 		if err := c.Run(); err != nil {
 			log.Fatalf("Ошибка генерации параметров: %v", err)
@@ -90,8 +75,6 @@ func printUsage() {
   --model <name>           Имя модели для запуска
   --threads <count>        Количество CPU потоков (по умолчанию: авто)
   --temperature <float>    Температура сэмплинга (по умолчанию: 0.8)
-  --start-webui            Запустить встроенный Web UI сервер
-  --port <number>          Порт Web UI (по умолчанию: 8080)
   --save-config <file>     Сохранить конфигурацию в файл
   --generate-params        Сгенерировать конфигурацию параметров
   --output <file>          Файл вывода для сгенерированных параметров
@@ -100,7 +83,6 @@ func printUsage() {
 Примеры:
   llama-server-loader --scan-dir=./models
   llama-server-loader --scan-dir=/models --model=gemma-4
-  llama-server-loader --start-webui --port=8080
   llama-server-loader --scan-dir=./models --threads=16 --temperature=0.9`)
 }
 
