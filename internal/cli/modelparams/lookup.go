@@ -197,6 +197,19 @@ func parseFileType(v any) string {
 	return ""
 }
 
+// AddFromParams добавляет параметры в индекс по пути к .gguf. Используется для
+// live-чтения GGUF когда модель не найдена в models.json.
+func (l *Lookup) AddFromParams(path string, ps []ggufmeta.Param) {
+	if l == nil || l.byName == nil || len(ps) == 0 {
+		return
+	}
+	params := make([]config.ModelParam, len(ps))
+	for i, p := range ps {
+		params[i] = config.ModelParam{Key: p.Key, Value: p.Value, DescriptionRU: p.DescriptionRU}
+	}
+	l.byName[nameFromPath(path)] = params
+}
+
 // ForPathCurated — удобный шорткат: lookup + extract.
 func (l *Lookup) ForPathCurated(path string) Curated {
 	return ExtractCurated(l.ForPath(path))

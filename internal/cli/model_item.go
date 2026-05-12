@@ -16,13 +16,14 @@ import (
 
 // ListItem представляет элемент списка моделей.
 type ListItem struct {
-	model  *modelscan.Model
-	params *modelparams.Lookup
+	model   *modelscan.Model
+	params  *modelparams.Lookup
+	comment string
 }
 
 // NewListItem создает новый ListItem.
-func NewListItem(m *modelscan.Model, params *modelparams.Lookup) *ListItem {
-	return &ListItem{model: m, params: params}
+func NewListItem(m *modelscan.Model, params *modelparams.Lookup, comment string) *ListItem {
+	return &ListItem{model: m, params: params, comment: comment}
 }
 
 // Title возвращает заголовок элемента.
@@ -76,14 +77,14 @@ func (l *ListItem) Render(w io.Writer, m list.Model, index int, item list.Item) 
 		Render("●")
 
 	if selected {
-		fmt.Fprint(w, renderSelected(model, dot, quant, itemWidth, st, listItem.params))
+		fmt.Fprint(w, renderSelected(model, dot, quant, itemWidth, st, listItem.params, listItem.comment))
 	} else {
-		fmt.Fprint(w, renderNormal(model, dot, quant, itemWidth, st, listItem.params))
+		fmt.Fprint(w, renderNormal(model, dot, quant, itemWidth, st, listItem.params, listItem.comment))
 	}
 }
 
 // renderSelected рендерит выбранный item.
-func renderSelected(model *modelscan.Model, dot, quant string, itemWidth int, st *uistyle.StyleConfig, params *modelparams.Lookup) string {
+func renderSelected(model *modelscan.Model, dot, quant string, itemWidth int, st *uistyle.StyleConfig, params *modelparams.Lookup, comment string) string {
 	bracketStyle := st.ItemSelectedStyle()
 	innerW := itemWidth - bracketStyle.GetHorizontalFrameSize()
 	if innerW < 1 {
@@ -117,7 +118,16 @@ func renderSelected(model *modelscan.Model, dot, quant string, itemWidth int, st
 		Render(formatMetadataBadgesSelected(model, st))
 
 	empty := rowFill.Render("")
-	content := lipgloss.JoinVertical(lipgloss.Left, empty, nameLine, pathLine, badgeBlock, empty)
+	parts := []string{empty, nameLine, pathLine, badgeBlock}
+	if comment != "" {
+		commentLine := rowFill.
+			Foreground(lipgloss.Color(st.TextMuted)).
+			Italic(true).
+			Render("  # " + comment)
+		parts = append(parts, commentLine)
+	}
+	parts = append(parts, empty)
+	content := lipgloss.JoinVertical(lipgloss.Left, parts...)
 
 	if itemWidth > 0 {
 		bracketStyle = bracketStyle.Width(itemWidth)
@@ -126,7 +136,7 @@ func renderSelected(model *modelscan.Model, dot, quant string, itemWidth int, st
 }
 
 // renderNormal рендерит обычный (не выбранный) item.
-func renderNormal(model *modelscan.Model, dot, quant string, itemWidth int, st *uistyle.StyleConfig, params *modelparams.Lookup) string {
+func renderNormal(model *modelscan.Model, dot, quant string, itemWidth int, st *uistyle.StyleConfig, params *modelparams.Lookup, comment string) string {
 	if itemWidth < 1 {
 		itemWidth = 1
 	}
@@ -161,7 +171,16 @@ func renderNormal(model *modelscan.Model, dot, quant string, itemWidth int, st *
 		PaddingLeft(4).
 		Render(formatMetadataBadges(model, st))
 
-	content := lipgloss.JoinVertical(lipgloss.Left, nameLine, pathLine, badgeBlock)
+	parts := []string{nameLine, pathLine, badgeBlock}
+	if comment != "" {
+		commentLine := rowFill.
+			PaddingLeft(4).
+			Foreground(lipgloss.Color(st.TextMuted)).
+			Italic(true).
+			Render("# " + comment)
+		parts = append(parts, commentLine)
+	}
+	content := lipgloss.JoinVertical(lipgloss.Left, parts...)
 
 	empty := rowFill.Render("")
 	return lipgloss.JoinVertical(lipgloss.Left, empty, content, empty)
@@ -241,7 +260,10 @@ func formatMetaBracket(m *modelscan.Model, st *uistyle.StyleConfig, parentBg str
 		}
 	}
 	if len(parts) == 0 {
-		parts = []string{"GGUF", extractQuantization(m.Name)}
+		parts = []string{"GGUF"}
+		if q := extractQuantization(m.Name); q != "" {
+			parts = append(parts, q)
+		}
 		if len(m.MMProjPaths) > 0 {
 			parts = append(parts, "mmproj")
 		}
@@ -264,11 +286,11 @@ func formatMetaLine(m *modelscan.Model, st *uistyle.StyleConfig, parentBg string
 	if st == nil {
 		return ""
 	}
-	parts := []string{
-		"GGUF",
-		extractQuantization(m.Name),
-		formatSize(m.Size),
+	parts := []string{"GGUF"}
+	if q := extractQuantization(m.Name); q != "" {
+		parts = append(parts, q)
 	}
+	parts = append(parts, formatSize(m.Size))
 	if len(m.MMProjPaths) > 0 {
 		parts = append(parts, "mmproj")
 	}
@@ -340,6 +362,10 @@ func extractQuantization(name string) string {
 		"q8_0",
 		"f16", "f32", "f64",
 		"q6_k",
+		"iq4_xs", "iq4_nl",
+		"iq3_xxs", "iq3_xs", "iq3_s", "iq3_m",
+		"iq2_xxs", "iq2_xs", "iq2_s", "iq2_m",
+		"iq1_s", "iq1_m",
 	}
 
 	nameLower := strings.ToLower(name)
@@ -349,7 +375,7 @@ func extractQuantization(name string) string {
 		}
 	}
 
-	return "Q4_K_M"
+	return ""
 }
 
 // ============================================================================

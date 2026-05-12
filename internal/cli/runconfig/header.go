@@ -12,9 +12,10 @@ import (
 	"llama-server-loader/pkg/modelscan"
 )
 
-// RenderHeader рендерит верхний блок экрана: имя модели, путь, бэйджи.
+// RenderHeader рендерит верхний блок экрана: имя модели, путь, бэйджи, комментарий.
+// comment — пользовательская заметка (пустая строка = не показывать).
 // curated — курируемая выжимка из GGUF-параметров (может быть нулевой Curated{}).
-func RenderHeader(m *modelscan.Model, st *uistyle.StyleConfig, innerW int, curated ...modelparams.Curated) string {
+func RenderHeader(m *modelscan.Model, st *uistyle.StyleConfig, innerW int, comment string, curated ...modelparams.Curated) string {
 	if m == nil {
 		return ""
 	}
@@ -109,12 +110,6 @@ func RenderHeader(m *modelscan.Model, st *uistyle.StyleConfig, innerW int, curat
 		rowFill.Render(pathStr),
 		rowFill.Render(badges),
 	}
-	if passport != "" {
-		// badges — многострочный (border'ы у бэйджей дают 3 строки).
-		// Каждую визуальную строку badges уже обернули rowFill'ом выше — этого мало,
-		// т.к. rowFill применяется к строке целиком, lipgloss может не покрыть
-		// все вертикальные сегменты. Прогоняем построчно ниже.
-	}
 	// Развернём каждый блок (некоторые из них многострочные) построчно, чтобы
 	// каждая визуальная строка прошла через rowFill.
 	expanded := make([]string, 0, 6)
@@ -125,6 +120,14 @@ func RenderHeader(m *modelscan.Model, st *uistyle.StyleConfig, innerW int, curat
 	}
 	if passport != "" {
 		expanded = append(expanded, rowFill.Render(passport))
+	}
+	if comment != "" {
+		commentStr := lipgloss.NewStyle().
+			Background(lipgloss.Color(headerBg)).
+			Foreground(lipgloss.Color(st.TextMuted)).
+			Italic(true).
+			Render("# " + comment)
+		expanded = append(expanded, rowFill.Render(commentStr))
 	}
 	leftBlock := lipgloss.JoinVertical(lipgloss.Left, expanded...)
 	leftRows := len(expanded)

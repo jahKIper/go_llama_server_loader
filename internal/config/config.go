@@ -22,6 +22,8 @@ type ModelConfig struct {
 	MMProjOn   bool                   `json:"mmproj_on"`
 	Size       int64                  `json:"size"`
 	LastScan   string                 `json:"last_scan"`
+	LastRun    string                 `json:"last_run,omitempty"`
+	Comment    string                 `json:"comment,omitempty"`
 	Flags      map[string]interface{} `json:"flags"`
 	Params     []ModelParam           `json:"params,omitempty"`
 }

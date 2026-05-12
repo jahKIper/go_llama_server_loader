@@ -30,6 +30,24 @@ func LoadSavedFlagsForModel(modelsCfgPath string, m *modelscan.Model) (map[strin
 	return mc.Flags, true
 }
 
+// LoadCommentForModel читает comment из models.json для модели m.
+// Возвращает пустую строку, если файл не существует или модель не найдена.
+func LoadCommentForModel(modelsCfgPath string, m *modelscan.Model) string {
+	if modelsCfgPath == "" || m == nil {
+		return ""
+	}
+	cfg, err := config.LoadConfig(modelsCfgPath)
+	if err != nil {
+		return ""
+	}
+	name := strings.TrimSuffix(filepath.Base(m.Path), ".gguf")
+	mc, ok := cfg.GetModel(name)
+	if !ok || mc == nil {
+		return ""
+	}
+	return mc.Comment
+}
+
 // MergeWithSavedFlags берёт предзаполненные строки (--model/--mmproj/…) и
 // накатывает на них сохранённые значения из models.json. Если сохранённый
 // флаг отсутствует в prefilled — он добавляется в хвост (по алфавиту ключа).

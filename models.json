@@ -3,19 +3,1424 @@
   "scan_paths": [],
   "models": [
     {
-      "name": "gemma-4-E4B-it-ultra-uncensored-heretic-Q6_K",
-      "model_path": "/home/kiper/src/go_llama_server_loader/models/llmfan46/gemma-4-E4B-it-ultra-uncensored-heretic-GGUF/gemma-4-E4B-it-ultra-uncensored-heretic-Q6_K.gguf",
-      "mmproj_path": "/home/kiper/src/go_llama_server_loader/models/llmfan46/gemma-4-E4B-it-ultra-uncensored-heretic-GGUF/gemma-4-E4B-it-mmproj-BF16.gguf",
+      "name": "q4_k_m",
+      "model_path": "D:/progs/lmstudio/models/google/DiarizationLM-8b-Fisher-v2/q4_k_m.gguf",
+      "mmproj_on": false,
+      "size": 4920733568,
+      "last_scan": "2026-05-11T15:30:52Z",
+      "flags": {},
+      "params": [
+        {
+          "key": "general.architecture",
+          "value": "llama",
+          "description_ru": "Идентификатор архитектуры (llama, qwen3, gemma3, gemma4, qwen35 и т.п.) — определяет LLM_ARCH в llama.cpp"
+        },
+        {
+          "key": "general.name",
+          "value": "model",
+          "description_ru": "Человекочитаемое имя модели"
+        },
+        {
+          "key": "llama.block_count",
+          "value": 32,
+          "description_ru": "Количество трансформерных блоков (слоёв)"
+        },
+        {
+          "key": "llama.context_length",
+          "value": 8192,
+          "description_ru": "Максимальная длина контекста в токенах, на которую модель обучена (training-time, без YARN/rope-scaling)"
+        },
+        {
+          "key": "llama.embedding_length",
+          "value": 4096,
+          "description_ru": "Размерность скрытого состояния (hidden size, d_model)"
+        },
+        {
+          "key": "llama.feed_forward_length",
+          "value": 14336,
+          "description_ru": "Размерность промежуточного слоя FFN (intermediate size)"
+        },
+        {
+          "key": "llama.attention.head_count",
+          "value": 32,
+          "description_ru": "Число голов внимания (Q)"
+        },
+        {
+          "key": "llama.attention.head_count_kv",
+          "value": 8,
+          "description_ru": "Число KV-голов (для GQA/MQA; равно head_count при обычном MHA)"
+        },
+        {
+          "key": "llama.rope.freq_base",
+          "value": 500000,
+          "description_ru": "Базовая частота θ для RoPE (обычно 10000; 1e6 у global-слоёв Gemma 3+ и моделей с расширенным контекстом)"
+        },
+        {
+          "key": "llama.attention.layer_norm_rms_epsilon",
+          "value": 0.00001,
+          "description_ru": "Epsilon в RMSNorm перед attention/FFN (типично 1e-5…1e-6)"
+        },
+        {
+          "key": "general.file_type",
+          "value": "15 (Q4_K_M)",
+          "description_ru": "Числовой код общей квантизации файла (enum LLAMA_FTYPE_*: 0=F32, 1=F16, 2=Q4_0, 7=Q8_0, 15=Q4_K_M, 18=Q6_K и т.д.)"
+        },
+        {
+          "key": "llama.vocab_size",
+          "value": 128256,
+          "description_ru": "Размер словаря токенизатора"
+        },
+        {
+          "key": "llama.rope.dimension_count",
+          "value": 128,
+          "description_ru": "Число измерений head_dim, на которые применяется RoPE (обычно равно key_length)"
+        },
+        {
+          "key": "tokenizer.ggml.model",
+          "value": "gpt2",
+          "description_ru": "Тип токенизатора: \"gpt2\" (BPE), \"llama\" (SentencePiece), \"bert\" (WordPiece), \"no_vocab\" и т.д."
+        },
+        {
+          "key": "tokenizer.ggml.pre",
+          "value": "llama-bpe",
+          "description_ru": "Имя pre-tokenizer'а для BPE-моделей (\"llama-bpe\", \"qwen2\", \"gemma\" и т.д.) — задаёт regex-разбиение текста перед BPE"
+        },
+        {
+          "key": "tokenizer.ggml.tokens",
+          "value": "\u003carray len=128256 type=String\u003e",
+          "description_ru": "Массив всех токенов словаря (строки)"
+        },
+        {
+          "key": "tokenizer.ggml.token_type",
+          "value": "\u003carray len=128256 type=Int32\u003e",
+          "description_ru": "Массив типов токенов (1=normal, 2=unknown, 3=control, 4=user-defined, 5=unused, 6=byte)"
+        },
+        {
+          "key": "tokenizer.ggml.merges",
+          "value": "\u003carray len=280147 type=String\u003e",
+          "description_ru": "Массив BPE-merge правил (\"a b\" → \"ab\") для BPE-токенизаторов"
+        },
+        {
+          "key": "tokenizer.ggml.bos_token_id",
+          "value": 128000,
+          "description_ru": "ID токена начала последовательности (BOS)"
+        },
+        {
+          "key": "tokenizer.ggml.eos_token_id",
+          "value": 128001,
+          "description_ru": "ID токена конца последовательности (EOS)"
+        },
+        {
+          "key": "tokenizer.ggml.padding_token_id",
+          "value": 128255,
+          "description_ru": "ID padding-токена"
+        },
+        {
+          "key": "general.quantization_version",
+          "value": 2,
+          "description_ru": "Версия формата квантизации GGUF (текущая — 2)"
+        }
+      ]
+    },
+    {
+      "name": "Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive-IQ3_M",
+      "model_path": "D:/progs/lmstudio/models/HauhauCS/Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive/Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive-IQ3_M.gguf",
+      "mmproj_path": "D:/progs/lmstudio/models/HauhauCS/Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive/mmproj-Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive-f16.gguf",
       "mmproj_on": true,
-      "size": 6217260896,
-      "last_scan": "2026-05-11T12:02:48Z",
+      "size": 15440519296,
+      "last_scan": "2026-05-11T15:30:52Z",
+      "flags": {},
+      "params": [
+        {
+          "key": "general.architecture",
+          "value": "qwen35moe",
+          "description_ru": "Идентификатор архитектуры (llama, qwen3, gemma3, gemma4, qwen35 и т.п.) — определяет LLM_ARCH в llama.cpp"
+        },
+        {
+          "key": "general.type",
+          "value": "model",
+          "description_ru": "Тип артефакта: \"model\", \"adapter\" (LoRA) и т.п."
+        },
+        {
+          "key": "general.sampling.top_k",
+          "value": 20,
+          "description_ru": "Рекомендуемый top-k по умолчанию"
+        },
+        {
+          "key": "general.sampling.top_p",
+          "value": 0.95,
+          "description_ru": "Рекомендуемый top-p (nucleus) по умолчанию"
+        },
+        {
+          "key": "general.sampling.temp",
+          "value": 1,
+          "description_ru": "Рекомендуемая авторами модели температура семплирования по умолчанию"
+        },
+        {
+          "key": "general.name",
+          "value": "Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive",
+          "description_ru": "Человекочитаемое имя модели"
+        },
+        {
+          "key": "general.finetune",
+          "value": "3Ref",
+          "description_ru": ""
+        },
+        {
+          "key": "general.basename",
+          "value": "KL0.0764",
+          "description_ru": "Базовое имя модели без суффиксов квантизации/размера (например, \"Gemma-4-E4B-it\")"
+        },
+        {
+          "key": "qwen35moe.block_count",
+          "value": 40,
+          "description_ru": "Количество трансформерных блоков (слоёв)"
+        },
+        {
+          "key": "qwen35moe.context_length",
+          "value": 262144,
+          "description_ru": "Максимальная длина контекста в токенах, на которую модель обучена (training-time, без YARN/rope-scaling)"
+        },
+        {
+          "key": "qwen35moe.embedding_length",
+          "value": 2048,
+          "description_ru": "Размерность скрытого состояния (hidden size, d_model)"
+        },
+        {
+          "key": "qwen35moe.attention.head_count",
+          "value": 16,
+          "description_ru": "Число голов внимания (Q)"
+        },
+        {
+          "key": "qwen35moe.attention.head_count_kv",
+          "value": 2,
+          "description_ru": "Число KV-голов (для GQA/MQA; равно head_count при обычном MHA)"
+        },
+        {
+          "key": "qwen35moe.rope.dimension_sections",
+          "value": [
+            11,
+            11,
+            10,
+            0
+          ],
+          "description_ru": "Разбиение RoPE-измерений на секции для multi-axis M-RoPE (Qwen3-VL/3.5: длины секций time/height/width)"
+        },
+        {
+          "key": "qwen35moe.rope.freq_base",
+          "value": 10000000,
+          "description_ru": "Базовая частота θ для RoPE (обычно 10000; 1e6 у global-слоёв Gemma 3+ и моделей с расширенным контекстом)"
+        },
+        {
+          "key": "qwen35moe.attention.layer_norm_rms_epsilon",
+          "value": 0.000001,
+          "description_ru": "Epsilon в RMSNorm перед attention/FFN (типично 1e-5…1e-6)"
+        },
+        {
+          "key": "qwen35moe.expert_count",
+          "value": 256,
+          "description_ru": "Количество MoE-экспертов"
+        },
+        {
+          "key": "qwen35moe.expert_used_count",
+          "value": 8,
+          "description_ru": "Сколько экспертов активируется на токен (top-k)"
+        },
+        {
+          "key": "qwen35moe.attention.key_length",
+          "value": 256,
+          "description_ru": "Размерность одной K-головы (head_dim для ключей) в обычных (global/full) слоях"
+        },
+        {
+          "key": "qwen35moe.attention.value_length",
+          "value": 256,
+          "description_ru": "Размерность одной V-головы в обычных (global/full) слоях"
+        },
+        {
+          "key": "qwen35moe.expert_feed_forward_length",
+          "value": 512,
+          "description_ru": "FFN intermediate size для экспертов MoE"
+        },
+        {
+          "key": "qwen35moe.expert_shared_feed_forward_length",
+          "value": 512,
+          "description_ru": "FFN intermediate size для shared-эксперта"
+        },
+        {
+          "key": "qwen35moe.ssm.conv_kernel",
+          "value": 4,
+          "description_ru": "Размер 1D-свёрточного ядра в SSM-блоке (Mamba-2; типично 4)"
+        },
+        {
+          "key": "qwen35moe.ssm.state_size",
+          "value": 128,
+          "description_ru": "Размер скрытого состояния SSM (d_state; типично 64/128/256)"
+        },
+        {
+          "key": "qwen35moe.ssm.group_count",
+          "value": 16,
+          "description_ru": "Число групп в multi-group SSM (аналог GQA для state-space; разделяет B/C-проекции между головами)"
+        },
+        {
+          "key": "qwen35moe.ssm.time_step_rank",
+          "value": 32,
+          "description_ru": "Ранг низкоранговой параметризации шага Δt в SSM (dt_rank; обычно ceil(d_model/16))"
+        },
+        {
+          "key": "qwen35moe.ssm.inner_size",
+          "value": 4096,
+          "description_ru": "Внутренняя размерность SSM-блока (d_inner; обычно 2·embedding_length)"
+        },
+        {
+          "key": "qwen35moe.full_attention_interval",
+          "value": 4,
+          "description_ru": "Интервал full-attention слоёв в гибридной SSM/Attn архитектуре (Qwen3-Next/3.5): full-attn только на каждом N-м слое (обычно 4), остальные — SSM"
+        },
+        {
+          "key": "qwen35moe.rope.dimension_count",
+          "value": 64,
+          "description_ru": "Число измерений head_dim, на которые применяется RoPE (обычно равно key_length)"
+        },
+        {
+          "key": "tokenizer.ggml.model",
+          "value": "gpt2",
+          "description_ru": "Тип токенизатора: \"gpt2\" (BPE), \"llama\" (SentencePiece), \"bert\" (WordPiece), \"no_vocab\" и т.д."
+        },
+        {
+          "key": "tokenizer.ggml.pre",
+          "value": "qwen35",
+          "description_ru": "Имя pre-tokenizer'а для BPE-моделей (\"llama-bpe\", \"qwen2\", \"gemma\" и т.д.) — задаёт regex-разбиение текста перед BPE"
+        },
+        {
+          "key": "tokenizer.ggml.tokens",
+          "value": "\u003carray len=248320 type=String\u003e",
+          "description_ru": "Массив всех токенов словаря (строки)"
+        },
+        {
+          "key": "tokenizer.ggml.token_type",
+          "value": "\u003carray len=248320 type=Int32\u003e",
+          "description_ru": "Массив типов токенов (1=normal, 2=unknown, 3=control, 4=user-defined, 5=unused, 6=byte)"
+        },
+        {
+          "key": "tokenizer.ggml.merges",
+          "value": "\u003carray len=247587 type=String\u003e",
+          "description_ru": "Массив BPE-merge правил (\"a b\" → \"ab\") для BPE-токенизаторов"
+        },
+        {
+          "key": "tokenizer.ggml.eos_token_id",
+          "value": 248046,
+          "description_ru": "ID токена конца последовательности (EOS)"
+        },
+        {
+          "key": "tokenizer.ggml.padding_token_id",
+          "value": 248044,
+          "description_ru": "ID padding-токена"
+        },
+        {
+          "key": "tokenizer.ggml.bos_token_id",
+          "value": 248044,
+          "description_ru": "ID токена начала последовательности (BOS)"
+        },
+        {
+          "key": "tokenizer.chat_template",
+          "value": "{%- set image_count = namespace(value=0) %}\n{%- set video_count = namespace(value=0) %}\n{%- macro render_content(content, do_vision_count, is_system_content=false) %}\n    {%- if content is string %}\n        {{- content }}\n    {%- elif content is iterable and content is not mapping %}\n        {%- for item in content %}\n            {%- if 'image' in item or 'image_url' in item or item.type == 'image' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain images.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set image_count.value = image_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Picture ' ~ image_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|image_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'video' in item or item.type == 'video' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain videos.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set video_count.value = video_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Video ' ~ video_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|video_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'text' in item %}\n                {{- item.text }}\n            {%- else %}\n                {{- raise_exception('Unexpected item type in content.') }}\n            {%- endif %}\n        {%- endfor %}\n    {%- elif content is none or content is undefined %}\n        {{- '' }}\n    {%- else %}\n        {{- raise_exception('Unexpected content type.') }}\n    {%- endif %}\n{%- endmacro %}\n{%- if not messages %}\n    {{- raise_exception('No messages provided.') }}\n{%- endif %}\n{%- if tools and tools is iterable and tools is not mapping %}\n    {{- '\u003c|im_start|\u003esystem\\n' }}\n    {{- \"# Tools\\n\\nYou have access to the following functions:\\n\\n\u003ctools\u003e\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n\u003c/tools\u003e\" }}\n    {{- '\\n\\nIf you choose to call a function ONLY reply in the following format with NO suffix:\\n\\n\u003ctool_call\u003e\\n\u003cfunction=example_function_name\u003e\\n\u003cparameter=example_parameter_1\u003e\\nvalue_1\\n\u003c/parameter\u003e\\n\u003cparameter=example_parameter_2\u003e\\nThis is the value for the second parameter\\nthat can span\\nmultiple lines\\n\u003c/parameter\u003e\\n\u003c/function\u003e\\n\u003c/tool_call\u003e\\n\\n\u003cIMPORTANT\u003e\\nReminder:\\n- Function calls MUST follow the specified format: an inner \u003cfunction=...\u003e\u003c/function\u003e block must be nested within \u003ctool_call\u003e\u003c/tool_call\u003e XML tags\\n- Required parameters MUST be specified\\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\\n\u003c/IMPORTANT\u003e' }}\n    {%- if messages[0].role == 'system' %}\n        {%- set content = render_content(messages[0].content, false, true)|trim %}\n        {%- if content %}\n            {{- '\\n\\n' + content }}\n        {%- endif %}\n    {%- endif %}\n    {{- '\u003c|im_end|\u003e\\n' }}\n{%- else %}\n    {%- if messages[0].role == 'system' %}\n        {%- set content = render_content(messages[0].content, false, true)|trim %}\n        {{- '\u003c|im_start|\u003esystem\\n' + content + '\u003c|im_end|\u003e\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for message in messages[::-1] %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- if ns.multi_step_tool and message.role == \"user\" %}\n        {%- set content = render_content(message.content, false)|trim %}\n        {%- if not(content.startswith('\u003ctool_response\u003e') and content.endswith('\u003c/tool_response\u003e')) %}\n            {%- set ns.multi_step_tool = false %}\n            {%- set ns.last_query_index = index %}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if ns.multi_step_tool %}\n    {{- raise_exception('No user query found in messages.') }}\n{%- endif %}\n{%- for message in messages %}\n    {%- set content = render_content(message.content, true)|trim %}\n    {%- if message.role == \"system\" %}\n        {%- if not loop.first %}\n            {{- raise_exception('System message must be at the beginning.') }}\n        {%- endif %}\n    {%- elif message.role == \"user\" %}\n        {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content + '\u003c|im_end|\u003e' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is string %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '\u003c/think\u003e' in content %}\n                {%- set reasoning_content = content.split('\u003c/think\u003e')[0].rstrip('\\n').split('\u003cthink\u003e')[-1].lstrip('\\n') %}\n                {%- set content = content.split('\u003c/think\u003e')[-1].lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n        {%- set reasoning_content = reasoning_content|trim %}\n        {%- if (preserve_thinking is defined and preserve_thinking is true) or (loop.index0 \u003e ns.last_query_index) %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n\u003cthink\u003e\\n' + reasoning_content + '\\n\u003c/think\u003e\\n\\n' + content }}\n        {%- else %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls and message.tool_calls is iterable and message.tool_calls is not mapping %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if tool_call.function is defined %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {%- if loop.first %}\n                    {%- if content|trim %}\n                        {{- '\\n\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- else %}\n                        {{- '\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- endif %}\n                {%- else %}\n                    {{- '\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                {%- endif %}\n                {%- if tool_call.arguments is defined %}\n                    {%- for args_name, args_value in tool_call.arguments|items %}\n                        {{- '\u003cparameter=' + args_name + '\u003e\\n' }}\n                        {%- set args_value = args_value | string if args_value is string else args_value | tojson | safe %}\n                        {{- args_value }}\n                        {{- '\\n\u003c/parameter\u003e\\n' }}\n                    {%- endfor %}\n                {%- endif %}\n                {{- '\u003c/function\u003e\\n\u003c/tool_call\u003e' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '\u003c|im_end|\u003e\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.previtem and loop.previtem.role != \"tool\" %}\n            {{- '\u003c|im_start|\u003euser' }}\n        {%- endif %}\n        {{- '\\n\u003ctool_response\u003e\\n' }}\n        {{- content }}\n        {{- '\\n\u003c/tool_response\u003e' }}\n        {%- if not loop.last and loop.nextitem.role != \"tool\" %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- elif loop.last %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- endif %}\n    {%- else %}\n        {{- raise_exception('Unexpected message role.') }}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '\u003c|im_start|\u003eassistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '\u003cthink\u003e\\n\\n\u003c/think\u003e\\n\\n' }}\n    {%- else %}\n        {{- '\u003cthink\u003e\\n' }}\n    {%- endif %}\n{%- endif %}",
+          "description_ru": "Jinja-шаблон чат-промпта (форматирование ролей user/assistant/system)"
+        },
+        {
+          "key": "general.quantization_version",
+          "value": 2,
+          "description_ru": "Версия формата квантизации GGUF (текущая — 2)"
+        },
+        {
+          "key": "general.file_type",
+          "value": "27 (IQ3_M)",
+          "description_ru": "Числовой код общей квантизации файла (enum LLAMA_FTYPE_*: 0=F32, 1=F16, 2=Q4_0, 7=Q8_0, 15=Q4_K_M, 18=Q6_K и т.д.)"
+        },
+        {
+          "key": "general.size_label",
+          "value": "35B-A3B",
+          "description_ru": "Метка размера модели (\"4B\", \"9B\", \"70B\"), используется в имени файла"
+        },
+        {
+          "key": "quantize.imatrix.file",
+          "value": "Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive.imatrix",
+          "description_ru": "Файл importance-matrix, использованный при квантизации"
+        },
+        {
+          "key": "quantize.imatrix.dataset",
+          "value": "/home/hauhaucs/llama.cpp/groups_merged.txt",
+          "description_ru": "Датасет для importance-matrix"
+        },
+        {
+          "key": "quantize.imatrix.entries_count",
+          "value": 510,
+          "description_ru": "Число записей в importance-matrix"
+        },
+        {
+          "key": "quantize.imatrix.chunks_count",
+          "value": 93,
+          "description_ru": "Число чанков в importance-matrix"
+        }
+      ]
+    },
+    {
+      "name": "Qwen3.6-27B-MTP-UD-Q3_K_XL",
+      "model_path": "D:/progs/lmstudio/models/havenoammo/Qwen3.6-27B-MTP-UD-GGUF/Qwen3.6-27B-MTP-UD-Q3_K_XL.gguf",
+      "mmproj_path": "D:/progs/lmstudio/models/havenoammo/Qwen3.6-27B-MTP-UD-GGUF/mmproj-Qwen3.6-27B-MTP-f16.gguf",
+      "mmproj_on": true,
+      "size": 14924752064,
+      "last_scan": "2026-05-11T15:30:52Z",
+      "flags": {},
+      "params": [
+        {
+          "key": "general.architecture",
+          "value": "qwen35",
+          "description_ru": "Идентификатор архитектуры (llama, qwen3, gemma3, gemma4, qwen35 и т.п.) — определяет LLM_ARCH в llama.cpp"
+        },
+        {
+          "key": "general.type",
+          "value": "model",
+          "description_ru": "Тип артефакта: \"model\", \"adapter\" (LoRA) и т.п."
+        },
+        {
+          "key": "general.sampling.top_k",
+          "value": 20,
+          "description_ru": "Рекомендуемый top-k по умолчанию"
+        },
+        {
+          "key": "general.sampling.top_p",
+          "value": 0.95,
+          "description_ru": "Рекомендуемый top-p (nucleus) по умолчанию"
+        },
+        {
+          "key": "general.sampling.temp",
+          "value": 1,
+          "description_ru": "Рекомендуемая авторами модели температура семплирования по умолчанию"
+        },
+        {
+          "key": "general.name",
+          "value": "Qwen3.6-27B",
+          "description_ru": "Человекочитаемое имя модели"
+        },
+        {
+          "key": "general.basename",
+          "value": "Qwen3.6-27B",
+          "description_ru": "Базовое имя модели без суффиксов квантизации/размера (например, \"Gemma-4-E4B-it\")"
+        },
+        {
+          "key": "general.quantized_by",
+          "value": "Unsloth",
+          "description_ru": ""
+        },
+        {
+          "key": "general.size_label",
+          "value": "27B",
+          "description_ru": "Метка размера модели (\"4B\", \"9B\", \"70B\"), используется в имени файла"
+        },
+        {
+          "key": "general.license",
+          "value": "apache-2.0",
+          "description_ru": "Лицензия модели"
+        },
+        {
+          "key": "general.license.link",
+          "value": "https://huggingface.co/Qwen/Qwen3.6-27B/blob/main/LICENSE",
+          "description_ru": "Ссылка на текст лицензии"
+        },
+        {
+          "key": "general.repo_url",
+          "value": "https://huggingface.co/unsloth",
+          "description_ru": "URL репозитория"
+        },
+        {
+          "key": "general.base_model.count",
+          "value": 1,
+          "description_ru": ""
+        },
+        {
+          "key": "general.base_model.0.name",
+          "value": "Qwen3.6 27B",
+          "description_ru": ""
+        },
+        {
+          "key": "general.base_model.0.organization",
+          "value": "Qwen",
+          "description_ru": ""
+        },
+        {
+          "key": "general.base_model.0.repo_url",
+          "value": "https://huggingface.co/Qwen/Qwen3.6-27B",
+          "description_ru": ""
+        },
+        {
+          "key": "general.tags",
+          "value": [
+            "unsloth",
+            "image-text-to-text"
+          ],
+          "description_ru": "Теги модели"
+        },
+        {
+          "key": "qwen35.context_length",
+          "value": 262144,
+          "description_ru": "Максимальная длина контекста в токенах, на которую модель обучена (training-time, без YARN/rope-scaling)"
+        },
+        {
+          "key": "qwen35.embedding_length",
+          "value": 5120,
+          "description_ru": "Размерность скрытого состояния (hidden size, d_model)"
+        },
+        {
+          "key": "qwen35.feed_forward_length",
+          "value": 17408,
+          "description_ru": "Размерность промежуточного слоя FFN (intermediate size)"
+        },
+        {
+          "key": "qwen35.attention.head_count",
+          "value": 24,
+          "description_ru": "Число голов внимания (Q)"
+        },
+        {
+          "key": "qwen35.attention.head_count_kv",
+          "value": 4,
+          "description_ru": "Число KV-голов (для GQA/MQA; равно head_count при обычном MHA)"
+        },
+        {
+          "key": "qwen35.rope.dimension_sections",
+          "value": [
+            11,
+            11,
+            10,
+            0
+          ],
+          "description_ru": "Разбиение RoPE-измерений на секции для multi-axis M-RoPE (Qwen3-VL/3.5: длины секций time/height/width)"
+        },
+        {
+          "key": "qwen35.rope.freq_base",
+          "value": 10000000,
+          "description_ru": "Базовая частота θ для RoPE (обычно 10000; 1e6 у global-слоёв Gemma 3+ и моделей с расширенным контекстом)"
+        },
+        {
+          "key": "qwen35.attention.layer_norm_rms_epsilon",
+          "value": 0.000001,
+          "description_ru": "Epsilon в RMSNorm перед attention/FFN (типично 1e-5…1e-6)"
+        },
+        {
+          "key": "qwen35.attention.key_length",
+          "value": 256,
+          "description_ru": "Размерность одной K-головы (head_dim для ключей) в обычных (global/full) слоях"
+        },
+        {
+          "key": "qwen35.attention.value_length",
+          "value": 256,
+          "description_ru": "Размерность одной V-головы в обычных (global/full) слоях"
+        },
+        {
+          "key": "qwen35.ssm.conv_kernel",
+          "value": 4,
+          "description_ru": "Размер 1D-свёрточного ядра в SSM-блоке (Mamba-2; типично 4)"
+        },
+        {
+          "key": "qwen35.ssm.state_size",
+          "value": 128,
+          "description_ru": "Размер скрытого состояния SSM (d_state; типично 64/128/256)"
+        },
+        {
+          "key": "qwen35.ssm.group_count",
+          "value": 16,
+          "description_ru": "Число групп в multi-group SSM (аналог GQA для state-space; разделяет B/C-проекции между головами)"
+        },
+        {
+          "key": "qwen35.ssm.time_step_rank",
+          "value": 48,
+          "description_ru": "Ранг низкоранговой параметризации шага Δt в SSM (dt_rank; обычно ceil(d_model/16))"
+        },
+        {
+          "key": "qwen35.ssm.inner_size",
+          "value": 6144,
+          "description_ru": "Внутренняя размерность SSM-блока (d_inner; обычно 2·embedding_length)"
+        },
+        {
+          "key": "qwen35.full_attention_interval",
+          "value": 4,
+          "description_ru": "Интервал full-attention слоёв в гибридной SSM/Attn архитектуре (Qwen3-Next/3.5): full-attn только на каждом N-м слое (обычно 4), остальные — SSM"
+        },
+        {
+          "key": "qwen35.rope.dimension_count",
+          "value": 64,
+          "description_ru": "Число измерений head_dim, на которые применяется RoPE (обычно равно key_length)"
+        },
+        {
+          "key": "tokenizer.ggml.model",
+          "value": "gpt2",
+          "description_ru": "Тип токенизатора: \"gpt2\" (BPE), \"llama\" (SentencePiece), \"bert\" (WordPiece), \"no_vocab\" и т.д."
+        },
+        {
+          "key": "tokenizer.ggml.pre",
+          "value": "qwen35",
+          "description_ru": "Имя pre-tokenizer'а для BPE-моделей (\"llama-bpe\", \"qwen2\", \"gemma\" и т.д.) — задаёт regex-разбиение текста перед BPE"
+        },
+        {
+          "key": "tokenizer.ggml.tokens",
+          "value": "\u003carray len=248320 type=String\u003e",
+          "description_ru": "Массив всех токенов словаря (строки)"
+        },
+        {
+          "key": "tokenizer.ggml.token_type",
+          "value": "\u003carray len=248320 type=Int32\u003e",
+          "description_ru": "Массив типов токенов (1=normal, 2=unknown, 3=control, 4=user-defined, 5=unused, 6=byte)"
+        },
+        {
+          "key": "tokenizer.ggml.merges",
+          "value": "\u003carray len=247587 type=String\u003e",
+          "description_ru": "Массив BPE-merge правил (\"a b\" → \"ab\") для BPE-токенизаторов"
+        },
+        {
+          "key": "tokenizer.ggml.eos_token_id",
+          "value": 248046,
+          "description_ru": "ID токена конца последовательности (EOS)"
+        },
+        {
+          "key": "tokenizer.ggml.padding_token_id",
+          "value": 248055,
+          "description_ru": "ID padding-токена"
+        },
+        {
+          "key": "tokenizer.ggml.bos_token_id",
+          "value": 248044,
+          "description_ru": "ID токена начала последовательности (BOS)"
+        },
+        {
+          "key": "tokenizer.ggml.add_bos_token",
+          "value": false,
+          "description_ru": "Добавлять ли BOS автоматически при токенизации"
+        },
+        {
+          "key": "tokenizer.chat_template",
+          "value": "{%- set image_count = namespace(value=0) %}\n{%- set video_count = namespace(value=0) %}\n{%- macro render_content(content, do_vision_count, is_system_content=false) %}\n    {%- if content is string %}\n        {{- content }}\n    {%- elif content is iterable and content is not mapping %}\n        {%- for item in content %}\n            {%- if 'image' in item or 'image_url' in item or item.type == 'image' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain images.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set image_count.value = image_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Picture ' ~ image_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|image_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'video' in item or item.type == 'video' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain videos.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set video_count.value = video_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Video ' ~ video_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|video_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'text' in item %}\n                {{- item.text }}\n            {%- else %}\n                {{- raise_exception('Unexpected item type in content.') }}\n            {%- endif %}\n        {%- endfor %}\n    {%- elif content is none or content is undefined %}\n        {{- '' }}\n    {%- else %}\n        {{- raise_exception('Unexpected content type.') }}\n    {%- endif %}\n{%- endmacro %}\n{%- if not messages %}\n    {{- raise_exception('No messages provided.') }}\n{%- endif %}\n{%- set num_sys = 0 %}\n{%- set merged_system = '' %}\n{%- if messages[0].role == 'system' or messages[0].role == 'developer' %}\n    {%- set first = render_content(messages[0].content, false, true)|trim %}\n    {%- if messages|length \u003e 1 and (messages[1].role == 'system' or messages[1].role == 'developer') %}\n        {%- set second = render_content(messages[1].content, false, true)|trim %}\n        {%- set merged_system = first + '\\n' + second %}\n        {%- set num_sys = 2 %}\n    {%- else %}\n        {%- set merged_system = first %}\n        {%- set num_sys = 1 %}\n    {%- endif %}\n{%- endif %}\n{%- if tools and tools is iterable and tools is not mapping %}\n    {{- '\u003c|im_start|\u003esystem\\n' }}\n    {{- \"# Tools\\n\\nYou have access to the following functions:\\n\\n\u003ctools\u003e\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n\u003c/tools\u003e\" }}\n    {{- '\\n\\nIf you choose to call a function ONLY reply in the following format with NO suffix:\\n\\n\u003ctool_call\u003e\\n\u003cfunction=example_function_name\u003e\\n\u003cparameter=example_parameter_1\u003e\\nvalue_1\\n\u003c/parameter\u003e\\n\u003cparameter=example_parameter_2\u003e\\nThis is the value for the second parameter\\nthat can span\\nmultiple lines\\n\u003c/parameter\u003e\\n\u003c/function\u003e\\n\u003c/tool_call\u003e\\n\\n\u003cIMPORTANT\u003e\\nReminder:\\n- Function calls MUST follow the specified format: an inner \u003cfunction=...\u003e\u003c/function\u003e block must be nested within \u003ctool_call\u003e\u003c/tool_call\u003e XML tags\\n- Required parameters MUST be specified\\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\\n\u003c/IMPORTANT\u003e' }}\n    {%- if merged_system %}\n        {{- '\\n\\n' + merged_system }}\n    {%- endif %}\n    {{- '\u003c|im_end|\u003e\\n' }}\n{%- else %}\n    {%- if merged_system %}\n        {{- '\u003c|im_start|\u003esystem\\n' + merged_system + '\u003c|im_end|\u003e\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for message in messages[::-1] %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- if ns.multi_step_tool and message.role == \"user\" %}\n        {%- set content = render_content(message.content, false)|trim %}\n        {%- if not(content.startswith('\u003ctool_response\u003e') and content.endswith('\u003c/tool_response\u003e')) %}\n            {%- set ns.multi_step_tool = false %}\n            {%- set ns.last_query_index = index %}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- for message in messages %}\n    {%- if loop.index0 \u003e= num_sys and message.role != \"system\" and message.role != \"developer\" %}\n    {%- set content = render_content(message.content, true)|trim %}\n    {%- if message.role == \"user\" %}\n        {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content + '\u003c|im_end|\u003e' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is string %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '\u003c/think\u003e' in content %}\n                {%- set reasoning_content = content.split('\u003c/think\u003e')[0].rstrip('\\n').split('\u003cthink\u003e')[-1].lstrip('\\n') %}\n                {%- set content = content.split('\u003c/think\u003e')[-1].lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n        {%- set reasoning_content = reasoning_content|trim %}\n        {%- if (preserve_thinking is defined and preserve_thinking is true) or (loop.index0 \u003e ns.last_query_index) %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n\u003cthink\u003e\\n' + reasoning_content + '\\n\u003c/think\u003e\\n\\n' + content }}\n        {%- else %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls and message.tool_calls is iterable and message.tool_calls is not mapping %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if tool_call.function is defined %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {%- if loop.first %}\n                    {%- if content|trim %}\n                        {{- '\\n\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- else %}\n                        {{- '\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- endif %}\n                {%- else %}\n                    {{- '\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                {%- endif %}\n                {%- if tool_call.arguments is mapping %}\n                    {%- for args_name in tool_call.arguments %}\n                        {%- set args_value = tool_call.arguments[args_name] %}\n                        {{- '\u003cparameter=' + args_name + '\u003e\\n' }}\n                        {%- set args_value = args_value | tojson | safe if args_value is mapping or (args_value is sequence and args_value is not string) else args_value | string %}\n                        {{- args_value }}\n                        {{- '\\n\u003c/parameter\u003e\\n' }}\n                    {%- endfor %}\n                {%- endif %}\n                {{- '\u003c/function\u003e\\n\u003c/tool_call\u003e' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '\u003c|im_end|\u003e\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.previtem and loop.previtem.role != \"tool\" %}\n            {{- '\u003c|im_start|\u003euser' }}\n        {%- endif %}\n        {{- '\\n\u003ctool_response\u003e\\n' }}\n        {{- content }}\n        {{- '\\n\u003c/tool_response\u003e' }}\n        {%- if not loop.last and loop.nextitem.role != \"tool\" %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- elif loop.last %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- endif %}\n    {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '\u003c|im_start|\u003eassistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '\u003cthink\u003e\\n\\n\u003c/think\u003e\\n\\n' }}\n    {%- else %}\n        {{- '\u003cthink\u003e\\n' }}\n    {%- endif %}\n{%- endif %}\n{#- Unsloth fixes - developer role, tool calling #}",
+          "description_ru": "Jinja-шаблон чат-промпта (форматирование ролей user/assistant/system)"
+        },
+        {
+          "key": "general.quantization_version",
+          "value": 2,
+          "description_ru": "Версия формата квантизации GGUF (текущая — 2)"
+        },
+        {
+          "key": "general.file_type",
+          "value": "12 (Q3_K_S)",
+          "description_ru": "Числовой код общей квантизации файла (enum LLAMA_FTYPE_*: 0=F32, 1=F16, 2=Q4_0, 7=Q8_0, 15=Q4_K_M, 18=Q6_K и т.д.)"
+        },
+        {
+          "key": "quantize.imatrix.file",
+          "value": "Qwen3.6-27B-GGUF/imatrix_unsloth.gguf",
+          "description_ru": "Файл importance-matrix, использованный при квантизации"
+        },
+        {
+          "key": "quantize.imatrix.dataset",
+          "value": "unsloth_calibration_Qwen3.6-27B.txt",
+          "description_ru": "Датасет для importance-matrix"
+        },
+        {
+          "key": "quantize.imatrix.entries_count",
+          "value": 496,
+          "description_ru": "Число записей в importance-matrix"
+        },
+        {
+          "key": "quantize.imatrix.chunks_count",
+          "value": 76,
+          "description_ru": "Число чанков в importance-matrix"
+        },
+        {
+          "key": "qwen35.block_count",
+          "value": 65,
+          "description_ru": "Количество трансформерных блоков (слоёв)"
+        },
+        {
+          "key": "qwen35.nextn_predict_layers",
+          "value": 1,
+          "description_ru": ""
+        },
+        {
+          "key": "general.version",
+          "value": "36-27",
+          "description_ru": "Версия модели"
+        }
+      ]
+    },
+    {
+      "name": "Qwen3.6-27B-MTP-UD-Q4_K_XL",
+      "model_path": "D:/progs/lmstudio/models/havenoammo/Qwen3.6-27B-MTP-UD-GGUF/Qwen3.6-27B-MTP-UD-Q4_K_XL.gguf",
+      "mmproj_path": "D:/progs/lmstudio/models/havenoammo/Qwen3.6-27B-MTP-UD-GGUF/mmproj-Qwen3.6-27B-MTP-f16.gguf",
+      "mmproj_on": true,
+      "size": 18063885504,
+      "last_scan": "2026-05-11T15:54:03Z",
+      "last_run": "2026-05-11T15:54:03Z",
       "flags": {
-        "ctx_size": 100000,
-        "mmproj": "/home/kiper/src/go_llama_server_loader/models/llmfan46/gemma-4-E4B-it-ultra-uncensored-heretic-GGUF/gemma-4-E4B-it-mmproj-BF16.gguf",
-        "model": "/home/kiper/src/go_llama_server_loader/models/llmfan46/gemma-4-E4B-it-ultra-uncensored-heretic-GGUF/gemma-4-E4B-it-ultra-uncensored-heretic-Q6_K.gguf",
-        "no_mmproj_offload": true,
-        "threads": 10
+        "ctx_size": 64000,
+        "gpu_layers": 50,
+        "host": "192.168.250.4",
+        "model": "D:/progs/lmstudio/models/havenoammo/Qwen3.6-27B-MTP-UD-GGUF/Qwen3.6-27B-MTP-UD-Q4_K_XL.gguf",
+        "parallel": 1,
+        "predict": -1,
+        "reasoning": "off",
+        "temp": 0.1
       },
+      "params": [
+        {
+          "key": "general.architecture",
+          "value": "qwen35",
+          "description_ru": "Идентификатор архитектуры (llama, qwen3, gemma3, gemma4, qwen35 и т.п.) — определяет LLM_ARCH в llama.cpp"
+        },
+        {
+          "key": "general.type",
+          "value": "model",
+          "description_ru": "Тип артефакта: \"model\", \"adapter\" (LoRA) и т.п."
+        },
+        {
+          "key": "general.sampling.top_k",
+          "value": 20,
+          "description_ru": "Рекомендуемый top-k по умолчанию"
+        },
+        {
+          "key": "general.sampling.top_p",
+          "value": 0.95,
+          "description_ru": "Рекомендуемый top-p (nucleus) по умолчанию"
+        },
+        {
+          "key": "general.sampling.temp",
+          "value": 1,
+          "description_ru": "Рекомендуемая авторами модели температура семплирования по умолчанию"
+        },
+        {
+          "key": "general.name",
+          "value": "Qwen3.6-27B",
+          "description_ru": "Человекочитаемое имя модели"
+        },
+        {
+          "key": "general.basename",
+          "value": "Qwen3.6-27B",
+          "description_ru": "Базовое имя модели без суффиксов квантизации/размера (например, \"Gemma-4-E4B-it\")"
+        },
+        {
+          "key": "general.quantized_by",
+          "value": "Unsloth",
+          "description_ru": ""
+        },
+        {
+          "key": "general.size_label",
+          "value": "27B",
+          "description_ru": "Метка размера модели (\"4B\", \"9B\", \"70B\"), используется в имени файла"
+        },
+        {
+          "key": "general.license",
+          "value": "apache-2.0",
+          "description_ru": "Лицензия модели"
+        },
+        {
+          "key": "general.license.link",
+          "value": "https://huggingface.co/Qwen/Qwen3.6-27B/blob/main/LICENSE",
+          "description_ru": "Ссылка на текст лицензии"
+        },
+        {
+          "key": "general.repo_url",
+          "value": "https://huggingface.co/unsloth",
+          "description_ru": "URL репозитория"
+        },
+        {
+          "key": "general.base_model.count",
+          "value": 1,
+          "description_ru": ""
+        },
+        {
+          "key": "general.base_model.0.name",
+          "value": "Qwen3.6 27B",
+          "description_ru": ""
+        },
+        {
+          "key": "general.base_model.0.organization",
+          "value": "Qwen",
+          "description_ru": ""
+        },
+        {
+          "key": "general.base_model.0.repo_url",
+          "value": "https://huggingface.co/Qwen/Qwen3.6-27B",
+          "description_ru": ""
+        },
+        {
+          "key": "general.tags",
+          "value": [
+            "unsloth",
+            "image-text-to-text"
+          ],
+          "description_ru": "Теги модели"
+        },
+        {
+          "key": "qwen35.context_length",
+          "value": 262144,
+          "description_ru": "Максимальная длина контекста в токенах, на которую модель обучена (training-time, без YARN/rope-scaling)"
+        },
+        {
+          "key": "qwen35.embedding_length",
+          "value": 5120,
+          "description_ru": "Размерность скрытого состояния (hidden size, d_model)"
+        },
+        {
+          "key": "qwen35.feed_forward_length",
+          "value": 17408,
+          "description_ru": "Размерность промежуточного слоя FFN (intermediate size)"
+        },
+        {
+          "key": "qwen35.attention.head_count",
+          "value": 24,
+          "description_ru": "Число голов внимания (Q)"
+        },
+        {
+          "key": "qwen35.attention.head_count_kv",
+          "value": 4,
+          "description_ru": "Число KV-голов (для GQA/MQA; равно head_count при обычном MHA)"
+        },
+        {
+          "key": "qwen35.rope.dimension_sections",
+          "value": [
+            11,
+            11,
+            10,
+            0
+          ],
+          "description_ru": "Разбиение RoPE-измерений на секции для multi-axis M-RoPE (Qwen3-VL/3.5: длины секций time/height/width)"
+        },
+        {
+          "key": "qwen35.rope.freq_base",
+          "value": 10000000,
+          "description_ru": "Базовая частота θ для RoPE (обычно 10000; 1e6 у global-слоёв Gemma 3+ и моделей с расширенным контекстом)"
+        },
+        {
+          "key": "qwen35.attention.layer_norm_rms_epsilon",
+          "value": 0.000001,
+          "description_ru": "Epsilon в RMSNorm перед attention/FFN (типично 1e-5…1e-6)"
+        },
+        {
+          "key": "qwen35.attention.key_length",
+          "value": 256,
+          "description_ru": "Размерность одной K-головы (head_dim для ключей) в обычных (global/full) слоях"
+        },
+        {
+          "key": "qwen35.attention.value_length",
+          "value": 256,
+          "description_ru": "Размерность одной V-головы в обычных (global/full) слоях"
+        },
+        {
+          "key": "qwen35.ssm.conv_kernel",
+          "value": 4,
+          "description_ru": "Размер 1D-свёрточного ядра в SSM-блоке (Mamba-2; типично 4)"
+        },
+        {
+          "key": "qwen35.ssm.state_size",
+          "value": 128,
+          "description_ru": "Размер скрытого состояния SSM (d_state; типично 64/128/256)"
+        },
+        {
+          "key": "qwen35.ssm.group_count",
+          "value": 16,
+          "description_ru": "Число групп в multi-group SSM (аналог GQA для state-space; разделяет B/C-проекции между головами)"
+        },
+        {
+          "key": "qwen35.ssm.time_step_rank",
+          "value": 48,
+          "description_ru": "Ранг низкоранговой параметризации шага Δt в SSM (dt_rank; обычно ceil(d_model/16))"
+        },
+        {
+          "key": "qwen35.ssm.inner_size",
+          "value": 6144,
+          "description_ru": "Внутренняя размерность SSM-блока (d_inner; обычно 2·embedding_length)"
+        },
+        {
+          "key": "qwen35.full_attention_interval",
+          "value": 4,
+          "description_ru": "Интервал full-attention слоёв в гибридной SSM/Attn архитектуре (Qwen3-Next/3.5): full-attn только на каждом N-м слое (обычно 4), остальные — SSM"
+        },
+        {
+          "key": "qwen35.rope.dimension_count",
+          "value": 64,
+          "description_ru": "Число измерений head_dim, на которые применяется RoPE (обычно равно key_length)"
+        },
+        {
+          "key": "tokenizer.ggml.model",
+          "value": "gpt2",
+          "description_ru": "Тип токенизатора: \"gpt2\" (BPE), \"llama\" (SentencePiece), \"bert\" (WordPiece), \"no_vocab\" и т.д."
+        },
+        {
+          "key": "tokenizer.ggml.pre",
+          "value": "qwen35",
+          "description_ru": "Имя pre-tokenizer'а для BPE-моделей (\"llama-bpe\", \"qwen2\", \"gemma\" и т.д.) — задаёт regex-разбиение текста перед BPE"
+        },
+        {
+          "key": "tokenizer.ggml.tokens",
+          "value": "\u003carray len=248320 type=String\u003e",
+          "description_ru": "Массив всех токенов словаря (строки)"
+        },
+        {
+          "key": "tokenizer.ggml.token_type",
+          "value": "\u003carray len=248320 type=Int32\u003e",
+          "description_ru": "Массив типов токенов (1=normal, 2=unknown, 3=control, 4=user-defined, 5=unused, 6=byte)"
+        },
+        {
+          "key": "tokenizer.ggml.merges",
+          "value": "\u003carray len=247587 type=String\u003e",
+          "description_ru": "Массив BPE-merge правил (\"a b\" → \"ab\") для BPE-токенизаторов"
+        },
+        {
+          "key": "tokenizer.ggml.eos_token_id",
+          "value": 248046,
+          "description_ru": "ID токена конца последовательности (EOS)"
+        },
+        {
+          "key": "tokenizer.ggml.padding_token_id",
+          "value": 248055,
+          "description_ru": "ID padding-токена"
+        },
+        {
+          "key": "tokenizer.ggml.bos_token_id",
+          "value": 248044,
+          "description_ru": "ID токена начала последовательности (BOS)"
+        },
+        {
+          "key": "tokenizer.ggml.add_bos_token",
+          "value": false,
+          "description_ru": "Добавлять ли BOS автоматически при токенизации"
+        },
+        {
+          "key": "tokenizer.chat_template",
+          "value": "{%- set image_count = namespace(value=0) %}\n{%- set video_count = namespace(value=0) %}\n{%- macro render_content(content, do_vision_count, is_system_content=false) %}\n    {%- if content is string %}\n        {{- content }}\n    {%- elif content is iterable and content is not mapping %}\n        {%- for item in content %}\n            {%- if 'image' in item or 'image_url' in item or item.type == 'image' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain images.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set image_count.value = image_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Picture ' ~ image_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|image_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'video' in item or item.type == 'video' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain videos.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set video_count.value = video_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Video ' ~ video_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|video_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'text' in item %}\n                {{- item.text }}\n            {%- else %}\n                {{- raise_exception('Unexpected item type in content.') }}\n            {%- endif %}\n        {%- endfor %}\n    {%- elif content is none or content is undefined %}\n        {{- '' }}\n    {%- else %}\n        {{- raise_exception('Unexpected content type.') }}\n    {%- endif %}\n{%- endmacro %}\n{%- if not messages %}\n    {{- raise_exception('No messages provided.') }}\n{%- endif %}\n{%- set num_sys = 0 %}\n{%- set merged_system = '' %}\n{%- if messages[0].role == 'system' or messages[0].role == 'developer' %}\n    {%- set first = render_content(messages[0].content, false, true)|trim %}\n    {%- if messages|length \u003e 1 and (messages[1].role == 'system' or messages[1].role == 'developer') %}\n        {%- set second = render_content(messages[1].content, false, true)|trim %}\n        {%- set merged_system = first + '\\n' + second %}\n        {%- set num_sys = 2 %}\n    {%- else %}\n        {%- set merged_system = first %}\n        {%- set num_sys = 1 %}\n    {%- endif %}\n{%- endif %}\n{%- if tools and tools is iterable and tools is not mapping %}\n    {{- '\u003c|im_start|\u003esystem\\n' }}\n    {{- \"# Tools\\n\\nYou have access to the following functions:\\n\\n\u003ctools\u003e\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n\u003c/tools\u003e\" }}\n    {{- '\\n\\nIf you choose to call a function ONLY reply in the following format with NO suffix:\\n\\n\u003ctool_call\u003e\\n\u003cfunction=example_function_name\u003e\\n\u003cparameter=example_parameter_1\u003e\\nvalue_1\\n\u003c/parameter\u003e\\n\u003cparameter=example_parameter_2\u003e\\nThis is the value for the second parameter\\nthat can span\\nmultiple lines\\n\u003c/parameter\u003e\\n\u003c/function\u003e\\n\u003c/tool_call\u003e\\n\\n\u003cIMPORTANT\u003e\\nReminder:\\n- Function calls MUST follow the specified format: an inner \u003cfunction=...\u003e\u003c/function\u003e block must be nested within \u003ctool_call\u003e\u003c/tool_call\u003e XML tags\\n- Required parameters MUST be specified\\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\\n\u003c/IMPORTANT\u003e' }}\n    {%- if merged_system %}\n        {{- '\\n\\n' + merged_system }}\n    {%- endif %}\n    {{- '\u003c|im_end|\u003e\\n' }}\n{%- else %}\n    {%- if merged_system %}\n        {{- '\u003c|im_start|\u003esystem\\n' + merged_system + '\u003c|im_end|\u003e\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for message in messages[::-1] %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- if ns.multi_step_tool and message.role == \"user\" %}\n        {%- set content = render_content(message.content, false)|trim %}\n        {%- if not(content.startswith('\u003ctool_response\u003e') and content.endswith('\u003c/tool_response\u003e')) %}\n            {%- set ns.multi_step_tool = false %}\n            {%- set ns.last_query_index = index %}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- for message in messages %}\n    {%- if loop.index0 \u003e= num_sys and message.role != \"system\" and message.role != \"developer\" %}\n    {%- set content = render_content(message.content, true)|trim %}\n    {%- if message.role == \"user\" %}\n        {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content + '\u003c|im_end|\u003e' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is string %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '\u003c/think\u003e' in content %}\n                {%- set reasoning_content = content.split('\u003c/think\u003e')[0].rstrip('\\n').split('\u003cthink\u003e')[-1].lstrip('\\n') %}\n                {%- set content = content.split('\u003c/think\u003e')[-1].lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n        {%- set reasoning_content = reasoning_content|trim %}\n        {%- if (preserve_thinking is defined and preserve_thinking is true) or (loop.index0 \u003e ns.last_query_index) %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n\u003cthink\u003e\\n' + reasoning_content + '\\n\u003c/think\u003e\\n\\n' + content }}\n        {%- else %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls and message.tool_calls is iterable and message.tool_calls is not mapping %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if tool_call.function is defined %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {%- if loop.first %}\n                    {%- if content|trim %}\n                        {{- '\\n\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- else %}\n                        {{- '\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- endif %}\n                {%- else %}\n                    {{- '\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                {%- endif %}\n                {%- if tool_call.arguments is mapping %}\n                    {%- for args_name in tool_call.arguments %}\n                        {%- set args_value = tool_call.arguments[args_name] %}\n                        {{- '\u003cparameter=' + args_name + '\u003e\\n' }}\n                        {%- set args_value = args_value | tojson | safe if args_value is mapping or (args_value is sequence and args_value is not string) else args_value | string %}\n                        {{- args_value }}\n                        {{- '\\n\u003c/parameter\u003e\\n' }}\n                    {%- endfor %}\n                {%- endif %}\n                {{- '\u003c/function\u003e\\n\u003c/tool_call\u003e' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '\u003c|im_end|\u003e\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.previtem and loop.previtem.role != \"tool\" %}\n            {{- '\u003c|im_start|\u003euser' }}\n        {%- endif %}\n        {{- '\\n\u003ctool_response\u003e\\n' }}\n        {{- content }}\n        {{- '\\n\u003c/tool_response\u003e' }}\n        {%- if not loop.last and loop.nextitem.role != \"tool\" %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- elif loop.last %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- endif %}\n    {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '\u003c|im_start|\u003eassistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '\u003cthink\u003e\\n\\n\u003c/think\u003e\\n\\n' }}\n    {%- else %}\n        {{- '\u003cthink\u003e\\n' }}\n    {%- endif %}\n{%- endif %}\n{#- Unsloth fixes - developer role, tool calling #}",
+          "description_ru": "Jinja-шаблон чат-промпта (форматирование ролей user/assistant/system)"
+        },
+        {
+          "key": "general.quantization_version",
+          "value": 2,
+          "description_ru": "Версия формата квантизации GGUF (текущая — 2)"
+        },
+        {
+          "key": "general.file_type",
+          "value": "15 (Q4_K_M)",
+          "description_ru": "Числовой код общей квантизации файла (enum LLAMA_FTYPE_*: 0=F32, 1=F16, 2=Q4_0, 7=Q8_0, 15=Q4_K_M, 18=Q6_K и т.д.)"
+        },
+        {
+          "key": "quantize.imatrix.file",
+          "value": "Qwen3.6-27B-GGUF/imatrix_unsloth.gguf",
+          "description_ru": "Файл importance-matrix, использованный при квантизации"
+        },
+        {
+          "key": "quantize.imatrix.dataset",
+          "value": "unsloth_calibration_Qwen3.6-27B.txt",
+          "description_ru": "Датасет для importance-matrix"
+        },
+        {
+          "key": "quantize.imatrix.entries_count",
+          "value": 496,
+          "description_ru": "Число записей в importance-matrix"
+        },
+        {
+          "key": "quantize.imatrix.chunks_count",
+          "value": 76,
+          "description_ru": "Число чанков в importance-matrix"
+        },
+        {
+          "key": "qwen35.block_count",
+          "value": 65,
+          "description_ru": "Количество трансформерных блоков (слоёв)"
+        },
+        {
+          "key": "qwen35.nextn_predict_layers",
+          "value": 1,
+          "description_ru": ""
+        },
+        {
+          "key": "general.version",
+          "value": "36-27",
+          "description_ru": "Версия модели"
+        }
+      ]
+    },
+    {
+      "name": "heretic-UD-27B-Q4_K_XL",
+      "model_path": "D:/progs/lmstudio/models/lambsea/Qwen3.6-27B-Abliterated-Heretic-Uncensored-UD-GGUF/heretic-UD-27B-Q4_K_XL.gguf",
+      "mmproj_path": "D:/progs/lmstudio/models/lambsea/Qwen3.6-27B-Abliterated-Heretic-Uncensored-UD-GGUF/mmproj-27B-F16.gguf",
+      "mmproj_on": true,
+      "size": 19880847328,
+      "last_scan": "2026-05-11T15:59:30Z",
+      "last_run": "2026-05-11T15:59:30Z",
+      "comment": "медленно 5 t/s",
+      "flags": {
+        "ctx_size": 64000,
+        "gpu_layers": 48,
+        "host": "192.168.250.4",
+        "mmproj": "D:/progs/lmstudio/models/lambsea/Qwen3.6-27B-Abliterated-Heretic-Uncensored-UD-GGUF/mmproj-27B-F16.gguf",
+        "model": "D:/progs/lmstudio/models/lambsea/Qwen3.6-27B-Abliterated-Heretic-Uncensored-UD-GGUF/heretic-UD-27B-Q4_K_XL.gguf",
+        "no_mmproj_offload": true,
+        "parallel": 1,
+        "predict": -1,
+        "reasoning": "off",
+        "temp": 0.1
+      },
+      "params": [
+        {
+          "key": "general.architecture",
+          "value": "qwen35",
+          "description_ru": "Идентификатор архитектуры (llama, qwen3, gemma3, gemma4, qwen35 и т.п.) — определяет LLM_ARCH в llama.cpp"
+        },
+        {
+          "key": "general.type",
+          "value": "model",
+          "description_ru": "Тип артефакта: \"model\", \"adapter\" (LoRA) и т.п."
+        },
+        {
+          "key": "general.sampling.top_k",
+          "value": 20,
+          "description_ru": "Рекомендуемый top-k по умолчанию"
+        },
+        {
+          "key": "general.sampling.top_p",
+          "value": 0.95,
+          "description_ru": "Рекомендуемый top-p (nucleus) по умолчанию"
+        },
+        {
+          "key": "general.sampling.temp",
+          "value": 1,
+          "description_ru": "Рекомендуемая авторами модели температура семплирования по умолчанию"
+        },
+        {
+          "key": "general.name",
+          "value": "Qwen3.6 27B Direct Ablated BF16 v4",
+          "description_ru": "Человекочитаемое имя модели"
+        },
+        {
+          "key": "general.version",
+          "value": "v4",
+          "description_ru": "Версия модели"
+        },
+        {
+          "key": "general.finetune",
+          "value": "Direct-Ablated",
+          "description_ru": ""
+        },
+        {
+          "key": "general.basename",
+          "value": "Qwen3.6",
+          "description_ru": "Базовое имя модели без суффиксов квантизации/размера (например, \"Gemma-4-E4B-it\")"
+        },
+        {
+          "key": "general.size_label",
+          "value": "27B",
+          "description_ru": "Метка размера модели (\"4B\", \"9B\", \"70B\"), используется в имени файла"
+        },
+        {
+          "key": "general.license",
+          "value": "apache-2.0",
+          "description_ru": "Лицензия модели"
+        },
+        {
+          "key": "general.base_model.count",
+          "value": 1,
+          "description_ru": ""
+        },
+        {
+          "key": "general.base_model.0.name",
+          "value": "Qwen3.6 27B",
+          "description_ru": ""
+        },
+        {
+          "key": "general.base_model.0.organization",
+          "value": "Qwen",
+          "description_ru": ""
+        },
+        {
+          "key": "general.base_model.0.repo_url",
+          "value": "https://huggingface.co/Qwen/Qwen3.6-27B",
+          "description_ru": ""
+        },
+        {
+          "key": "general.tags",
+          "value": [
+            "qwen",
+            "qwen3.6",
+            "qwen3_5",
+            "dense",
+            "multimodal",
+            "vlm",
+            "vision",
+            "video",
+            "image-text-to-text",
+            "abliterated",
+            "uncensored",
+            "heretic",
+            "mpoa",
+            "bf16",
+            "custom_code",
+            "image-text-to-text"
+          ],
+          "description_ru": "Теги модели"
+        },
+        {
+          "key": "qwen35.block_count",
+          "value": 64,
+          "description_ru": "Количество трансформерных блоков (слоёв)"
+        },
+        {
+          "key": "qwen35.context_length",
+          "value": 262144,
+          "description_ru": "Максимальная длина контекста в токенах, на которую модель обучена (training-time, без YARN/rope-scaling)"
+        },
+        {
+          "key": "qwen35.embedding_length",
+          "value": 5120,
+          "description_ru": "Размерность скрытого состояния (hidden size, d_model)"
+        },
+        {
+          "key": "qwen35.feed_forward_length",
+          "value": 17408,
+          "description_ru": "Размерность промежуточного слоя FFN (intermediate size)"
+        },
+        {
+          "key": "qwen35.attention.head_count",
+          "value": 24,
+          "description_ru": "Число голов внимания (Q)"
+        },
+        {
+          "key": "qwen35.attention.head_count_kv",
+          "value": 4,
+          "description_ru": "Число KV-голов (для GQA/MQA; равно head_count при обычном MHA)"
+        },
+        {
+          "key": "qwen35.rope.dimension_sections",
+          "value": [
+            11,
+            11,
+            10,
+            0
+          ],
+          "description_ru": "Разбиение RoPE-измерений на секции для multi-axis M-RoPE (Qwen3-VL/3.5: длины секций time/height/width)"
+        },
+        {
+          "key": "qwen35.rope.freq_base",
+          "value": 10000000,
+          "description_ru": "Базовая частота θ для RoPE (обычно 10000; 1e6 у global-слоёв Gemma 3+ и моделей с расширенным контекстом)"
+        },
+        {
+          "key": "qwen35.attention.layer_norm_rms_epsilon",
+          "value": 0.000001,
+          "description_ru": "Epsilon в RMSNorm перед attention/FFN (типично 1e-5…1e-6)"
+        },
+        {
+          "key": "qwen35.attention.key_length",
+          "value": 256,
+          "description_ru": "Размерность одной K-головы (head_dim для ключей) в обычных (global/full) слоях"
+        },
+        {
+          "key": "qwen35.attention.value_length",
+          "value": 256,
+          "description_ru": "Размерность одной V-головы в обычных (global/full) слоях"
+        },
+        {
+          "key": "qwen35.ssm.conv_kernel",
+          "value": 4,
+          "description_ru": "Размер 1D-свёрточного ядра в SSM-блоке (Mamba-2; типично 4)"
+        },
+        {
+          "key": "qwen35.ssm.state_size",
+          "value": 128,
+          "description_ru": "Размер скрытого состояния SSM (d_state; типично 64/128/256)"
+        },
+        {
+          "key": "qwen35.ssm.group_count",
+          "value": 16,
+          "description_ru": "Число групп в multi-group SSM (аналог GQA для state-space; разделяет B/C-проекции между головами)"
+        },
+        {
+          "key": "qwen35.ssm.time_step_rank",
+          "value": 48,
+          "description_ru": "Ранг низкоранговой параметризации шага Δt в SSM (dt_rank; обычно ceil(d_model/16))"
+        },
+        {
+          "key": "qwen35.ssm.inner_size",
+          "value": 6144,
+          "description_ru": "Внутренняя размерность SSM-блока (d_inner; обычно 2·embedding_length)"
+        },
+        {
+          "key": "qwen35.full_attention_interval",
+          "value": 4,
+          "description_ru": "Интервал full-attention слоёв в гибридной SSM/Attn архитектуре (Qwen3-Next/3.5): full-attn только на каждом N-м слое (обычно 4), остальные — SSM"
+        },
+        {
+          "key": "qwen35.rope.dimension_count",
+          "value": 64,
+          "description_ru": "Число измерений head_dim, на которые применяется RoPE (обычно равно key_length)"
+        },
+        {
+          "key": "tokenizer.ggml.model",
+          "value": "gpt2",
+          "description_ru": "Тип токенизатора: \"gpt2\" (BPE), \"llama\" (SentencePiece), \"bert\" (WordPiece), \"no_vocab\" и т.д."
+        },
+        {
+          "key": "tokenizer.ggml.pre",
+          "value": "qwen2",
+          "description_ru": "Имя pre-tokenizer'а для BPE-моделей (\"llama-bpe\", \"qwen2\", \"gemma\" и т.д.) — задаёт regex-разбиение текста перед BPE"
+        },
+        {
+          "key": "tokenizer.ggml.tokens",
+          "value": "\u003carray len=248320 type=String\u003e",
+          "description_ru": "Массив всех токенов словаря (строки)"
+        },
+        {
+          "key": "tokenizer.ggml.token_type",
+          "value": "\u003carray len=248320 type=Int32\u003e",
+          "description_ru": "Массив типов токенов (1=normal, 2=unknown, 3=control, 4=user-defined, 5=unused, 6=byte)"
+        },
+        {
+          "key": "tokenizer.ggml.merges",
+          "value": "\u003carray len=247587 type=String\u003e",
+          "description_ru": "Массив BPE-merge правил (\"a b\" → \"ab\") для BPE-токенизаторов"
+        },
+        {
+          "key": "tokenizer.ggml.eos_token_id",
+          "value": 248046,
+          "description_ru": "ID токена конца последовательности (EOS)"
+        },
+        {
+          "key": "tokenizer.ggml.padding_token_id",
+          "value": 248044,
+          "description_ru": "ID padding-токена"
+        },
+        {
+          "key": "tokenizer.ggml.bos_token_id",
+          "value": 248044,
+          "description_ru": "ID токена начала последовательности (BOS)"
+        },
+        {
+          "key": "tokenizer.chat_template",
+          "value": "{%- set image_count = namespace(value=0) %}\n{%- set video_count = namespace(value=0) %}\n{%- macro render_content(content, do_vision_count, is_system_content=false) %}\n    {%- if content is string %}\n        {{- content }}\n    {%- elif content is iterable and content is not mapping %}\n        {%- for item in content %}\n            {%- if 'image' in item or 'image_url' in item or item.type == 'image' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain images.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set image_count.value = image_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Picture ' ~ image_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|image_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'video' in item or item.type == 'video' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain videos.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set video_count.value = video_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Video ' ~ video_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|video_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'text' in item %}\n                {{- item.text }}\n            {%- else %}\n                {{- raise_exception('Unexpected item type in content.') }}\n            {%- endif %}\n        {%- endfor %}\n    {%- elif content is none or content is undefined %}\n        {{- '' }}\n    {%- else %}\n        {{- raise_exception('Unexpected content type.') }}\n    {%- endif %}\n{%- endmacro %}\n{%- if not messages %}\n    {{- raise_exception('No messages provided.') }}\n{%- endif %}\n{%- if tools and tools is iterable and tools is not mapping %}\n    {{- '\u003c|im_start|\u003esystem\\n' }}\n    {{- \"# Tools\\n\\nYou have access to the following functions:\\n\\n\u003ctools\u003e\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n\u003c/tools\u003e\" }}\n    {{- '\\n\\nIf you choose to call a function ONLY reply in the following format with NO suffix:\\n\\n\u003ctool_call\u003e\\n\u003cfunction=example_function_name\u003e\\n\u003cparameter=example_parameter_1\u003e\\nvalue_1\\n\u003c/parameter\u003e\\n\u003cparameter=example_parameter_2\u003e\\nThis is the value for the second parameter\\nthat can span\\nmultiple lines\\n\u003c/parameter\u003e\\n\u003c/function\u003e\\n\u003c/tool_call\u003e\\n\\n\u003cIMPORTANT\u003e\\nReminder:\\n- Function calls MUST follow the specified format: an inner \u003cfunction=...\u003e\u003c/function\u003e block must be nested within \u003ctool_call\u003e\u003c/tool_call\u003e XML tags\\n- Required parameters MUST be specified\\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\\n\u003c/IMPORTANT\u003e' }}\n    {%- if messages[0].role == 'system' %}\n        {%- set content = render_content(messages[0].content, false, true)|trim %}\n        {%- if content %}\n            {{- '\\n\\n' + content }}\n        {%- endif %}\n    {%- endif %}\n    {{- '\u003c|im_end|\u003e\\n' }}\n{%- else %}\n    {%- if messages[0].role == 'system' %}\n        {%- set content = render_content(messages[0].content, false, true)|trim %}\n        {{- '\u003c|im_start|\u003esystem\\n' + content + '\u003c|im_end|\u003e\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for message in messages[::-1] %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- if ns.multi_step_tool and message.role == \"user\" %}\n        {%- set content = render_content(message.content, false)|trim %}\n        {%- if not(content.startswith('\u003ctool_response\u003e') and content.endswith('\u003c/tool_response\u003e')) %}\n            {%- set ns.multi_step_tool = false %}\n            {%- set ns.last_query_index = index %}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if ns.multi_step_tool %}\n    {{- raise_exception('No user query found in messages.') }}\n{%- endif %}\n{%- for message in messages %}\n    {%- set content = render_content(message.content, true)|trim %}\n    {%- if message.role == \"system\" %}\n        {%- if not loop.first %}\n            {{- raise_exception('System message must be at the beginning.') }}\n        {%- endif %}\n    {%- elif message.role == \"user\" %}\n        {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content + '\u003c|im_end|\u003e' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is string %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '\u003c/think\u003e' in content %}\n                {%- set reasoning_content = content.split('\u003c/think\u003e')[0].rstrip('\\n').split('\u003cthink\u003e')[-1].lstrip('\\n') %}\n                {%- set content = content.split('\u003c/think\u003e')[-1].lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n        {%- set reasoning_content = reasoning_content|trim %}\n        {%- if (preserve_thinking is defined and preserve_thinking is true) or (loop.index0 \u003e ns.last_query_index) %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n\u003cthink\u003e\\n' + reasoning_content + '\\n\u003c/think\u003e\\n\\n' + content }}\n        {%- else %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls and message.tool_calls is iterable and message.tool_calls is not mapping %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if tool_call.function is defined %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {%- if loop.first %}\n                    {%- if content|trim %}\n                        {{- '\\n\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- else %}\n                        {{- '\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- endif %}\n                {%- else %}\n                    {{- '\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                {%- endif %}\n                {%- if tool_call.arguments is defined %}\n                    {%- for args_name, args_value in tool_call.arguments|items %}\n                        {{- '\u003cparameter=' + args_name + '\u003e\\n' }}\n                        {%- set args_value = args_value | string if args_value is string else args_value | tojson | safe %}\n                        {{- args_value }}\n                        {{- '\\n\u003c/parameter\u003e\\n' }}\n                    {%- endfor %}\n                {%- endif %}\n                {{- '\u003c/function\u003e\\n\u003c/tool_call\u003e' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '\u003c|im_end|\u003e\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.previtem and loop.previtem.role != \"tool\" %}\n            {{- '\u003c|im_start|\u003euser' }}\n        {%- endif %}\n        {{- '\\n\u003ctool_response\u003e\\n' }}\n        {{- content }}\n        {{- '\\n\u003c/tool_response\u003e' }}\n        {%- if not loop.last and loop.nextitem.role != \"tool\" %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- elif loop.last %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- endif %}\n    {%- else %}\n        {{- raise_exception('Unexpected message role.') }}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '\u003c|im_start|\u003eassistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '\u003cthink\u003e\\n\\n\u003c/think\u003e\\n\\n' }}\n    {%- else %}\n        {{- '\u003cthink\u003e\\n' }}\n    {%- endif %}\n{%- endif %}",
+          "description_ru": "Jinja-шаблон чат-промпта (форматирование ролей user/assistant/system)"
+        },
+        {
+          "key": "general.quantization_version",
+          "value": 2,
+          "description_ru": "Версия формата квантизации GGUF (текущая — 2)"
+        },
+        {
+          "key": "general.file_type",
+          "value": "15 (Q4_K_M)",
+          "description_ru": "Числовой код общей квантизации файла (enum LLAMA_FTYPE_*: 0=F32, 1=F16, 2=Q4_0, 7=Q8_0, 15=Q4_K_M, 18=Q6_K и т.д.)"
+        },
+        {
+          "key": "quantize.imatrix.file",
+          "value": "calib_imatrix/imatrix.dat",
+          "description_ru": "Файл importance-matrix, использованный при квантизации"
+        },
+        {
+          "key": "quantize.imatrix.dataset",
+          "value": "unsloth_calibration_Qwen3.6-27B.txt",
+          "description_ru": "Датасет для importance-matrix"
+        },
+        {
+          "key": "quantize.imatrix.entries_count",
+          "value": 496,
+          "description_ru": "Число записей в importance-matrix"
+        },
+        {
+          "key": "quantize.imatrix.chunks_count",
+          "value": 76,
+          "description_ru": "Число чанков в importance-matrix"
+        }
+      ]
+    },
+    {
+      "name": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q6_K",
+      "model_path": "D:/progs/lmstudio/models/HauhauCS/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q6_K.gguf",
+      "mmproj_path": "D:/progs/lmstudio/models/HauhauCS/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive/mmproj-Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-BF16.gguf",
+      "mmproj_on": true,
+      "size": 7359259008,
+      "last_scan": "2026-05-11T15:30:52Z",
+      "flags": {},
+      "params": [
+        {
+          "key": "general.architecture",
+          "value": "qwen35",
+          "description_ru": "Идентификатор архитектуры (llama, qwen3, gemma3, gemma4, qwen35 и т.п.) — определяет LLM_ARCH в llama.cpp"
+        },
+        {
+          "key": "general.type",
+          "value": "model",
+          "description_ru": "Тип артефакта: \"model\", \"adapter\" (LoRA) и т.п."
+        },
+        {
+          "key": "general.name",
+          "value": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-BF16",
+          "description_ru": "Человекочитаемое имя модели"
+        },
+        {
+          "key": "general.basename",
+          "value": "Qwen3.5",
+          "description_ru": "Базовое имя модели без суффиксов квантизации/размера (например, \"Gemma-4-E4B-it\")"
+        },
+        {
+          "key": "general.size_label",
+          "value": "9B",
+          "description_ru": "Метка размера модели (\"4B\", \"9B\", \"70B\"), используется в имени файла"
+        },
+        {
+          "key": "qwen35.block_count",
+          "value": 32,
+          "description_ru": "Количество трансформерных блоков (слоёв)"
+        },
+        {
+          "key": "qwen35.context_length",
+          "value": 262144,
+          "description_ru": "Максимальная длина контекста в токенах, на которую модель обучена (training-time, без YARN/rope-scaling)"
+        },
+        {
+          "key": "qwen35.embedding_length",
+          "value": 4096,
+          "description_ru": "Размерность скрытого состояния (hidden size, d_model)"
+        },
+        {
+          "key": "qwen35.feed_forward_length",
+          "value": 12288,
+          "description_ru": "Размерность промежуточного слоя FFN (intermediate size)"
+        },
+        {
+          "key": "qwen35.attention.head_count",
+          "value": 16,
+          "description_ru": "Число голов внимания (Q)"
+        },
+        {
+          "key": "qwen35.attention.head_count_kv",
+          "value": 4,
+          "description_ru": "Число KV-голов (для GQA/MQA; равно head_count при обычном MHA)"
+        },
+        {
+          "key": "qwen35.rope.dimension_sections",
+          "value": [
+            11,
+            11,
+            10,
+            0
+          ],
+          "description_ru": "Разбиение RoPE-измерений на секции для multi-axis M-RoPE (Qwen3-VL/3.5: длины секций time/height/width)"
+        },
+        {
+          "key": "qwen35.rope.freq_base",
+          "value": 10000000,
+          "description_ru": "Базовая частота θ для RoPE (обычно 10000; 1e6 у global-слоёв Gemma 3+ и моделей с расширенным контекстом)"
+        },
+        {
+          "key": "qwen35.attention.layer_norm_rms_epsilon",
+          "value": 0.000001,
+          "description_ru": "Epsilon в RMSNorm перед attention/FFN (типично 1e-5…1e-6)"
+        },
+        {
+          "key": "qwen35.attention.key_length",
+          "value": 256,
+          "description_ru": "Размерность одной K-головы (head_dim для ключей) в обычных (global/full) слоях"
+        },
+        {
+          "key": "qwen35.attention.value_length",
+          "value": 256,
+          "description_ru": "Размерность одной V-головы в обычных (global/full) слоях"
+        },
+        {
+          "key": "qwen35.ssm.conv_kernel",
+          "value": 4,
+          "description_ru": "Размер 1D-свёрточного ядра в SSM-блоке (Mamba-2; типично 4)"
+        },
+        {
+          "key": "qwen35.ssm.state_size",
+          "value": 128,
+          "description_ru": "Размер скрытого состояния SSM (d_state; типично 64/128/256)"
+        },
+        {
+          "key": "qwen35.ssm.group_count",
+          "value": 16,
+          "description_ru": "Число групп в multi-group SSM (аналог GQA для state-space; разделяет B/C-проекции между головами)"
+        },
+        {
+          "key": "qwen35.ssm.time_step_rank",
+          "value": 32,
+          "description_ru": "Ранг низкоранговой параметризации шага Δt в SSM (dt_rank; обычно ceil(d_model/16))"
+        },
+        {
+          "key": "qwen35.ssm.inner_size",
+          "value": 4096,
+          "description_ru": "Внутренняя размерность SSM-блока (d_inner; обычно 2·embedding_length)"
+        },
+        {
+          "key": "qwen35.full_attention_interval",
+          "value": 4,
+          "description_ru": "Интервал full-attention слоёв в гибридной SSM/Attn архитектуре (Qwen3-Next/3.5): full-attn только на каждом N-м слое (обычно 4), остальные — SSM"
+        },
+        {
+          "key": "qwen35.rope.dimension_count",
+          "value": 64,
+          "description_ru": "Число измерений head_dim, на которые применяется RoPE (обычно равно key_length)"
+        },
+        {
+          "key": "tokenizer.ggml.model",
+          "value": "gpt2",
+          "description_ru": "Тип токенизатора: \"gpt2\" (BPE), \"llama\" (SentencePiece), \"bert\" (WordPiece), \"no_vocab\" и т.д."
+        },
+        {
+          "key": "tokenizer.ggml.pre",
+          "value": "qwen35",
+          "description_ru": "Имя pre-tokenizer'а для BPE-моделей (\"llama-bpe\", \"qwen2\", \"gemma\" и т.д.) — задаёт regex-разбиение текста перед BPE"
+        },
+        {
+          "key": "tokenizer.ggml.tokens",
+          "value": "\u003carray len=248320 type=String\u003e",
+          "description_ru": "Массив всех токенов словаря (строки)"
+        },
+        {
+          "key": "tokenizer.ggml.token_type",
+          "value": "\u003carray len=248320 type=Int32\u003e",
+          "description_ru": "Массив типов токенов (1=normal, 2=unknown, 3=control, 4=user-defined, 5=unused, 6=byte)"
+        },
+        {
+          "key": "tokenizer.ggml.merges",
+          "value": "\u003carray len=247587 type=String\u003e",
+          "description_ru": "Массив BPE-merge правил (\"a b\" → \"ab\") для BPE-токенизаторов"
+        },
+        {
+          "key": "tokenizer.ggml.eos_token_id",
+          "value": 248046,
+          "description_ru": "ID токена конца последовательности (EOS)"
+        },
+        {
+          "key": "tokenizer.ggml.padding_token_id",
+          "value": 248044,
+          "description_ru": "ID padding-токена"
+        },
+        {
+          "key": "tokenizer.chat_template",
+          "value": "{%- set image_count = namespace(value=0) %}\n{%- set video_count = namespace(value=0) %}\n{%- macro render_content(content, do_vision_count, is_system_content=false) %}\n    {%- if content is string %}\n        {{- content }}\n    {%- elif content is iterable and content is not mapping %}\n        {%- for item in content %}\n            {%- if 'image' in item or 'image_url' in item or item.type == 'image' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain images.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set image_count.value = image_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Picture ' ~ image_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|image_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'video' in item or item.type == 'video' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain videos.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set video_count.value = video_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Video ' ~ video_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|video_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'text' in item %}\n                {{- item.text }}\n            {%- else %}\n                {{- raise_exception('Unexpected item type in content.') }}\n            {%- endif %}\n        {%- endfor %}\n    {%- elif content is none or content is undefined %}\n        {{- '' }}\n    {%- else %}\n        {{- raise_exception('Unexpected content type.') }}\n    {%- endif %}\n{%- endmacro %}\n{%- if not messages %}\n    {{- raise_exception('No messages provided.') }}\n{%- endif %}\n{%- if tools and tools is iterable and tools is not mapping %}\n    {{- '\u003c|im_start|\u003esystem\\n' }}\n    {{- \"# Tools\\n\\nYou have access to the following functions:\\n\\n\u003ctools\u003e\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n\u003c/tools\u003e\" }}\n    {{- '\\n\\nIf you choose to call a function ONLY reply in the following format with NO suffix:\\n\\n\u003ctool_call\u003e\\n\u003cfunction=example_function_name\u003e\\n\u003cparameter=example_parameter_1\u003e\\nvalue_1\\n\u003c/parameter\u003e\\n\u003cparameter=example_parameter_2\u003e\\nThis is the value for the second parameter\\nthat can span\\nmultiple lines\\n\u003c/parameter\u003e\\n\u003c/function\u003e\\n\u003c/tool_call\u003e\\n\\n\u003cIMPORTANT\u003e\\nReminder:\\n- Function calls MUST follow the specified format: an inner \u003cfunction=...\u003e\u003c/function\u003e block must be nested within \u003ctool_call\u003e\u003c/tool_call\u003e XML tags\\n- Required parameters MUST be specified\\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\\n\u003c/IMPORTANT\u003e' }}\n    {%- if messages[0].role == 'system' %}\n        {%- set content = render_content(messages[0].content, false, true)|trim %}\n        {%- if content %}\n            {{- '\\n\\n' + content }}\n        {%- endif %}\n    {%- endif %}\n    {{- '\u003c|im_end|\u003e\\n' }}\n{%- else %}\n    {%- if messages[0].role == 'system' %}\n        {%- set content = render_content(messages[0].content, false, true)|trim %}\n        {{- '\u003c|im_start|\u003esystem\\n' + content + '\u003c|im_end|\u003e\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for message in messages[::-1] %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- if ns.multi_step_tool and message.role == \"user\" %}\n        {%- set content = render_content(message.content, false)|trim %}\n        {%- if not(content.startswith('\u003ctool_response\u003e') and content.endswith('\u003c/tool_response\u003e')) %}\n            {%- set ns.multi_step_tool = false %}\n            {%- set ns.last_query_index = index %}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if ns.multi_step_tool %}\n    {{- raise_exception('No user query found in messages.') }}\n{%- endif %}\n{%- for message in messages %}\n    {%- set content = render_content(message.content, true)|trim %}\n    {%- if message.role == \"system\" %}\n        {%- if not loop.first %}\n            {{- raise_exception('System message must be at the beginning.') }}\n        {%- endif %}\n    {%- elif message.role == \"user\" %}\n        {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content + '\u003c|im_end|\u003e' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is string %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '\u003c/think\u003e' in content %}\n                {%- set reasoning_content = content.split('\u003c/think\u003e')[0].rstrip('\\n').split('\u003cthink\u003e')[-1].lstrip('\\n') %}\n                {%- set content = content.split('\u003c/think\u003e')[-1].lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n        {%- set reasoning_content = reasoning_content|trim %}\n        {%- if loop.index0 \u003e ns.last_query_index %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n\u003cthink\u003e\\n' + reasoning_content + '\\n\u003c/think\u003e\\n\\n' + content }}\n        {%- else %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls and message.tool_calls is iterable and message.tool_calls is not mapping %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if tool_call.function is defined %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {%- if loop.first %}\n                    {%- if content|trim %}\n                        {{- '\\n\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- else %}\n                        {{- '\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- endif %}\n                {%- else %}\n                    {{- '\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                {%- endif %}\n                {%- if tool_call.arguments is defined %}\n                    {%- for args_name, args_value in tool_call.arguments|items %}\n                        {{- '\u003cparameter=' + args_name + '\u003e\\n' }}\n                        {%- set args_value = args_value | tojson | safe if args_value is mapping or (args_value is sequence and args_value is not string) else args_value | string %}\n                        {{- args_value }}\n                        {{- '\\n\u003c/parameter\u003e\\n' }}\n                    {%- endfor %}\n                {%- endif %}\n                {{- '\u003c/function\u003e\\n\u003c/tool_call\u003e' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '\u003c|im_end|\u003e\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.previtem and loop.previtem.role != \"tool\" %}\n            {{- '\u003c|im_start|\u003euser' }}\n        {%- endif %}\n        {{- '\\n\u003ctool_response\u003e\\n' }}\n        {{- content }}\n        {{- '\\n\u003c/tool_response\u003e' }}\n        {%- if not loop.last and loop.nextitem.role != \"tool\" %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- elif loop.last %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- endif %}\n    {%- else %}\n        {{- raise_exception('Unexpected message role.') }}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '\u003c|im_start|\u003eassistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '\u003cthink\u003e\\n\\n\u003c/think\u003e\\n\\n' }}\n    {%- else %}\n        {{- '\u003cthink\u003e\\n' }}\n    {%- endif %}\n{%- endif %}",
+          "description_ru": "Jinja-шаблон чат-промпта (форматирование ролей user/assistant/system)"
+        },
+        {
+          "key": "general.quantization_version",
+          "value": 2,
+          "description_ru": "Версия формата квантизации GGUF (текущая — 2)"
+        },
+        {
+          "key": "general.file_type",
+          "value": "18 (Q6_K)",
+          "description_ru": "Числовой код общей квантизации файла (enum LLAMA_FTYPE_*: 0=F32, 1=F16, 2=Q4_0, 7=Q8_0, 15=Q4_K_M, 18=Q6_K и т.д.)"
+        }
+      ]
+    },
+    {
+      "name": "gemma-4-E4B-it-Q6_K",
+      "model_path": "D:/progs/lmstudio/models/lmstudio-community/gemma-4-E4B-it-GGUF/gemma-4-E4B-it-Q6_K.gguf",
+      "mmproj_path": "D:/progs/lmstudio/models/lmstudio-community/gemma-4-E4B-it-GGUF/mmproj-gemma-4-E4B-it-BF16.gguf",
+      "mmproj_on": true,
+      "size": 6217260864,
+      "last_scan": "2026-05-11T15:30:52Z",
+      "flags": {},
       "params": [
         {
           "key": "general.architecture",
@@ -44,7 +1449,7 @@
         },
         {
           "key": "general.name",
-          "value": "Gemma 4 E4B It Ultra Uncensored Heretic",
+          "value": "Gemma 4 E4B",
           "description_ru": "Человекочитаемое имя модели"
         },
         {
@@ -273,17 +1678,871 @@
       ]
     },
     {
-      "name": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M",
-      "model_path": "/home/kiper/src/go_llama_server_loader/models/HauhauCS/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
-      "mmproj_path": "/home/kiper/src/go_llama_server_loader/models/HauhauCS/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive/mmproj-Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-BF16.gguf",
+      "name": "Qwen3.6-35B-A3B-Kimi-K2.6-Reasoning-Distilled.IQ4_XS",
+      "model_path": "D:/progs/lmstudio/models/lordx64/Qwen3.6-35B-A3B-Kimi-K2.6-Reasoning-Distilled-GGUF/Qwen3.6-35B-A3B-Kimi-K2.6-Reasoning-Distilled.IQ4_XS.gguf",
+      "mmproj_on": false,
+      "size": 18939312928,
+      "last_scan": "2026-05-11T15:30:52Z",
+      "flags": {},
+      "params": [
+        {
+          "key": "general.architecture",
+          "value": "qwen35moe",
+          "description_ru": "Идентификатор архитектуры (llama, qwen3, gemma3, gemma4, qwen35 и т.п.) — определяет LLM_ARCH в llama.cpp"
+        },
+        {
+          "key": "general.type",
+          "value": "model",
+          "description_ru": "Тип артефакта: \"model\", \"adapter\" (LoRA) и т.п."
+        },
+        {
+          "key": "general.name",
+          "value": "Model",
+          "description_ru": "Человекочитаемое имя модели"
+        },
+        {
+          "key": "general.size_label",
+          "value": "256x2.6B",
+          "description_ru": "Метка размера модели (\"4B\", \"9B\", \"70B\"), используется в имени файла"
+        },
+        {
+          "key": "general.license",
+          "value": "apache-2.0",
+          "description_ru": "Лицензия модели"
+        },
+        {
+          "key": "general.base_model.count",
+          "value": 1,
+          "description_ru": ""
+        },
+        {
+          "key": "general.base_model.0.name",
+          "value": "Qwen3.6 35B A3B",
+          "description_ru": ""
+        },
+        {
+          "key": "general.base_model.0.organization",
+          "value": "Qwen",
+          "description_ru": ""
+        },
+        {
+          "key": "general.base_model.0.repo_url",
+          "value": "https://huggingface.co/Qwen/Qwen3.6-35B-A3B",
+          "description_ru": ""
+        },
+        {
+          "key": "general.dataset.count",
+          "value": 1,
+          "description_ru": ""
+        },
+        {
+          "key": "general.dataset.0.name",
+          "value": "Reasoning Distill Kimi K2 6 Max Sft",
+          "description_ru": ""
+        },
+        {
+          "key": "general.dataset.0.organization",
+          "value": "Lordx64",
+          "description_ru": ""
+        },
+        {
+          "key": "general.dataset.0.repo_url",
+          "value": "https://huggingface.co/lordx64/reasoning-distill-kimi-k2-6-max-sft",
+          "description_ru": ""
+        },
+        {
+          "key": "general.tags",
+          "value": [
+            "text-generation",
+            "reasoning",
+            "distillation",
+            "chain-of-thought",
+            "qwen",
+            "qwen3.6",
+            "kimi",
+            "kimi-k2",
+            "mixture-of-experts",
+            "moe",
+            "lora",
+            "unsloth",
+            "text-generation"
+          ],
+          "description_ru": "Теги модели"
+        },
+        {
+          "key": "general.languages",
+          "value": [
+            "en"
+          ],
+          "description_ru": "Поддерживаемые языки"
+        },
+        {
+          "key": "qwen35moe.block_count",
+          "value": 40,
+          "description_ru": "Количество трансформерных блоков (слоёв)"
+        },
+        {
+          "key": "qwen35moe.context_length",
+          "value": 262144,
+          "description_ru": "Максимальная длина контекста в токенах, на которую модель обучена (training-time, без YARN/rope-scaling)"
+        },
+        {
+          "key": "qwen35moe.embedding_length",
+          "value": 2048,
+          "description_ru": "Размерность скрытого состояния (hidden size, d_model)"
+        },
+        {
+          "key": "qwen35moe.attention.head_count",
+          "value": 16,
+          "description_ru": "Число голов внимания (Q)"
+        },
+        {
+          "key": "qwen35moe.attention.head_count_kv",
+          "value": 2,
+          "description_ru": "Число KV-голов (для GQA/MQA; равно head_count при обычном MHA)"
+        },
+        {
+          "key": "qwen35moe.rope.dimension_sections",
+          "value": [
+            11,
+            11,
+            10,
+            0
+          ],
+          "description_ru": "Разбиение RoPE-измерений на секции для multi-axis M-RoPE (Qwen3-VL/3.5: длины секций time/height/width)"
+        },
+        {
+          "key": "qwen35moe.rope.freq_base",
+          "value": 10000000,
+          "description_ru": "Базовая частота θ для RoPE (обычно 10000; 1e6 у global-слоёв Gemma 3+ и моделей с расширенным контекстом)"
+        },
+        {
+          "key": "qwen35moe.attention.layer_norm_rms_epsilon",
+          "value": 0.000001,
+          "description_ru": "Epsilon в RMSNorm перед attention/FFN (типично 1e-5…1e-6)"
+        },
+        {
+          "key": "qwen35moe.expert_count",
+          "value": 256,
+          "description_ru": "Количество MoE-экспертов"
+        },
+        {
+          "key": "qwen35moe.expert_used_count",
+          "value": 8,
+          "description_ru": "Сколько экспертов активируется на токен (top-k)"
+        },
+        {
+          "key": "qwen35moe.attention.key_length",
+          "value": 256,
+          "description_ru": "Размерность одной K-головы (head_dim для ключей) в обычных (global/full) слоях"
+        },
+        {
+          "key": "qwen35moe.attention.value_length",
+          "value": 256,
+          "description_ru": "Размерность одной V-головы в обычных (global/full) слоях"
+        },
+        {
+          "key": "qwen35moe.expert_feed_forward_length",
+          "value": 512,
+          "description_ru": "FFN intermediate size для экспертов MoE"
+        },
+        {
+          "key": "qwen35moe.expert_shared_feed_forward_length",
+          "value": 512,
+          "description_ru": "FFN intermediate size для shared-эксперта"
+        },
+        {
+          "key": "qwen35moe.ssm.conv_kernel",
+          "value": 4,
+          "description_ru": "Размер 1D-свёрточного ядра в SSM-блоке (Mamba-2; типично 4)"
+        },
+        {
+          "key": "qwen35moe.ssm.state_size",
+          "value": 128,
+          "description_ru": "Размер скрытого состояния SSM (d_state; типично 64/128/256)"
+        },
+        {
+          "key": "qwen35moe.ssm.group_count",
+          "value": 16,
+          "description_ru": "Число групп в multi-group SSM (аналог GQA для state-space; разделяет B/C-проекции между головами)"
+        },
+        {
+          "key": "qwen35moe.ssm.time_step_rank",
+          "value": 32,
+          "description_ru": "Ранг низкоранговой параметризации шага Δt в SSM (dt_rank; обычно ceil(d_model/16))"
+        },
+        {
+          "key": "qwen35moe.ssm.inner_size",
+          "value": 4096,
+          "description_ru": "Внутренняя размерность SSM-блока (d_inner; обычно 2·embedding_length)"
+        },
+        {
+          "key": "qwen35moe.full_attention_interval",
+          "value": 4,
+          "description_ru": "Интервал full-attention слоёв в гибридной SSM/Attn архитектуре (Qwen3-Next/3.5): full-attn только на каждом N-м слое (обычно 4), остальные — SSM"
+        },
+        {
+          "key": "qwen35moe.rope.dimension_count",
+          "value": 64,
+          "description_ru": "Число измерений head_dim, на которые применяется RoPE (обычно равно key_length)"
+        },
+        {
+          "key": "tokenizer.ggml.model",
+          "value": "gpt2",
+          "description_ru": "Тип токенизатора: \"gpt2\" (BPE), \"llama\" (SentencePiece), \"bert\" (WordPiece), \"no_vocab\" и т.д."
+        },
+        {
+          "key": "tokenizer.ggml.pre",
+          "value": "qwen35",
+          "description_ru": "Имя pre-tokenizer'а для BPE-моделей (\"llama-bpe\", \"qwen2\", \"gemma\" и т.д.) — задаёт regex-разбиение текста перед BPE"
+        },
+        {
+          "key": "tokenizer.ggml.tokens",
+          "value": "\u003carray len=248320 type=String\u003e",
+          "description_ru": "Массив всех токенов словаря (строки)"
+        },
+        {
+          "key": "tokenizer.ggml.token_type",
+          "value": "\u003carray len=248320 type=Int32\u003e",
+          "description_ru": "Массив типов токенов (1=normal, 2=unknown, 3=control, 4=user-defined, 5=unused, 6=byte)"
+        },
+        {
+          "key": "tokenizer.ggml.merges",
+          "value": "\u003carray len=247587 type=String\u003e",
+          "description_ru": "Массив BPE-merge правил (\"a b\" → \"ab\") для BPE-токенизаторов"
+        },
+        {
+          "key": "tokenizer.ggml.eos_token_id",
+          "value": 248046,
+          "description_ru": "ID токена конца последовательности (EOS)"
+        },
+        {
+          "key": "tokenizer.ggml.padding_token_id",
+          "value": 248055,
+          "description_ru": "ID padding-токена"
+        },
+        {
+          "key": "tokenizer.ggml.bos_token_id",
+          "value": 248044,
+          "description_ru": "ID токена начала последовательности (BOS)"
+        },
+        {
+          "key": "tokenizer.chat_template",
+          "value": "{%- set image_count = namespace(value=0) %}\n{%- set video_count = namespace(value=0) %}\n{%- macro render_content(content, do_vision_count, is_system_content=false) %}\n    {%- if content is string %}\n        {{- content }}\n    {%- elif content is iterable and content is not mapping %}\n        {%- for item in content %}\n            {%- if 'image' in item or 'image_url' in item or item.type == 'image' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain images.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set image_count.value = image_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Picture ' ~ image_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|image_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'video' in item or item.type == 'video' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain videos.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set video_count.value = video_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Video ' ~ video_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|video_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'text' in item %}\n                {{- item.text }}\n            {%- else %}\n                {{- raise_exception('Unexpected item type in content.') }}\n            {%- endif %}\n        {%- endfor %}\n    {%- elif content is none or content is undefined %}\n        {{- '' }}\n    {%- else %}\n        {{- raise_exception('Unexpected content type.') }}\n    {%- endif %}\n{%- endmacro %}\n{%- if not messages %}\n    {{- raise_exception('No messages provided.') }}\n{%- endif %}\n{%- set num_sys = 0 %}\n{%- set merged_system = '' %}\n{%- if messages[0].role == 'system' or messages[0].role == 'developer' %}\n    {%- set first = render_content(messages[0].content, false, true)|trim %}\n    {%- if messages|length \u003e 1 and (messages[1].role == 'system' or messages[1].role == 'developer') %}\n        {%- set second = render_content(messages[1].content, false, true)|trim %}\n        {%- set merged_system = first + '\\n' + second %}\n        {%- set num_sys = 2 %}\n    {%- else %}\n        {%- set merged_system = first %}\n        {%- set num_sys = 1 %}\n    {%- endif %}\n{%- endif %}\n{%- if tools and tools is iterable and tools is not mapping %}\n    {{- '\u003c|im_start|\u003esystem\\n' }}\n    {{- \"# Tools\\n\\nYou have access to the following functions:\\n\\n\u003ctools\u003e\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n\u003c/tools\u003e\" }}\n    {{- '\\n\\nIf you choose to call a function ONLY reply in the following format with NO suffix:\\n\\n\u003ctool_call\u003e\\n\u003cfunction=example_function_name\u003e\\n\u003cparameter=example_parameter_1\u003e\\nvalue_1\\n\u003c/parameter\u003e\\n\u003cparameter=example_parameter_2\u003e\\nThis is the value for the second parameter\\nthat can span\\nmultiple lines\\n\u003c/parameter\u003e\\n\u003c/function\u003e\\n\u003c/tool_call\u003e\\n\\n\u003cIMPORTANT\u003e\\nReminder:\\n- Function calls MUST follow the specified format: an inner \u003cfunction=...\u003e\u003c/function\u003e block must be nested within \u003ctool_call\u003e\u003c/tool_call\u003e XML tags\\n- Required parameters MUST be specified\\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\\n\u003c/IMPORTANT\u003e' }}\n    {%- if merged_system %}\n        {{- '\\n\\n' + merged_system }}\n    {%- endif %}\n    {{- '\u003c|im_end|\u003e\\n' }}\n{%- else %}\n    {%- if merged_system %}\n        {{- '\u003c|im_start|\u003esystem\\n' + merged_system + '\u003c|im_end|\u003e\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for message in messages[::-1] %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- if ns.multi_step_tool and message.role == \"user\" %}\n        {%- set content = render_content(message.content, false)|trim %}\n        {%- if not(content.startswith('\u003ctool_response\u003e') and content.endswith('\u003c/tool_response\u003e')) %}\n            {%- set ns.multi_step_tool = false %}\n            {%- set ns.last_query_index = index %}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- for message in messages %}\n    {%- if loop.index0 \u003e= num_sys and message.role != \"system\" and message.role != \"developer\" %}\n    {%- set content = render_content(message.content, true)|trim %}\n    {%- if message.role == \"user\" %}\n        {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content + '\u003c|im_end|\u003e' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is string %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '\u003c/think\u003e' in content %}\n                {%- set reasoning_content = content.split('\u003c/think\u003e')[0].rstrip('\\n').split('\u003cthink\u003e')[-1].lstrip('\\n') %}\n                {%- set content = content.split('\u003c/think\u003e')[-1].lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n        {%- set reasoning_content = reasoning_content|trim %}\n        {%- if (preserve_thinking is defined and preserve_thinking is true) or (loop.index0 \u003e ns.last_query_index) %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n\u003cthink\u003e\\n' + reasoning_content + '\\n\u003c/think\u003e\\n\\n' + content }}\n        {%- else %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls and message.tool_calls is iterable and message.tool_calls is not mapping %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if tool_call.function is defined %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {%- if loop.first %}\n                    {%- if content|trim %}\n                        {{- '\\n\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- else %}\n                        {{- '\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- endif %}\n                {%- else %}\n                    {{- '\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                {%- endif %}\n                {%- if tool_call.arguments is mapping %}\n                    {%- for args_name in tool_call.arguments %}\n                        {%- set args_value = tool_call.arguments[args_name] %}\n                        {{- '\u003cparameter=' + args_name + '\u003e\\n' }}\n                        {%- set args_value = args_value | tojson | safe if args_value is mapping or (args_value is sequence and args_value is not string) else args_value | string %}\n                        {{- args_value }}\n                        {{- '\\n\u003c/parameter\u003e\\n' }}\n                    {%- endfor %}\n                {%- endif %}\n                {{- '\u003c/function\u003e\\n\u003c/tool_call\u003e' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '\u003c|im_end|\u003e\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.previtem and loop.previtem.role != \"tool\" %}\n            {{- '\u003c|im_start|\u003euser' }}\n        {%- endif %}\n        {{- '\\n\u003ctool_response\u003e\\n' }}\n        {{- content }}\n        {{- '\\n\u003c/tool_response\u003e' }}\n        {%- if not loop.last and loop.nextitem.role != \"tool\" %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- elif loop.last %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- endif %}\n    {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '\u003c|im_start|\u003eassistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '\u003cthink\u003e\\n\\n\u003c/think\u003e\\n\\n' }}\n    {%- else %}\n        {{- '\u003cthink\u003e\\n' }}\n    {%- endif %}\n{%- endif %}\n{#- Unsloth fixes - developer role, tool calling #}",
+          "description_ru": "Jinja-шаблон чат-промпта (форматирование ролей user/assistant/system)"
+        },
+        {
+          "key": "general.quantization_version",
+          "value": 2,
+          "description_ru": "Версия формата квантизации GGUF (текущая — 2)"
+        },
+        {
+          "key": "general.file_type",
+          "value": "30 (IQ4_XS)",
+          "description_ru": "Числовой код общей квантизации файла (enum LLAMA_FTYPE_*: 0=F32, 1=F16, 2=Q4_0, 7=Q8_0, 15=Q4_K_M, 18=Q6_K и т.д.)"
+        }
+      ]
+    },
+    {
+      "name": "Qwen3.6-35B-A3B-UD-Q3_K_XL",
+      "model_path": "D:/progs/lmstudio/models/unsloth/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-UD-Q3_K_XL.gguf",
+      "mmproj_path": "D:/progs/lmstudio/models/unsloth/Qwen3.6-35B-A3B-GGUF/mmproj-F32.gguf",
       "mmproj_on": true,
-      "size": 5627044224,
-      "last_scan": "2026-05-11T06:34:05Z",
-      "flags": {
-        "mmproj": "/home/kiper/src/go_llama_server_loader/models/HauhauCS/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive/mmproj-Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-BF16.gguf",
-        "model": "/home/kiper/src/go_llama_server_loader/models/HauhauCS/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf",
-        "no_mmproj_offload": 1
-      },
+      "size": 16845511648,
+      "last_scan": "2026-05-11T15:30:52Z",
+      "flags": {},
+      "params": [
+        {
+          "key": "general.architecture",
+          "value": "qwen35moe",
+          "description_ru": "Идентификатор архитектуры (llama, qwen3, gemma3, gemma4, qwen35 и т.п.) — определяет LLM_ARCH в llama.cpp"
+        },
+        {
+          "key": "general.type",
+          "value": "model",
+          "description_ru": "Тип артефакта: \"model\", \"adapter\" (LoRA) и т.п."
+        },
+        {
+          "key": "general.sampling.top_k",
+          "value": 20,
+          "description_ru": "Рекомендуемый top-k по умолчанию"
+        },
+        {
+          "key": "general.sampling.top_p",
+          "value": 0.95,
+          "description_ru": "Рекомендуемый top-p (nucleus) по умолчанию"
+        },
+        {
+          "key": "general.sampling.temp",
+          "value": 1,
+          "description_ru": "Рекомендуемая авторами модели температура семплирования по умолчанию"
+        },
+        {
+          "key": "general.name",
+          "value": "Qwen3.6-35B-A3B",
+          "description_ru": "Человекочитаемое имя модели"
+        },
+        {
+          "key": "general.basename",
+          "value": "Qwen3.6-35B-A3B",
+          "description_ru": "Базовое имя модели без суффиксов квантизации/размера (например, \"Gemma-4-E4B-it\")"
+        },
+        {
+          "key": "general.quantized_by",
+          "value": "Unsloth",
+          "description_ru": ""
+        },
+        {
+          "key": "general.size_label",
+          "value": "35B-A3B",
+          "description_ru": "Метка размера модели (\"4B\", \"9B\", \"70B\"), используется в имени файла"
+        },
+        {
+          "key": "general.license",
+          "value": "apache-2.0",
+          "description_ru": "Лицензия модели"
+        },
+        {
+          "key": "general.license.link",
+          "value": "https://huggingface.co/Qwen/Qwen3.6-35B-A3B/blob/main/LICENSE",
+          "description_ru": "Ссылка на текст лицензии"
+        },
+        {
+          "key": "general.repo_url",
+          "value": "https://huggingface.co/unsloth",
+          "description_ru": "URL репозитория"
+        },
+        {
+          "key": "general.base_model.count",
+          "value": 1,
+          "description_ru": ""
+        },
+        {
+          "key": "general.base_model.0.name",
+          "value": "Qwen3.6 35B A3B",
+          "description_ru": ""
+        },
+        {
+          "key": "general.base_model.0.organization",
+          "value": "Qwen",
+          "description_ru": ""
+        },
+        {
+          "key": "general.base_model.0.repo_url",
+          "value": "https://huggingface.co/Qwen/Qwen3.6-35B-A3B",
+          "description_ru": ""
+        },
+        {
+          "key": "general.tags",
+          "value": [
+            "qwen3_5_moe",
+            "qwen",
+            "image-text-to-text"
+          ],
+          "description_ru": "Теги модели"
+        },
+        {
+          "key": "qwen35moe.block_count",
+          "value": 40,
+          "description_ru": "Количество трансформерных блоков (слоёв)"
+        },
+        {
+          "key": "qwen35moe.context_length",
+          "value": 262144,
+          "description_ru": "Максимальная длина контекста в токенах, на которую модель обучена (training-time, без YARN/rope-scaling)"
+        },
+        {
+          "key": "qwen35moe.embedding_length",
+          "value": 2048,
+          "description_ru": "Размерность скрытого состояния (hidden size, d_model)"
+        },
+        {
+          "key": "qwen35moe.attention.head_count",
+          "value": 16,
+          "description_ru": "Число голов внимания (Q)"
+        },
+        {
+          "key": "qwen35moe.attention.head_count_kv",
+          "value": 2,
+          "description_ru": "Число KV-голов (для GQA/MQA; равно head_count при обычном MHA)"
+        },
+        {
+          "key": "qwen35moe.rope.dimension_sections",
+          "value": [
+            11,
+            11,
+            10,
+            0
+          ],
+          "description_ru": "Разбиение RoPE-измерений на секции для multi-axis M-RoPE (Qwen3-VL/3.5: длины секций time/height/width)"
+        },
+        {
+          "key": "qwen35moe.rope.freq_base",
+          "value": 10000000,
+          "description_ru": "Базовая частота θ для RoPE (обычно 10000; 1e6 у global-слоёв Gemma 3+ и моделей с расширенным контекстом)"
+        },
+        {
+          "key": "qwen35moe.attention.layer_norm_rms_epsilon",
+          "value": 0.000001,
+          "description_ru": "Epsilon в RMSNorm перед attention/FFN (типично 1e-5…1e-6)"
+        },
+        {
+          "key": "qwen35moe.expert_count",
+          "value": 256,
+          "description_ru": "Количество MoE-экспертов"
+        },
+        {
+          "key": "qwen35moe.expert_used_count",
+          "value": 8,
+          "description_ru": "Сколько экспертов активируется на токен (top-k)"
+        },
+        {
+          "key": "qwen35moe.attention.key_length",
+          "value": 256,
+          "description_ru": "Размерность одной K-головы (head_dim для ключей) в обычных (global/full) слоях"
+        },
+        {
+          "key": "qwen35moe.attention.value_length",
+          "value": 256,
+          "description_ru": "Размерность одной V-головы в обычных (global/full) слоях"
+        },
+        {
+          "key": "qwen35moe.expert_feed_forward_length",
+          "value": 512,
+          "description_ru": "FFN intermediate size для экспертов MoE"
+        },
+        {
+          "key": "qwen35moe.expert_shared_feed_forward_length",
+          "value": 512,
+          "description_ru": "FFN intermediate size для shared-эксперта"
+        },
+        {
+          "key": "qwen35moe.ssm.conv_kernel",
+          "value": 4,
+          "description_ru": "Размер 1D-свёрточного ядра в SSM-блоке (Mamba-2; типично 4)"
+        },
+        {
+          "key": "qwen35moe.ssm.state_size",
+          "value": 128,
+          "description_ru": "Размер скрытого состояния SSM (d_state; типично 64/128/256)"
+        },
+        {
+          "key": "qwen35moe.ssm.group_count",
+          "value": 16,
+          "description_ru": "Число групп в multi-group SSM (аналог GQA для state-space; разделяет B/C-проекции между головами)"
+        },
+        {
+          "key": "qwen35moe.ssm.time_step_rank",
+          "value": 32,
+          "description_ru": "Ранг низкоранговой параметризации шага Δt в SSM (dt_rank; обычно ceil(d_model/16))"
+        },
+        {
+          "key": "qwen35moe.ssm.inner_size",
+          "value": 4096,
+          "description_ru": "Внутренняя размерность SSM-блока (d_inner; обычно 2·embedding_length)"
+        },
+        {
+          "key": "qwen35moe.full_attention_interval",
+          "value": 4,
+          "description_ru": "Интервал full-attention слоёв в гибридной SSM/Attn архитектуре (Qwen3-Next/3.5): full-attn только на каждом N-м слое (обычно 4), остальные — SSM"
+        },
+        {
+          "key": "qwen35moe.rope.dimension_count",
+          "value": 64,
+          "description_ru": "Число измерений head_dim, на которые применяется RoPE (обычно равно key_length)"
+        },
+        {
+          "key": "tokenizer.ggml.model",
+          "value": "gpt2",
+          "description_ru": "Тип токенизатора: \"gpt2\" (BPE), \"llama\" (SentencePiece), \"bert\" (WordPiece), \"no_vocab\" и т.д."
+        },
+        {
+          "key": "tokenizer.ggml.pre",
+          "value": "qwen35",
+          "description_ru": "Имя pre-tokenizer'а для BPE-моделей (\"llama-bpe\", \"qwen2\", \"gemma\" и т.д.) — задаёт regex-разбиение текста перед BPE"
+        },
+        {
+          "key": "tokenizer.ggml.tokens",
+          "value": "\u003carray len=248320 type=String\u003e",
+          "description_ru": "Массив всех токенов словаря (строки)"
+        },
+        {
+          "key": "tokenizer.ggml.token_type",
+          "value": "\u003carray len=248320 type=Int32\u003e",
+          "description_ru": "Массив типов токенов (1=normal, 2=unknown, 3=control, 4=user-defined, 5=unused, 6=byte)"
+        },
+        {
+          "key": "tokenizer.ggml.merges",
+          "value": "\u003carray len=247587 type=String\u003e",
+          "description_ru": "Массив BPE-merge правил (\"a b\" → \"ab\") для BPE-токенизаторов"
+        },
+        {
+          "key": "tokenizer.ggml.eos_token_id",
+          "value": 248046,
+          "description_ru": "ID токена конца последовательности (EOS)"
+        },
+        {
+          "key": "tokenizer.ggml.padding_token_id",
+          "value": 248055,
+          "description_ru": "ID padding-токена"
+        },
+        {
+          "key": "tokenizer.ggml.bos_token_id",
+          "value": 248044,
+          "description_ru": "ID токена начала последовательности (BOS)"
+        },
+        {
+          "key": "tokenizer.ggml.add_bos_token",
+          "value": false,
+          "description_ru": "Добавлять ли BOS автоматически при токенизации"
+        },
+        {
+          "key": "tokenizer.chat_template",
+          "value": "{%- set image_count = namespace(value=0) %}\n{%- set video_count = namespace(value=0) %}\n{%- macro render_content(content, do_vision_count, is_system_content=false) %}\n    {%- if content is string %}\n        {{- content }}\n    {%- elif content is iterable and content is not mapping %}\n        {%- for item in content %}\n            {%- if 'image' in item or 'image_url' in item or item.type == 'image' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain images.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set image_count.value = image_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Picture ' ~ image_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|image_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'video' in item or item.type == 'video' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain videos.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set video_count.value = video_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Video ' ~ video_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|video_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'text' in item %}\n                {{- item.text }}\n            {%- else %}\n                {{- raise_exception('Unexpected item type in content.') }}\n            {%- endif %}\n        {%- endfor %}\n    {%- elif content is none or content is undefined %}\n        {{- '' }}\n    {%- else %}\n        {{- raise_exception('Unexpected content type.') }}\n    {%- endif %}\n{%- endmacro %}\n{%- if not messages %}\n    {{- raise_exception('No messages provided.') }}\n{%- endif %}\n{%- set num_sys = 0 %}\n{%- set merged_system = '' %}\n{%- if messages[0].role == 'system' or messages[0].role == 'developer' %}\n    {%- set first = render_content(messages[0].content, false, true)|trim %}\n    {%- if messages|length \u003e 1 and (messages[1].role == 'system' or messages[1].role == 'developer') %}\n        {%- set second = render_content(messages[1].content, false, true)|trim %}\n        {%- set merged_system = first + '\\n' + second %}\n        {%- set num_sys = 2 %}\n    {%- else %}\n        {%- set merged_system = first %}\n        {%- set num_sys = 1 %}\n    {%- endif %}\n{%- endif %}\n{%- if tools and tools is iterable and tools is not mapping %}\n    {{- '\u003c|im_start|\u003esystem\\n' }}\n    {{- \"# Tools\\n\\nYou have access to the following functions:\\n\\n\u003ctools\u003e\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n\u003c/tools\u003e\" }}\n    {{- '\\n\\nIf you choose to call a function ONLY reply in the following format with NO suffix:\\n\\n\u003ctool_call\u003e\\n\u003cfunction=example_function_name\u003e\\n\u003cparameter=example_parameter_1\u003e\\nvalue_1\\n\u003c/parameter\u003e\\n\u003cparameter=example_parameter_2\u003e\\nThis is the value for the second parameter\\nthat can span\\nmultiple lines\\n\u003c/parameter\u003e\\n\u003c/function\u003e\\n\u003c/tool_call\u003e\\n\\n\u003cIMPORTANT\u003e\\nReminder:\\n- Function calls MUST follow the specified format: an inner \u003cfunction=...\u003e\u003c/function\u003e block must be nested within \u003ctool_call\u003e\u003c/tool_call\u003e XML tags\\n- Required parameters MUST be specified\\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\\n\u003c/IMPORTANT\u003e' }}\n    {%- if merged_system %}\n        {{- '\\n\\n' + merged_system }}\n    {%- endif %}\n    {{- '\u003c|im_end|\u003e\\n' }}\n{%- else %}\n    {%- if merged_system %}\n        {{- '\u003c|im_start|\u003esystem\\n' + merged_system + '\u003c|im_end|\u003e\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for message in messages[::-1] %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- if ns.multi_step_tool and message.role == \"user\" %}\n        {%- set content = render_content(message.content, false)|trim %}\n        {%- if not(content.startswith('\u003ctool_response\u003e') and content.endswith('\u003c/tool_response\u003e')) %}\n            {%- set ns.multi_step_tool = false %}\n            {%- set ns.last_query_index = index %}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- for message in messages %}\n    {%- if loop.index0 \u003e= num_sys and message.role != \"system\" and message.role != \"developer\" %}\n    {%- set content = render_content(message.content, true)|trim %}\n    {%- if message.role == \"user\" %}\n        {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content + '\u003c|im_end|\u003e' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is string %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '\u003c/think\u003e' in content %}\n                {%- set reasoning_content = content.split('\u003c/think\u003e')[0].rstrip('\\n').split('\u003cthink\u003e')[-1].lstrip('\\n') %}\n                {%- set content = content.split('\u003c/think\u003e')[-1].lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n        {%- set reasoning_content = reasoning_content|trim %}\n        {%- if (preserve_thinking is defined and preserve_thinking is true) or (loop.index0 \u003e ns.last_query_index) %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n\u003cthink\u003e\\n' + reasoning_content + '\\n\u003c/think\u003e\\n\\n' + content }}\n        {%- else %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls and message.tool_calls is iterable and message.tool_calls is not mapping %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if tool_call.function is defined %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {%- if loop.first %}\n                    {%- if content|trim %}\n                        {{- '\\n\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- else %}\n                        {{- '\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- endif %}\n                {%- else %}\n                    {{- '\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                {%- endif %}\n                {%- if tool_call.arguments is mapping %}\n                    {%- for args_name in tool_call.arguments %}\n                        {%- set args_value = tool_call.arguments[args_name] %}\n                        {{- '\u003cparameter=' + args_name + '\u003e\\n' }}\n                        {%- set args_value = args_value | tojson | safe if args_value is mapping or (args_value is sequence and args_value is not string) else args_value | string %}\n                        {{- args_value }}\n                        {{- '\\n\u003c/parameter\u003e\\n' }}\n                    {%- endfor %}\n                {%- endif %}\n                {{- '\u003c/function\u003e\\n\u003c/tool_call\u003e' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '\u003c|im_end|\u003e\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.previtem and loop.previtem.role != \"tool\" %}\n            {{- '\u003c|im_start|\u003euser' }}\n        {%- endif %}\n        {{- '\\n\u003ctool_response\u003e\\n' }}\n        {{- content }}\n        {{- '\\n\u003c/tool_response\u003e' }}\n        {%- if not loop.last and loop.nextitem.role != \"tool\" %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- elif loop.last %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- endif %}\n    {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '\u003c|im_start|\u003eassistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '\u003cthink\u003e\\n\\n\u003c/think\u003e\\n\\n' }}\n    {%- else %}\n        {{- '\u003cthink\u003e\\n' }}\n    {%- endif %}\n{%- endif %}\n{#- Unsloth fixes - developer role, tool calling #}",
+          "description_ru": "Jinja-шаблон чат-промпта (форматирование ролей user/assistant/system)"
+        },
+        {
+          "key": "general.quantization_version",
+          "value": 2,
+          "description_ru": "Версия формата квантизации GGUF (текущая — 2)"
+        },
+        {
+          "key": "general.file_type",
+          "value": "12 (Q3_K_S)",
+          "description_ru": "Числовой код общей квантизации файла (enum LLAMA_FTYPE_*: 0=F32, 1=F16, 2=Q4_0, 7=Q8_0, 15=Q4_K_M, 18=Q6_K и т.д.)"
+        },
+        {
+          "key": "quantize.imatrix.file",
+          "value": "Qwen3.6-35B-A3B-GGUF/imatrix_unsloth.gguf",
+          "description_ru": "Файл importance-matrix, использованный при квантизации"
+        },
+        {
+          "key": "quantize.imatrix.dataset",
+          "value": "unsloth_calibration_Qwen3.6-35B-A3B.txt",
+          "description_ru": "Датасет для importance-matrix"
+        },
+        {
+          "key": "quantize.imatrix.entries_count",
+          "value": 510,
+          "description_ru": "Число записей в importance-matrix"
+        },
+        {
+          "key": "quantize.imatrix.chunks_count",
+          "value": 76,
+          "description_ru": "Число чанков в importance-matrix"
+        }
+      ]
+    },
+    {
+      "name": "Huihui-Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated.Q3_K_L",
+      "model_path": "D:/progs/lmstudio/models/mradermacher/Huihui-Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated-GGUF/Huihui-Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated.Q3_K_L.gguf",
+      "mmproj_path": "D:/progs/lmstudio/models/mradermacher/Huihui-Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated-GGUF/Huihui-Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated.mmproj-f16.gguf",
+      "mmproj_on": true,
+      "size": 18115331424,
+      "last_scan": "2026-05-11T15:30:52Z",
+      "flags": {},
+      "params": [
+        {
+          "key": "general.architecture",
+          "value": "qwen35moe",
+          "description_ru": "Идентификатор архитектуры (llama, qwen3, gemma3, gemma4, qwen35 и т.п.) — определяет LLM_ARCH в llama.cpp"
+        },
+        {
+          "key": "general.type",
+          "value": "model",
+          "description_ru": "Тип артефакта: \"model\", \"adapter\" (LoRA) и т.п."
+        },
+        {
+          "key": "general.name",
+          "value": "Huihui Qwen3.6 35B A3B Claude 4.7 Opus Abliterated",
+          "description_ru": "Человекочитаемое имя модели"
+        },
+        {
+          "key": "general.version",
+          "value": "4.7",
+          "description_ru": "Версия модели"
+        },
+        {
+          "key": "general.finetune",
+          "value": "Claude-Opus-abliterated",
+          "description_ru": ""
+        },
+        {
+          "key": "general.basename",
+          "value": "Huihui-Qwen3.6",
+          "description_ru": "Базовое имя модели без суффиксов квантизации/размера (например, \"Gemma-4-E4B-it\")"
+        },
+        {
+          "key": "general.size_label",
+          "value": "35B-A3B",
+          "description_ru": "Метка размера модели (\"4B\", \"9B\", \"70B\"), используется в имени файла"
+        },
+        {
+          "key": "general.license",
+          "value": "apache-2.0",
+          "description_ru": "Лицензия модели"
+        },
+        {
+          "key": "general.base_model.count",
+          "value": 1,
+          "description_ru": ""
+        },
+        {
+          "key": "general.base_model.0.name",
+          "value": "Qwen3.6 35B A3B Claude 4.7 Opus Reasoning Distilled",
+          "description_ru": ""
+        },
+        {
+          "key": "general.base_model.0.version",
+          "value": "4.7",
+          "description_ru": ""
+        },
+        {
+          "key": "general.base_model.0.organization",
+          "value": "Lordx64",
+          "description_ru": ""
+        },
+        {
+          "key": "general.base_model.0.repo_url",
+          "value": "https://huggingface.co/lordx64/Qwen3.6-35B-A3B-Claude-4.7-Opus-Reasoning-Distilled",
+          "description_ru": ""
+        },
+        {
+          "key": "general.tags",
+          "value": [
+            "text-generation",
+            "reasoning",
+            "distillation",
+            "chain-of-thought",
+            "qwen",
+            "qwen3.6",
+            "mixture-of-experts",
+            "moe",
+            "lora",
+            "unsloth",
+            "abliterated",
+            "uncensored",
+            "text-generation"
+          ],
+          "description_ru": "Теги модели"
+        },
+        {
+          "key": "general.languages",
+          "value": [
+            "en"
+          ],
+          "description_ru": "Поддерживаемые языки"
+        },
+        {
+          "key": "qwen35moe.block_count",
+          "value": 40,
+          "description_ru": "Количество трансформерных блоков (слоёв)"
+        },
+        {
+          "key": "qwen35moe.context_length",
+          "value": 262144,
+          "description_ru": "Максимальная длина контекста в токенах, на которую модель обучена (training-time, без YARN/rope-scaling)"
+        },
+        {
+          "key": "qwen35moe.embedding_length",
+          "value": 2048,
+          "description_ru": "Размерность скрытого состояния (hidden size, d_model)"
+        },
+        {
+          "key": "qwen35moe.attention.head_count",
+          "value": 16,
+          "description_ru": "Число голов внимания (Q)"
+        },
+        {
+          "key": "qwen35moe.attention.head_count_kv",
+          "value": 2,
+          "description_ru": "Число KV-голов (для GQA/MQA; равно head_count при обычном MHA)"
+        },
+        {
+          "key": "qwen35moe.rope.dimension_sections",
+          "value": [
+            11,
+            11,
+            10,
+            0
+          ],
+          "description_ru": "Разбиение RoPE-измерений на секции для multi-axis M-RoPE (Qwen3-VL/3.5: длины секций time/height/width)"
+        },
+        {
+          "key": "qwen35moe.rope.freq_base",
+          "value": 10000000,
+          "description_ru": "Базовая частота θ для RoPE (обычно 10000; 1e6 у global-слоёв Gemma 3+ и моделей с расширенным контекстом)"
+        },
+        {
+          "key": "qwen35moe.attention.layer_norm_rms_epsilon",
+          "value": 0.000001,
+          "description_ru": "Epsilon в RMSNorm перед attention/FFN (типично 1e-5…1e-6)"
+        },
+        {
+          "key": "qwen35moe.expert_count",
+          "value": 256,
+          "description_ru": "Количество MoE-экспертов"
+        },
+        {
+          "key": "qwen35moe.expert_used_count",
+          "value": 8,
+          "description_ru": "Сколько экспертов активируется на токен (top-k)"
+        },
+        {
+          "key": "qwen35moe.attention.key_length",
+          "value": 256,
+          "description_ru": "Размерность одной K-головы (head_dim для ключей) в обычных (global/full) слоях"
+        },
+        {
+          "key": "qwen35moe.attention.value_length",
+          "value": 256,
+          "description_ru": "Размерность одной V-головы в обычных (global/full) слоях"
+        },
+        {
+          "key": "qwen35moe.expert_feed_forward_length",
+          "value": 512,
+          "description_ru": "FFN intermediate size для экспертов MoE"
+        },
+        {
+          "key": "qwen35moe.expert_shared_feed_forward_length",
+          "value": 512,
+          "description_ru": "FFN intermediate size для shared-эксперта"
+        },
+        {
+          "key": "qwen35moe.ssm.conv_kernel",
+          "value": 4,
+          "description_ru": "Размер 1D-свёрточного ядра в SSM-блоке (Mamba-2; типично 4)"
+        },
+        {
+          "key": "qwen35moe.ssm.state_size",
+          "value": 128,
+          "description_ru": "Размер скрытого состояния SSM (d_state; типично 64/128/256)"
+        },
+        {
+          "key": "qwen35moe.ssm.group_count",
+          "value": 16,
+          "description_ru": "Число групп в multi-group SSM (аналог GQA для state-space; разделяет B/C-проекции между головами)"
+        },
+        {
+          "key": "qwen35moe.ssm.time_step_rank",
+          "value": 32,
+          "description_ru": "Ранг низкоранговой параметризации шага Δt в SSM (dt_rank; обычно ceil(d_model/16))"
+        },
+        {
+          "key": "qwen35moe.ssm.inner_size",
+          "value": 4096,
+          "description_ru": "Внутренняя размерность SSM-блока (d_inner; обычно 2·embedding_length)"
+        },
+        {
+          "key": "qwen35moe.full_attention_interval",
+          "value": 4,
+          "description_ru": "Интервал full-attention слоёв в гибридной SSM/Attn архитектуре (Qwen3-Next/3.5): full-attn только на каждом N-м слое (обычно 4), остальные — SSM"
+        },
+        {
+          "key": "qwen35moe.rope.dimension_count",
+          "value": 64,
+          "description_ru": "Число измерений head_dim, на которые применяется RoPE (обычно равно key_length)"
+        },
+        {
+          "key": "tokenizer.ggml.model",
+          "value": "gpt2",
+          "description_ru": "Тип токенизатора: \"gpt2\" (BPE), \"llama\" (SentencePiece), \"bert\" (WordPiece), \"no_vocab\" и т.д."
+        },
+        {
+          "key": "tokenizer.ggml.pre",
+          "value": "qwen35",
+          "description_ru": "Имя pre-tokenizer'а для BPE-моделей (\"llama-bpe\", \"qwen2\", \"gemma\" и т.д.) — задаёт regex-разбиение текста перед BPE"
+        },
+        {
+          "key": "tokenizer.ggml.tokens",
+          "value": "\u003carray len=248320 type=String\u003e",
+          "description_ru": "Массив всех токенов словаря (строки)"
+        },
+        {
+          "key": "tokenizer.ggml.token_type",
+          "value": "\u003carray len=248320 type=Int32\u003e",
+          "description_ru": "Массив типов токенов (1=normal, 2=unknown, 3=control, 4=user-defined, 5=unused, 6=byte)"
+        },
+        {
+          "key": "tokenizer.ggml.merges",
+          "value": "\u003carray len=247587 type=String\u003e",
+          "description_ru": "Массив BPE-merge правил (\"a b\" → \"ab\") для BPE-токенизаторов"
+        },
+        {
+          "key": "tokenizer.ggml.eos_token_id",
+          "value": 248046,
+          "description_ru": "ID токена конца последовательности (EOS)"
+        },
+        {
+          "key": "tokenizer.ggml.padding_token_id",
+          "value": 248055,
+          "description_ru": "ID padding-токена"
+        },
+        {
+          "key": "tokenizer.ggml.bos_token_id",
+          "value": 248044,
+          "description_ru": "ID токена начала последовательности (BOS)"
+        },
+        {
+          "key": "tokenizer.chat_template",
+          "value": "{%- set image_count = namespace(value=0) %}\n{%- set video_count = namespace(value=0) %}\n{%- macro render_content(content, do_vision_count, is_system_content=false) %}\n    {%- if content is string %}\n        {{- content }}\n    {%- elif content is iterable and content is not mapping %}\n        {%- for item in content %}\n            {%- if 'image' in item or 'image_url' in item or item.type == 'image' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain images.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set image_count.value = image_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Picture ' ~ image_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|image_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'video' in item or item.type == 'video' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain videos.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set video_count.value = video_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Video ' ~ video_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|video_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'text' in item %}\n                {{- item.text }}\n            {%- else %}\n                {{- raise_exception('Unexpected item type in content.') }}\n            {%- endif %}\n        {%- endfor %}\n    {%- elif content is none or content is undefined %}\n        {{- '' }}\n    {%- else %}\n        {{- raise_exception('Unexpected content type.') }}\n    {%- endif %}\n{%- endmacro %}\n{%- if not messages %}\n    {{- raise_exception('No messages provided.') }}\n{%- endif %}\n{%- set num_sys = 0 %}\n{%- set merged_system = '' %}\n{%- if messages[0].role == 'system' or messages[0].role == 'developer' %}\n    {%- set first = render_content(messages[0].content, false, true)|trim %}\n    {%- if messages|length \u003e 1 and (messages[1].role == 'system' or messages[1].role == 'developer') %}\n        {%- set second = render_content(messages[1].content, false, true)|trim %}\n        {%- set merged_system = first + '\\n' + second %}\n        {%- set num_sys = 2 %}\n    {%- else %}\n        {%- set merged_system = first %}\n        {%- set num_sys = 1 %}\n    {%- endif %}\n{%- endif %}\n{%- if tools and tools is iterable and tools is not mapping %}\n    {{- '\u003c|im_start|\u003esystem\\n' }}\n    {{- \"# Tools\\n\\nYou have access to the following functions:\\n\\n\u003ctools\u003e\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n\u003c/tools\u003e\" }}\n    {{- '\\n\\nIf you choose to call a function ONLY reply in the following format with NO suffix:\\n\\n\u003ctool_call\u003e\\n\u003cfunction=example_function_name\u003e\\n\u003cparameter=example_parameter_1\u003e\\nvalue_1\\n\u003c/parameter\u003e\\n\u003cparameter=example_parameter_2\u003e\\nThis is the value for the second parameter\\nthat can span\\nmultiple lines\\n\u003c/parameter\u003e\\n\u003c/function\u003e\\n\u003c/tool_call\u003e\\n\\n\u003cIMPORTANT\u003e\\nReminder:\\n- Function calls MUST follow the specified format: an inner \u003cfunction=...\u003e\u003c/function\u003e block must be nested within \u003ctool_call\u003e\u003c/tool_call\u003e XML tags\\n- Required parameters MUST be specified\\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\\n\u003c/IMPORTANT\u003e' }}\n    {%- if merged_system %}\n        {{- '\\n\\n' + merged_system }}\n    {%- endif %}\n    {{- '\u003c|im_end|\u003e\\n' }}\n{%- else %}\n    {%- if merged_system %}\n        {{- '\u003c|im_start|\u003esystem\\n' + merged_system + '\u003c|im_end|\u003e\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for message in messages[::-1] %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- if ns.multi_step_tool and message.role == \"user\" %}\n        {%- set content = render_content(message.content, false)|trim %}\n        {%- if not(content.startswith('\u003ctool_response\u003e') and content.endswith('\u003c/tool_response\u003e')) %}\n            {%- set ns.multi_step_tool = false %}\n            {%- set ns.last_query_index = index %}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- for message in messages %}\n    {%- if loop.index0 \u003e= num_sys and message.role != \"system\" and message.role != \"developer\" %}\n    {%- set content = render_content(message.content, true)|trim %}\n    {%- if message.role == \"user\" %}\n        {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content + '\u003c|im_end|\u003e' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is string %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '\u003c/think\u003e' in content %}\n                {%- set reasoning_content = content.split('\u003c/think\u003e')[0].rstrip('\\n').split('\u003cthink\u003e')[-1].lstrip('\\n') %}\n                {%- set content = content.split('\u003c/think\u003e')[-1].lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n        {%- set reasoning_content = reasoning_content|trim %}\n        {%- if (preserve_thinking is defined and preserve_thinking is true) or (loop.index0 \u003e ns.last_query_index) %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n\u003cthink\u003e\\n' + reasoning_content + '\\n\u003c/think\u003e\\n\\n' + content }}\n        {%- else %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls and message.tool_calls is iterable and message.tool_calls is not mapping %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if tool_call.function is defined %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {%- if loop.first %}\n                    {%- if content|trim %}\n                        {{- '\\n\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- else %}\n                        {{- '\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- endif %}\n                {%- else %}\n                    {{- '\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                {%- endif %}\n                {%- if tool_call.arguments is mapping %}\n                    {%- for args_name in tool_call.arguments %}\n                        {%- set args_value = tool_call.arguments[args_name] %}\n                        {{- '\u003cparameter=' + args_name + '\u003e\\n' }}\n                        {%- set args_value = args_value | tojson | safe if args_value is mapping or (args_value is sequence and args_value is not string) else args_value | string %}\n                        {{- args_value }}\n                        {{- '\\n\u003c/parameter\u003e\\n' }}\n                    {%- endfor %}\n                {%- endif %}\n                {{- '\u003c/function\u003e\\n\u003c/tool_call\u003e' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '\u003c|im_end|\u003e\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.previtem and loop.previtem.role != \"tool\" %}\n            {{- '\u003c|im_start|\u003euser' }}\n        {%- endif %}\n        {{- '\\n\u003ctool_response\u003e\\n' }}\n        {{- content }}\n        {{- '\\n\u003c/tool_response\u003e' }}\n        {%- if not loop.last and loop.nextitem.role != \"tool\" %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- elif loop.last %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- endif %}\n    {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '\u003c|im_start|\u003eassistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '\u003cthink\u003e\\n\\n\u003c/think\u003e\\n\\n' }}\n    {%- else %}\n        {{- '\u003cthink\u003e\\n' }}\n    {%- endif %}\n{%- endif %}\n{#- Unsloth fixes - developer role, tool calling #}",
+          "description_ru": "Jinja-шаблон чат-промпта (форматирование ролей user/assistant/system)"
+        },
+        {
+          "key": "general.quantization_version",
+          "value": 2,
+          "description_ru": "Версия формата квантизации GGUF (текущая — 2)"
+        },
+        {
+          "key": "general.file_type",
+          "value": "13 (Q3_K_M)",
+          "description_ru": "Числовой код общей квантизации файла (enum LLAMA_FTYPE_*: 0=F32, 1=F16, 2=Q4_0, 7=Q8_0, 15=Q4_K_M, 18=Q6_K и т.д.)"
+        },
+        {
+          "key": "general.url",
+          "value": "https://huggingface.co/mradermacher/Huihui-Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated-GGUF",
+          "description_ru": "URL модели"
+        },
+        {
+          "key": "mradermacher.quantize_version",
+          "value": "2",
+          "description_ru": ""
+        },
+        {
+          "key": "mradermacher.quantized_by",
+          "value": "mradermacher",
+          "description_ru": ""
+        },
+        {
+          "key": "mradermacher.quantized_at",
+          "value": "2026-04-28T14:03:04+02:00",
+          "description_ru": ""
+        },
+        {
+          "key": "mradermacher.quantized_on",
+          "value": "nico1",
+          "description_ru": ""
+        },
+        {
+          "key": "general.source.url",
+          "value": "https://huggingface.co/huihui-ai/Huihui-Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated",
+          "description_ru": "URL исходной модели"
+        },
+        {
+          "key": "mradermacher.convert_type",
+          "value": "hf",
+          "description_ru": ""
+        }
+      ]
+    },
+    {
+      "name": "Qwen3.6-27B-Uncensored-HauhauCS-Aggressive-IQ3_M",
+      "model_path": "D:/progs/lmstudio/models/HauhauCS/Qwen3.6-27B-Uncensored-HauhauCS-Aggressive/Qwen3.6-27B-Uncensored-HauhauCS-Aggressive-IQ3_M.gguf",
+      "mmproj_path": "D:/progs/lmstudio/models/HauhauCS/Qwen3.6-27B-Uncensored-HauhauCS-Aggressive/mmproj-Qwen3.6-27B-Uncensored-HauhauCS-Aggressive-f16.gguf",
+      "mmproj_on": true,
+      "size": 12580873696,
+      "last_scan": "2026-05-11T15:30:52Z",
+      "flags": {},
       "params": [
         {
           "key": "general.architecture",
@@ -296,23 +2555,48 @@
           "description_ru": "Тип артефакта: \"model\", \"adapter\" (LoRA) и т.п."
         },
         {
+          "key": "general.sampling.top_k",
+          "value": 20,
+          "description_ru": "Рекомендуемый top-k по умолчанию"
+        },
+        {
+          "key": "general.sampling.top_p",
+          "value": 0.95,
+          "description_ru": "Рекомендуемый top-p (nucleus) по умолчанию"
+        },
+        {
+          "key": "general.sampling.temp",
+          "value": 1,
+          "description_ru": "Рекомендуемая авторами модели температура семплирования по умолчанию"
+        },
+        {
           "key": "general.name",
-          "value": "Qwen3.5-9B-Uncensored-HauhauCS-Aggressive-BF16",
+          "value": "Qwen3.6-27B-Uncensored-HauhauCS-Aggressive",
           "description_ru": "Человекочитаемое имя модели"
         },
         {
+          "key": "general.version",
+          "value": "v2",
+          "description_ru": "Версия модели"
+        },
+        {
+          "key": "general.finetune",
+          "value": "Aggressive",
+          "description_ru": ""
+        },
+        {
           "key": "general.basename",
-          "value": "Qwen3.5",
+          "value": "Qwen3.6",
           "description_ru": "Базовое имя модели без суффиксов квантизации/размера (например, \"Gemma-4-E4B-it\")"
         },
         {
           "key": "general.size_label",
-          "value": "9B",
+          "value": "27B",
           "description_ru": "Метка размера модели (\"4B\", \"9B\", \"70B\"), используется в имени файла"
         },
         {
           "key": "qwen35.block_count",
-          "value": 32,
+          "value": 64,
           "description_ru": "Количество трансформерных блоков (слоёв)"
         },
         {
@@ -322,17 +2606,17 @@
         },
         {
           "key": "qwen35.embedding_length",
-          "value": 4096,
+          "value": 5120,
           "description_ru": "Размерность скрытого состояния (hidden size, d_model)"
         },
         {
           "key": "qwen35.feed_forward_length",
-          "value": 12288,
+          "value": 17408,
           "description_ru": "Размерность промежуточного слоя FFN (intermediate size)"
         },
         {
           "key": "qwen35.attention.head_count",
-          "value": 16,
+          "value": 24,
           "description_ru": "Число голов внимания (Q)"
         },
         {
@@ -387,12 +2671,12 @@
         },
         {
           "key": "qwen35.ssm.time_step_rank",
-          "value": 32,
+          "value": 48,
           "description_ru": "Ранг низкоранговой параметризации шага Δt в SSM (dt_rank; обычно ceil(d_model/16))"
         },
         {
           "key": "qwen35.ssm.inner_size",
-          "value": 4096,
+          "value": 6144,
           "description_ru": "Внутренняя размерность SSM-блока (d_inner; обычно 2·embedding_length)"
         },
         {
@@ -441,8 +2725,13 @@
           "description_ru": "ID padding-токена"
         },
         {
+          "key": "tokenizer.ggml.bos_token_id",
+          "value": 248044,
+          "description_ru": "ID токена начала последовательности (BOS)"
+        },
+        {
           "key": "tokenizer.chat_template",
-          "value": "{%- set image_count = namespace(value=0) %}\n{%- set video_count = namespace(value=0) %}\n{%- macro render_content(content, do_vision_count, is_system_content=false) %}\n    {%- if content is string %}\n        {{- content }}\n    {%- elif content is iterable and content is not mapping %}\n        {%- for item in content %}\n            {%- if 'image' in item or 'image_url' in item or item.type == 'image' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain images.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set image_count.value = image_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Picture ' ~ image_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|image_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'video' in item or item.type == 'video' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain videos.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set video_count.value = video_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Video ' ~ video_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|video_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'text' in item %}\n                {{- item.text }}\n            {%- else %}\n                {{- raise_exception('Unexpected item type in content.') }}\n            {%- endif %}\n        {%- endfor %}\n    {%- elif content is none or content is undefined %}\n        {{- '' }}\n    {%- else %}\n        {{- raise_exception('Unexpected content type.') }}\n    {%- endif %}\n{%- endmacro %}\n{%- if not messages %}\n    {{- raise_exception('No messages provided.') }}\n{%- endif %}\n{%- if tools and tools is iterable and tools is not mapping %}\n    {{- '\u003c|im_start|\u003esystem\\n' }}\n    {{- \"# Tools\\n\\nYou have access to the following functions:\\n\\n\u003ctools\u003e\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n\u003c/tools\u003e\" }}\n    {{- '\\n\\nIf you choose to call a function ONLY reply in the following format with NO suffix:\\n\\n\u003ctool_call\u003e\\n\u003cfunction=example_function_name\u003e\\n\u003cparameter=example_parameter_1\u003e\\nvalue_1\\n\u003c/parameter\u003e\\n\u003cparameter=example_parameter_2\u003e\\nThis is the value for the second parameter\\nthat can span\\nmultiple lines\\n\u003c/parameter\u003e\\n\u003c/function\u003e\\n\u003c/tool_call\u003e\\n\\n\u003cIMPORTANT\u003e\\nReminder:\\n- Function calls MUST follow the specified format: an inner \u003cfunction=...\u003e\u003c/function\u003e block must be nested within \u003ctool_call\u003e\u003c/tool_call\u003e XML tags\\n- Required parameters MUST be specified\\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\\n\u003c/IMPORTANT\u003e' }}\n    {%- if messages[0].role == 'system' %}\n        {%- set content = render_content(messages[0].content, false, true)|trim %}\n        {%- if content %}\n            {{- '\\n\\n' + content }}\n        {%- endif %}\n    {%- endif %}\n    {{- '\u003c|im_end|\u003e\\n' }}\n{%- else %}\n    {%- if messages[0].role == 'system' %}\n        {%- set content = render_content(messages[0].content, false, true)|trim %}\n        {{- '\u003c|im_start|\u003esystem\\n' + content + '\u003c|im_end|\u003e\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for message in messages[::-1] %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- if ns.multi_step_tool and message.role == \"user\" %}\n        {%- set content = render_content(message.content, false)|trim %}\n        {%- if not(content.startswith('\u003ctool_response\u003e') and content.endswith('\u003c/tool_response\u003e')) %}\n            {%- set ns.multi_step_tool = false %}\n            {%- set ns.last_query_index = index %}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if ns.multi_step_tool %}\n    {{- raise_exception('No user query found in messages.') }}\n{%- endif %}\n{%- for message in messages %}\n    {%- set content = render_content(message.content, true)|trim %}\n    {%- if message.role == \"system\" %}\n        {%- if not loop.first %}\n            {{- raise_exception('System message must be at the beginning.') }}\n        {%- endif %}\n    {%- elif message.role == \"user\" %}\n        {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content + '\u003c|im_end|\u003e' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is string %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '\u003c/think\u003e' in content %}\n                {%- set reasoning_content = content.split('\u003c/think\u003e')[0].rstrip('\\n').split('\u003cthink\u003e')[-1].lstrip('\\n') %}\n                {%- set content = content.split('\u003c/think\u003e')[-1].lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n        {%- set reasoning_content = reasoning_content|trim %}\n        {%- if loop.index0 \u003e ns.last_query_index %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n\u003cthink\u003e\\n' + reasoning_content + '\\n\u003c/think\u003e\\n\\n' + content }}\n        {%- else %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls and message.tool_calls is iterable and message.tool_calls is not mapping %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if tool_call.function is defined %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {%- if loop.first %}\n                    {%- if content|trim %}\n                        {{- '\\n\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- else %}\n                        {{- '\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- endif %}\n                {%- else %}\n                    {{- '\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                {%- endif %}\n                {%- if tool_call.arguments is defined %}\n                    {%- for args_name, args_value in tool_call.arguments|items %}\n                        {{- '\u003cparameter=' + args_name + '\u003e\\n' }}\n                        {%- set args_value = args_value | tojson | safe if args_value is mapping or (args_value is sequence and args_value is not string) else args_value | string %}\n                        {{- args_value }}\n                        {{- '\\n\u003c/parameter\u003e\\n' }}\n                    {%- endfor %}\n                {%- endif %}\n                {{- '\u003c/function\u003e\\n\u003c/tool_call\u003e' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '\u003c|im_end|\u003e\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.previtem and loop.previtem.role != \"tool\" %}\n            {{- '\u003c|im_start|\u003euser' }}\n        {%- endif %}\n        {{- '\\n\u003ctool_response\u003e\\n' }}\n        {{- content }}\n        {{- '\\n\u003c/tool_response\u003e' }}\n        {%- if not loop.last and loop.nextitem.role != \"tool\" %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- elif loop.last %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- endif %}\n    {%- else %}\n        {{- raise_exception('Unexpected message role.') }}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '\u003c|im_start|\u003eassistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '\u003cthink\u003e\\n\\n\u003c/think\u003e\\n\\n' }}\n    {%- else %}\n        {{- '\u003cthink\u003e\\n' }}\n    {%- endif %}\n{%- endif %}",
+          "value": "{%- set image_count = namespace(value=0) %}\n{%- set video_count = namespace(value=0) %}\n{%- macro render_content(content, do_vision_count, is_system_content=false) %}\n    {%- if content is string %}\n        {{- content }}\n    {%- elif content is iterable and content is not mapping %}\n        {%- for item in content %}\n            {%- if 'image' in item or 'image_url' in item or item.type == 'image' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain images.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set image_count.value = image_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Picture ' ~ image_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|image_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'video' in item or item.type == 'video' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain videos.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set video_count.value = video_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Video ' ~ video_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '\u003c|vision_start|\u003e\u003c|video_pad|\u003e\u003c|vision_end|\u003e' }}\n            {%- elif 'text' in item %}\n                {{- item.text }}\n            {%- else %}\n                {{- raise_exception('Unexpected item type in content.') }}\n            {%- endif %}\n        {%- endfor %}\n    {%- elif content is none or content is undefined %}\n        {{- '' }}\n    {%- else %}\n        {{- raise_exception('Unexpected content type.') }}\n    {%- endif %}\n{%- endmacro %}\n{%- if not messages %}\n    {{- raise_exception('No messages provided.') }}\n{%- endif %}\n{%- if tools and tools is iterable and tools is not mapping %}\n    {{- '\u003c|im_start|\u003esystem\\n' }}\n    {{- \"# Tools\\n\\nYou have access to the following functions:\\n\\n\u003ctools\u003e\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n\u003c/tools\u003e\" }}\n    {{- '\\n\\nIf you choose to call a function ONLY reply in the following format with NO suffix:\\n\\n\u003ctool_call\u003e\\n\u003cfunction=example_function_name\u003e\\n\u003cparameter=example_parameter_1\u003e\\nvalue_1\\n\u003c/parameter\u003e\\n\u003cparameter=example_parameter_2\u003e\\nThis is the value for the second parameter\\nthat can span\\nmultiple lines\\n\u003c/parameter\u003e\\n\u003c/function\u003e\\n\u003c/tool_call\u003e\\n\\n\u003cIMPORTANT\u003e\\nReminder:\\n- Function calls MUST follow the specified format: an inner \u003cfunction=...\u003e\u003c/function\u003e block must be nested within \u003ctool_call\u003e\u003c/tool_call\u003e XML tags\\n- Required parameters MUST be specified\\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\\n\u003c/IMPORTANT\u003e' }}\n    {%- if messages[0].role == 'system' %}\n        {%- set content = render_content(messages[0].content, false, true)|trim %}\n        {%- if content %}\n            {{- '\\n\\n' + content }}\n        {%- endif %}\n    {%- endif %}\n    {{- '\u003c|im_end|\u003e\\n' }}\n{%- else %}\n    {%- if messages[0].role == 'system' %}\n        {%- set content = render_content(messages[0].content, false, true)|trim %}\n        {{- '\u003c|im_start|\u003esystem\\n' + content + '\u003c|im_end|\u003e\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for message in messages[::-1] %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- if ns.multi_step_tool and message.role == \"user\" %}\n        {%- set content = render_content(message.content, false)|trim %}\n        {%- if not(content.startswith('\u003ctool_response\u003e') and content.endswith('\u003c/tool_response\u003e')) %}\n            {%- set ns.multi_step_tool = false %}\n            {%- set ns.last_query_index = index %}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if ns.multi_step_tool %}\n    {{- raise_exception('No user query found in messages.') }}\n{%- endif %}\n{%- for message in messages %}\n    {%- set content = render_content(message.content, true)|trim %}\n    {%- if message.role == \"system\" %}\n        {%- if not loop.first %}\n            {{- raise_exception('System message must be at the beginning.') }}\n        {%- endif %}\n    {%- elif message.role == \"user\" %}\n        {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content + '\u003c|im_end|\u003e' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is string %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- else %}\n            {%- if '\u003c/think\u003e' in content %}\n                {%- set reasoning_content = content.split('\u003c/think\u003e')[0].rstrip('\\n').split('\u003cthink\u003e')[-1].lstrip('\\n') %}\n                {%- set content = content.split('\u003c/think\u003e')[-1].lstrip('\\n') %}\n            {%- endif %}\n        {%- endif %}\n        {%- set reasoning_content = reasoning_content|trim %}\n        {%- if (preserve_thinking is defined and preserve_thinking is true) or (loop.index0 \u003e ns.last_query_index) %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n\u003cthink\u003e\\n' + reasoning_content + '\\n\u003c/think\u003e\\n\\n' + content }}\n        {%- else %}\n            {{- '\u003c|im_start|\u003e' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls and message.tool_calls is iterable and message.tool_calls is not mapping %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if tool_call.function is defined %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {%- if loop.first %}\n                    {%- if content|trim %}\n                        {{- '\\n\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- else %}\n                        {{- '\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                    {%- endif %}\n                {%- else %}\n                    {{- '\\n\u003ctool_call\u003e\\n\u003cfunction=' + tool_call.name + '\u003e\\n' }}\n                {%- endif %}\n                {%- if tool_call.arguments is defined %}\n                    {%- for args_name, args_value in tool_call.arguments|items %}\n                        {{- '\u003cparameter=' + args_name + '\u003e\\n' }}\n                        {%- set args_value = args_value | string if args_value is string else args_value | tojson | safe %}\n                        {{- args_value }}\n                        {{- '\\n\u003c/parameter\u003e\\n' }}\n                    {%- endfor %}\n                {%- endif %}\n                {{- '\u003c/function\u003e\\n\u003c/tool_call\u003e' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '\u003c|im_end|\u003e\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.previtem and loop.previtem.role != \"tool\" %}\n            {{- '\u003c|im_start|\u003euser' }}\n        {%- endif %}\n        {{- '\\n\u003ctool_response\u003e\\n' }}\n        {{- content }}\n        {{- '\\n\u003c/tool_response\u003e' }}\n        {%- if not loop.last and loop.nextitem.role != \"tool\" %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- elif loop.last %}\n            {{- '\u003c|im_end|\u003e\\n' }}\n        {%- endif %}\n    {%- else %}\n        {{- raise_exception('Unexpected message role.') }}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '\u003c|im_start|\u003eassistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '\u003cthink\u003e\\n\\n\u003c/think\u003e\\n\\n' }}\n    {%- else %}\n        {{- '\u003cthink\u003e\\n' }}\n    {%- endif %}\n{%- endif %}",
           "description_ru": "Jinja-шаблон чат-промпта (форматирование ролей user/assistant/system)"
         },
         {
@@ -452,8 +2741,33 @@
         },
         {
           "key": "general.file_type",
-          "value": "15 (Q4_K_M)",
+          "value": "27 (IQ3_M)",
           "description_ru": "Числовой код общей квантизации файла (enum LLAMA_FTYPE_*: 0=F32, 1=F16, 2=Q4_0, 7=Q8_0, 15=Q4_K_M, 18=Q6_K и т.д.)"
+        },
+        {
+          "key": "general.author",
+          "value": "HauhauCS",
+          "description_ru": "Автор модели"
+        },
+        {
+          "key": "quantize.imatrix.file",
+          "value": "Qwen3.6-27B-Uncensored-HauhauCS-Aggressive.imatrix",
+          "description_ru": "Файл importance-matrix, использованный при квантизации"
+        },
+        {
+          "key": "quantize.imatrix.dataset",
+          "value": "groups_merged.txt",
+          "description_ru": "Датасет для importance-matrix"
+        },
+        {
+          "key": "quantize.imatrix.entries_count",
+          "value": 496,
+          "description_ru": "Число записей в importance-matrix"
+        },
+        {
+          "key": "quantize.imatrix.chunks_count",
+          "value": 93,
+          "description_ru": "Число чанков в importance-matrix"
         }
       ]
     }
